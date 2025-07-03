@@ -1,0 +1,58 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import ProductGrid from "../../components/product/ProductGrid.astro";
+import { fetchProducts } from "../../lib/gumroad";
+
+// For now, we'll show all products filtered by "bundle" tags
+let products: any[] = [];
+try {
+    console.log("Fetching products for bundles collection...");
+    const allProducts = await fetchProducts(20);
+    // Filter products that might be bundles (could be enhanced with proper collection filtering)
+    products = allProducts.filter(
+        (product: any) =>
+            product.tags?.some((tag: string) =>
+                tag.toLowerCase().includes("bundle"),
+            ) || product.title.toLowerCase().includes("bundle"),
+    );
+    console.log(`Successfully fetched ${products.length} bundle products`);
+} catch (error) {
+    console.error("Failed to fetch bundle products:", error);
+}
+---
+
+<Layout title="Bundles - TSK Sound Kits">
+    <main class="min-h-screen bg-[#151515] py-12">
+        <div class="container mx-auto px-4">
+            <!-- Collection Header -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
+                    BUNDLES
+                </h1>
+                <p class="text-gray-400 text-lg max-w-2xl mx-auto">
+                    Curated bundles of sound packs, presets, and samples. Get
+                    more value with our carefully crafted bundle collections.
+                </p>
+            </div>
+
+            <!-- Products Grid -->
+            {
+                products.length > 0 ? (
+                    <ProductGrid products={products} />
+                ) : (
+                    <div class="text-center py-12">
+                        <p class="text-gray-400 text-lg">
+                            No bundles available at the moment. Check back soon!
+                        </p>
+                        <a
+                            href="/products"
+                            class="inline-block mt-4 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                        >
+                            Browse All Products
+                        </a>
+                    </div>
+                )
+            }
+        </div>
+    </main>
+</Layout>

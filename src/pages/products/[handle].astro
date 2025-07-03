@@ -1,0 +1,257 @@
+---
+export const prerender = false;
+
+import Layout from '../../layouts/Layout.astro';
+import { fetchProductById, fetchProducts } from '../../lib/gumroad';
+import AddToCartButton from '../../components/ui/AddToCartButton.astro';
+import type { GumroadProduct } from '../../lib/types';
+
+// Get the product handle (ID) from the URL
+const { handle } = Astro.params;
+
+if (!handle) {
+  throw new Error('Product ID is required');
+}
+
+// Fetch the specific product
+let product: GumroadProduct | null = null;
+let relatedProducts: GumroadProduct[] = [];
+let error: string | null = null;
+
+try {
+  console.log(`Fetching product: ${handle}`);
+  product = await fetchProductById(handle);
+  
+  if (!product) {
+    return Astro.redirect('/404');
+  }
+
+  // Fetch related products (other products from the same seller)
+  const allProducts = await fetchProducts(12);
+  relatedProducts = allProducts
+    .filter(p => p.id !== product!.id)
+    .slice(0, 4);
+
+  console.log(`Successfully fetched product: ${product.title}`);
+} catch (e) {
+  error = e instanceof Error ? e.message : 'Failed to fetch product';
+  console.error('Error fetching product:', e);
+}
+
+
+---
+
+<Layout title={product?.title || 'Product Not Found'}>
+  <main class="min-h-screen bg-white relative">
+    <!-- Main Content -->
+    <div class="pt-20 pb-16 px-4">
+      {error && (
+        <div class="max-w-6xl mx-auto mb-8">
+          <div class="bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-xl">
+            <strong>Error:</strong> {error}
+          </div>
+        </div>
+      )}
+
+      {product && (
+        <>
+          <!-- Product Hero Section -->
+          <div class="max-w-6xl mx-auto mb-16">
+            <div class="grid lg:grid-cols-2 gap-12 items-start">
+              <!-- Left: Product Image -->
+              <div class="space-y-6">
+                <div class="relative group">
+                  <div class="aspect-square bg-gray-50 overflow-hidden border border-gray-200 shadow-lg">
+                    {product.thumbnail_url || product.cover_url ? (
+                      <img 
+                        src={product.thumbnail_url || product.cover_url}
+                        alt={product.title}
+                        class="main-product-image w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div class="w-full h-full flex items-center justify-center text-gray-400">
+                        <div class="text-center">
+                          <div class="text-6xl mb-4">🎵</div>
+                          <span class="text-lg">No image available</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <!-- Image badges -->
+                  <div class="absolute top-4 left-4 space-y-2">
+                    <div class="bg-black text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
+                      Digital Product
+                    </div>
+                    {product.tags && product.tags.toLowerCase().includes('new') && (
+                      <div class="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
+                        NEW
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right: Product Details -->
+              <div class="space-y-6">
+                <!-- Header -->
+                <div class="space-y-4">
+                  <div class="text-gray-600 text-lg font-medium tracking-wider">
+                    TSK Sound Kits
+                  </div>
+                  <div class="min-h-[4rem] flex items-start">
+                    <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-black leading-tight line-clamp-3">
+                      {product.title}
+                    </h1>
+                  </div>
+                </div>
+
+                <!-- Price -->
+                <div class="bg-gray-50 p-6 border border-gray-200">
+                  <div class="text-3xl font-bold text-black mb-2">
+                    {product.formatted_price || `$${(product.price / 100).toFixed(2)}`}
+                    <span class="text-lg text-gray-600 ml-2">
+                      {product.currency || 'USD'}
+                    </span>
+                  </div>
+                  <div class="text-gray-600 text-sm">
+                    Instant digital download
+                  </div>
+                </div>
+
+                <!-- Description -->
+                {product.description && (
+                  <div class="bg-gray-50 p-6 border border-gray-200">
+                    <h3 class="text-black font-semibold mb-3">About This Pack</h3>
+                    <div class="text-gray-700 leading-relaxed">
+                      <p id="description-text" class="description-text">
+                        {product.description.length <= 160 ? product.description : product.description.substring(0, 160) + '...'}
+                      </p>
+                      {product.description.length > 160 && (
+                        <button 
+                          id="toggle-description"
+                          class="text-black font-medium hover:underline mt-2 focus:outline-none"
+                          data-full-description={product.description}
+                          data-truncated-description={product.description.substring(0, 160) + '...'}
+                        >
+                          See more
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                <!-- Add to Cart / Buy Now -->
+                <div class="space-y-6">
+                  <div class="transform hover:scale-105 transition-transform duration-200">
+                    <AddToCartButton 
+                      productId={product.id}
+                      productTitle={product.title}
+                      price={product.price}
+                      productUrl={product.url}
+                      formattedPrice={product.formatted_price}
+                    />
+                  </div>
+                </div>
+
+                <!-- Tags -->
+                {product.tags && (
+                  <div class="space-y-3">
+                    <h3 class="text-black font-semibold">Tags</h3>
+                    <div class="flex flex-wrap gap-2">
+                      {product.tags.split(',').map(tag => (
+                        <span class="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full border border-gray-200 hover:bg-gray-200 transition-colors">
+                          {tag.trim()}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <!-- Product Info Section -->
+          <div class="max-w-6xl mx-auto mb-16">
+            <div class="bg-gray-50 p-8 border border-gray-200 rounded-lg">
+              <h2 class="text-2xl font-bold text-black mb-6">Product Details</h2>
+              <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                  <h3 class="font-semibold text-black mb-2">Sales</h3>
+                  <p class="text-gray-600">{product.sales_count || 0} sales</p>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-black mb-2">Published</h3>
+                  <p class="text-gray-600">
+                    {product.created_at ? new Date(product.created_at).toLocaleDateString() : 'N/A'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Related Products -->
+          {relatedProducts.length > 0 && (
+            <div class="max-w-6xl mx-auto">
+              <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-black mb-4">You Might Also Like</h2>
+                <p class="text-gray-600">Discover more sounds from our collection</p>
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {relatedProducts.map((relatedProduct) => (
+                  <div class="group">
+                    <a href={`/products/${relatedProduct.id}`} class="block">
+                      <div class="aspect-square mb-4 overflow-hidden rounded-lg">
+                        <img
+                          src={relatedProduct.thumbnail_url || relatedProduct.cover_url || "/images/bg.png"}
+                          alt={relatedProduct.title}
+                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                          onerror="this.src='/images/bg.png';"
+                        />
+                      </div>
+                      <h3 class="text-black font-bold text-lg mb-2 group-hover:text-gray-600 transition-colors line-clamp-2">
+                        {relatedProduct.title}
+                      </h3>
+                      <p class="text-gray-600 font-semibold">
+                        {relatedProduct.formatted_price || `$${(relatedProduct.price / 100).toFixed(2)}`}
+                      </p>
+                    </a>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  </main>
+
+  <script>
+    // Description toggle functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const toggleButton = document.getElementById('toggle-description');
+      const descriptionText = document.getElementById('description-text');
+      
+      if (toggleButton && descriptionText) {
+        let isExpanded = false;
+        
+        toggleButton.addEventListener('click', function() {
+          const fullDescription = toggleButton.getAttribute('data-full-description');
+          const truncatedDescription = toggleButton.getAttribute('data-truncated-description');
+          
+          if (isExpanded) {
+            descriptionText.textContent = truncatedDescription;
+            toggleButton.textContent = 'See more';
+            isExpanded = false;
+          } else {
+            descriptionText.textContent = fullDescription;
+            toggleButton.textContent = 'See less';
+            isExpanded = true;
+          }
+        });
+      }
+    });
+  </script>
+</Layout> 

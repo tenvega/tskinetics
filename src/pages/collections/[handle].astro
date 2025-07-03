@@ -1,0 +1,111 @@
+---
+export const prerender = false;
+
+import Layout from '../../layouts/Layout.astro';
+import { fetchCollectionByHandle } from '../../lib/gumroad';
+import ProductGrid from '../../components/product/ProductGrid.astro';
+
+// Get the collection handle from the URL
+const { handle } = Astro.params;
+
+if (!handle) {
+  throw new Error('Collection handle is required');
+}
+
+// Fetch the specific collection
+let collection: any = null;
+let error: string | null = null;
+
+try {
+  console.log(`Fetching collection: ${handle}`);
+  collection = await fetchCollectionByHandle(handle);
+  
+  if (!collection) {
+    return Astro.redirect('/404');
+  }
+
+  console.log(`Successfully fetched collection: ${collection.title} with ${collection.products.length} products`);
+} catch (e) {
+  error = e instanceof Error ? e.message : 'Failed to fetch collection';
+  console.error('Error fetching collection:', e);
+}
+---
+
+<Layout title={collection?.title || 'Collection Not Found'}>
+  <main class="min-h-screen">
+    {error && (
+      <div class="container mx-auto px-4 py-8">
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          <strong>Error:</strong> {error}
+        </div>
+      </div>
+    )}
+
+    {collection && (
+      <>
+        <!-- Collection Header -->
+        <div class="container mx-auto px-4 py-8">
+          <div class="text-center mb-12">
+            {collection.image && (
+              <div class="mb-6">
+                <img 
+                  src={collection.image.originalSrc}
+                  alt={collection.image.altText || collection.title}
+                  class="w-32 h-32 mx-auto rounded-lg object-cover"
+                />
+              </div>
+            )}
+            
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
+              {collection.title}
+            </h1>
+            
+            {collection.description && (
+              <p class="text-gray-300 text-lg max-w-2xl mx-auto leading-relaxed">
+                {collection.description}
+              </p>
+            )}
+            
+            <div class="mt-6">
+              <span class="text-orange-500 font-semibold">
+                {collection.products.length} {collection.products.length === 1 ? 'Product' : 'Products'}
+              </span>
+            </div>
+          </div>
+
+          <!-- Breadcrumb -->
+          <nav class="flex items-center space-x-2 text-sm text-gray-400 mb-8">
+            <a href="/" class="hover:text-white transition-colors">
+              Home
+            </a>
+            <span>•</span>
+            <a href="/collections" class="hover:text-white transition-colors">
+              Collections
+            </a>
+            <span>•</span>
+            <span class="text-white">
+              {collection.title}
+            </span>
+          </nav>
+
+          <!-- Products Grid -->
+          {collection.products.length > 0 ? (
+            <ProductGrid products={collection.products} />
+          ) : (
+            <div class="text-center py-16">
+              <div class="text-gray-400 text-xl mb-4">
+                No products found in this collection
+              </div>
+              <a 
+                href="/products"
+                class="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+              >
+                Browse All Products
+              </a>
+            </div>
+          )}
+        </div>
+      </>
+    )}
+  </main>
+</Layout> 

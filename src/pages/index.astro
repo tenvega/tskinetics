@@ -1,0 +1,599 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { fetchProducts, siteAssets } from "../lib/gumroad";
+import type { GumroadProduct } from "../lib/types";
+
+let products: GumroadProduct[] = [];
+let error: string | null = null;
+
+try {
+	products = await fetchProducts(8);
+	console.log(
+		`Successfully fetched ${products.length} products for homepage`,
+	);
+} catch (e) {
+	error = (e as Error).message;
+	console.error("Failed to fetch Gumroad products:", e);
+}
+
+// Use first 4 products for "New Releases" section
+const newReleases = products.slice(0, 4);
+---
+
+<Layout>
+	<!-- Hero Section - Sonic Entropy Featured -->
+	<section
+		class="w-full py-8 md:py-16 relative"
+		style="background-image: url('/images/bg.png'); background-size: cover; background-position: center; background-repeat: no-repeat;"
+	>
+		<!-- Transparent Overlay -->
+		<div class="absolute inset-0 bg-black/85"></div>
+
+		<!-- Content -->
+		<div class="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
+			<div
+				class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-20 py-12 md:py-24"
+			>
+				<!-- Left Side - Product Info -->
+				<div
+					class="flex flex-col justify-center space-y-6 pr-0 lg:pr-8"
+				>
+					<!-- New Release Label -->
+					<h2
+						class="text-white text-lg md:text-xl font-normal uppercase tracking-wide font-['Alexandria'] leading-tight"
+					>
+						new Release
+					</h2>
+
+					<!-- Main Title -->
+					<h1
+						class="text-white text-4xl md:text-5xl lg:text-6xl font-normal font-['Alexandria'] leading-tight"
+					>
+						<strong>SONIC ENTROPY</strong>
+					</h1>
+
+					<!-- Description -->
+					<div class="py-2">
+						<p
+							class="text-[#DDDDDD] text-sm md:text-base leading-relaxed font-['Inter'] max-w-full"
+						>
+							Experience our complete experimental audio
+							collection featuring Temporal Fauna's evolving
+							soundscapes, Replikas' authentic modular percussion,
+							and Interference Volume One's distinctive MicroFreak
+							textures, all in one comprehensive package. This
+							versatile bundle delivers over 600 meticulously
+							crafted sounds spanning atmospheric drones, complex
+							modular drums, glitched percussion, warped chords,
+							and evolving textures. Perfect for electronic
+							producers, film composers, and sound designers
+							seeking unique sonic elements that blend organic
+							unpredictability with technical precision. All
+							samples are royalty-free, professionally processed
+							at 24-bit quality, and ready to enhance any
+							production environment.
+						</p>
+					</div>
+
+					<!-- CTA Button -->
+					<div class="pt-2">
+						<a
+							href="https://tehnsoundkits.com/collections/bundles/products/sonic-entropy-bundle"
+							target="_self"
+							class="inline-flex items-center justify-center px-6 py-2 bg-[#151515] border border-[#f3f3f3] text-[#f3f3f3] text-base md:text-lg font-bold font-['Inter'] leading-relaxed rounded-lg hover:bg-[#2266ff] hover:text-[#f3f3f3] transition-colors duration-300"
+						>
+							LEARN MORE
+						</a>
+					</div>
+				</div>
+
+				<!-- Right Side - Product Visual -->
+				<div class="flex justify-center order-first lg:order-last">
+					<div class="w-full max-w-lg">
+						<a
+							href="https://tehnsoundkits.com/collections/bundles/products/sonic-entropy-bundle"
+							target="_blank"
+							class="block rounded-lg overflow-hidden"
+						>
+							<img
+								src="//tehnsoundkits.com/cdn/shop/files/gempages_552427883264476290-ab1b4084-bb46-41a4-8cbf-d6267fca0e78.png?v=606652978065471714"
+								alt="Sonic Entropy Bundle"
+								class="w-full h-auto object-cover"
+								width="100%"
+							/>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- New Releases Section -->
+	<section class="bg-[#151515] py-20">
+		<div class="max-w-7xl mx-auto px-4">
+			<div class="text-center mb-16">
+				<h2 class="text-4xl font-bold text-white mb-4">NEW RELEASES</h2>
+				<a
+					href="/collections"
+					class="text-gray-400 hover:text-white transition-colors underline"
+				>
+					VIEW FULL COLLECTION HERE
+				</a>
+			</div>
+
+			{
+				error ? (
+					<div class="text-center py-12">
+						<div class="bg-red-900/50 border border-red-700 rounded-lg p-6 max-w-2xl mx-auto">
+							<h3 class="text-red-400 font-semibold text-lg mb-2">
+								Error Loading Products
+							</h3>
+							<p class="text-red-300 text-sm mb-4">{error}</p>
+							<p class="text-gray-400 text-xs">
+								Please check your Gumroad configuration in the
+								.env file and ensure your API token is correct.
+							</p>
+						</div>
+					</div>
+				) : newReleases.length > 0 ? (
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+						{newReleases.map((product: GumroadProduct) => {
+							const imageUrl =
+								product.thumbnail_url || product.cover_url;
+							const formattedPrice = product.formatted_price;
+							const productUrl = product.url;
+
+							return (
+								<div class="group">
+									<a
+										href={productUrl}
+										class="block"
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										<div class="aspect-square mb-4 overflow-hidden rounded-lg">
+											<img
+												src={
+													imageUrl ||
+													"/api/placeholder/400/400"
+												}
+												alt={product.title}
+												class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+											/>
+										</div>
+									</a>
+									<a
+										href={productUrl}
+										class="block"
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										<h3 class="text-white font-bold text-xl mb-2 uppercase hover:text-gray-300 transition-colors h-14 flex items-center">
+											{product.title}
+										</h3>
+									</a>
+									<p class="text-white text-xl font-semibold mb-4">
+										{formattedPrice}
+									</p>
+									<a
+										href={productUrl}
+										target="_blank"
+										rel="noopener noreferrer"
+										class="inline-block border border-white text-white px-6 py-2 hover:bg-white hover:text-black transition-colors duration-300 text-sm font-semibold"
+									>
+										VIEW PRODUCT
+									</a>
+								</div>
+							);
+						})}
+					</div>
+				) : (
+					<div class="text-center py-12">
+						<div class="bg-gray-800 rounded-lg p-8 max-w-2xl mx-auto">
+							<h3 class="text-white font-semibold text-lg mb-2">
+								No Products Available
+							</h3>
+							<p class="text-gray-400 mb-4">
+								We're currently updating our product catalog.
+								Please check back soon!
+							</p>
+							<a
+								href="/products"
+								class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors inline-block"
+							>
+								Browse All Products
+							</a>
+						</div>
+					</div>
+				)
+			}
+		</div>
+	</section>
+
+	<!-- Save on Curated Collections Section -->
+	<section
+		class="py-20"
+		style="background: linear-gradient(130deg, #52FFF3, #000503)"
+	>
+		<div class="max-w-7xl mx-auto px-4">
+			<div class="text-center mb-16">
+				<p class="text-white text-sm uppercase tracking-wide mb-2">
+					ALL BUNDLES
+				</p>
+				<h2 class="text-5xl font-bold text-white">
+					SAVE ON CURATED COLLECTIONS
+				</h2>
+			</div>
+
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+				<!-- FM Percussion Bundle -->
+				<div class="bg-[#151515] rounded-lg overflow-hidden">
+					<div class="relative p-6">
+						<!-- Background Image -->
+						<img
+							src={siteAssets.bundles.fmPercussion}
+							alt="FM Percussion Bundle"
+							class="w-full h-auto object-contain"
+						/>
+					</div>
+					<div class="p-8">
+						<h3 class="text-white text-3xl font-bold mb-4">
+							FM PERCUSSION
+						</h3>
+						<p class="text-gray-300 mb-6 leading-relaxed">
+							The FM Drums & Percussion Bundle combines the
+							dynamic sounds of FM Vapor Drums and GenArch Cycle,
+							delivering punchy kicks, crisp snares, metallic
+							crashes, and layered noise. With its mix of
+							precision and experimental textures, this collection
+							is ideal for adding depth and complexity to any
+							genre or creative project.
+						</p>
+						<div class="flex items-center justify-between">
+							<div class="flex items-center space-x-4">
+								<span class="text-white text-2xl font-bold"
+									>$40</span
+								>
+								<span class="text-gray-400 line-through"
+									>$50</span
+								>
+							</div>
+							<button
+								class="border border-white text-white px-6 py-3 hover:bg-white hover:text-black transition-colors duration-300 font-semibold"
+							>
+								BUY BUNDLE
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<!-- Sonic Entropy Bundle -->
+				<div class="bg-[#151515] rounded-lg overflow-hidden">
+					<div class="relative p-6">
+						<!-- Background Image -->
+						<img
+							src={siteAssets.bundles.sonicEntropy}
+							alt="Sonic Entropy Bundle"
+							class="w-full h-auto object-contain"
+						/>
+					</div>
+					<div class="p-8">
+						<h3 class="text-white text-3xl font-bold mb-4">
+							SONIC ENTROPY
+						</h3>
+						<p class="text-gray-300 mb-6 leading-relaxed">
+							Includes Temporal Fauna, Replikas Modular Drums, and
+							Interference Volume One, offering rich soundscapes,
+							modular percussion, and glitch-infused textures.
+							With its blend of atmospheric layers and detailed
+							sonic elements, this collection is perfect for
+							adding depth and unpredictability to any composition
+							or sound design project.
+						</p>
+						<div class="flex items-center justify-between">
+							<div class="flex items-center space-x-4">
+								<span class="text-white text-2xl font-bold"
+									>$50</span
+								>
+								<span class="text-gray-400 line-through"
+									>$70</span
+								>
+							</div>
+							<button
+								class="border border-white text-white px-6 py-3 hover:bg-white hover:text-black transition-colors duration-300 font-semibold"
+							>
+								BUY BUNDLE
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- TSK Intro Kit Section -->
+	<section
+		class="py-20"
+		style="background: linear-gradient(141deg, #040E17, #C0093B)"
+	>
+		<div class="max-w-4xl mx-auto px-4 text-center">
+			<p class="text-white text-sm uppercase tracking-wide mb-4">
+				FREE 300+ SOUNDS
+			</p>
+			<h2 class="text-5xl font-bold text-white mb-12">TSK INTRO KIT</h2>
+
+			<div class="relative max-w-md mx-auto mb-12">
+				<!-- Kit Visual -->
+				<div class="aspect-square rounded-lg relative overflow-hidden">
+					<!-- Background Image -->
+					<img
+						src={siteAssets.freeKits.threehundredFree}
+						alt="TSK Intro Kit - 300+ Free Sounds"
+						class="w-full h-full object-cover"
+					/>
+					<div class="absolute inset-0 bg-[#151515]/20"></div>
+				</div>
+			</div>
+
+			<button
+				class="bg-yellow-500 text-black px-8 py-4 rounded font-bold text-lg hover:bg-yellow-400 transition-colors duration-300"
+			>
+				DOWNLOAD
+			</button>
+		</div>
+	</section>
+
+	<!-- Curated Sound Selections Section -->
+	<section class="bg-gray-100 py-20">
+		<div class="max-w-7xl mx-auto px-4">
+			<div class="text-center mb-16">
+				<a
+					href="/collections"
+					class="text-black hover:text-gray-600 transition-colors underline text-sm"
+				>
+					View All Collections Here
+				</a>
+				<h2 class="text-4xl font-bold text-black mt-4">
+					CHECK OUT CURATED SOUND SELECTIONS
+				</h2>
+			</div>
+
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+				<!-- Drum Kits -->
+				<div
+					class="bg-[#151515] rounded-lg p-8 flex items-center space-x-6"
+				>
+					<div class="flex-1">
+						<h3 class="text-white text-2xl font-bold mb-4">
+							DRUM KITS
+						</h3>
+						<p class="text-gray-300 mb-6 leading-relaxed">
+							Curated collections of punchy, nuanced drum sounds,
+							designed to add depth and character to your beats.
+						</p>
+						<a
+							href="/drum-kits"
+							class="text-white underline hover:text-gray-300 transition-colors"
+						>
+							Click to View Products
+						</a>
+					</div>
+					<div class="w-32 h-32 rounded-lg overflow-hidden">
+						<img
+							src={siteAssets.curatedSelections.drumKits}
+							alt="Drum Kits"
+							class="w-full h-full object-cover"
+						/>
+					</div>
+				</div>
+
+				<!-- One Shots -->
+				<div
+					class="bg-[#151515] rounded-lg p-8 flex items-center space-x-6"
+				>
+					<div class="flex-1">
+						<h3 class="text-white text-2xl font-bold mb-4">
+							ONE SHOTS
+						</h3>
+						<p class="text-gray-300 mb-6 leading-relaxed">
+							A versatile mix of drum hits, chords, SFX, ideal for
+							detailed sound design and creative layering.
+						</p>
+						<a
+							href="/one-shots"
+							class="text-white underline hover:text-gray-300 transition-colors"
+						>
+							Click to View Products
+						</a>
+					</div>
+					<div class="w-32 h-32 rounded-lg overflow-hidden">
+						<img
+							src={siteAssets.curatedSelections.oneShots}
+							alt="One Shots"
+							class="w-full h-full object-cover"
+						/>
+					</div>
+				</div>
+
+				<!-- Presets -->
+				<div
+					class="bg-[#151515] rounded-lg p-8 flex items-center space-x-6"
+				>
+					<div class="flex-1">
+						<h3 class="text-white text-2xl font-bold mb-4">
+							PRESETS
+						</h3>
+						<p class="text-gray-300 mb-6 leading-relaxed">
+							Custom designed sound patches for VSTs and hardware.
+							Designed to adapt to a broad spectrum of musical
+							styles and moods.
+						</p>
+						<a
+							href="/presets"
+							class="text-white underline hover:text-gray-300 transition-colors"
+						>
+							Click to View Products
+						</a>
+					</div>
+					<div class="w-32 h-32 rounded-lg overflow-hidden">
+						<img
+							src={siteAssets.curatedSelections.presets}
+							alt="Presets"
+							class="w-full h-full object-cover"
+						/>
+					</div>
+				</div>
+
+				<!-- Bundles -->
+				<div
+					class="bg-[#151515] rounded-lg p-8 flex items-center space-x-6"
+				>
+					<div class="flex-1">
+						<h3 class="text-white text-2xl font-bold mb-4">
+							BUNDLES
+						</h3>
+						<p class="text-gray-300 mb-6 leading-relaxed">
+							Convenient collections that combine multiple sound
+							packs, offering variety and savings in one package.
+						</p>
+						<a
+							href="/bundles"
+							class="text-white underline hover:text-gray-300 transition-colors"
+						>
+							Click to View Products
+						</a>
+					</div>
+					<div class="w-32 h-32 rounded-lg overflow-hidden">
+						<img
+							src={siteAssets.curatedSelections.bundles}
+							alt="Bundles"
+							class="w-full h-full object-cover"
+						/>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Artist Profile & Albums Section -->
+	<section
+		class="py-20"
+		style="background: linear-gradient(141deg, #040E17, #C0093B)"
+	>
+		<div class="max-w-7xl mx-auto px-4">
+			<!-- Artist Profile -->
+			<div
+				class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20"
+			>
+				<!-- Left Side - Artist Info -->
+				<div class="space-y-6">
+					<h2 class="text-5xl font-bold text-white">TEHN VEGA</h2>
+					<p class="text-gray-200 text-lg leading-relaxed">
+						I'm a sound designer, composer, and beatmaker with a
+						passion for crafting intricate sonic worlds. Merging
+						precise rhythms with organic textures, my work spans
+						everything from creating experimental sound packs to
+						sonic branding and music production. I've also created
+						sound effects for a sci-fi-themed collectible item tied
+						to a prominent entertainment universe.
+					</p>
+					<div class="flex space-x-4">
+						<a
+							href="#"
+							class="text-white hover:text-gray-300 transition-colors"
+							aria-label="Instagram"
+						>
+							<svg
+								class="w-8 h-8"
+								fill="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
+								></path>
+							</svg>
+						</a>
+						<a
+							href="#"
+							class="text-white hover:text-gray-300 transition-colors"
+							aria-label="YouTube"
+						>
+							<svg
+								class="w-8 h-8"
+								fill="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"
+								></path>
+							</svg>
+						</a>
+					</div>
+				</div>
+
+				<!-- Right Side - Artist Image -->
+				<div class="relative">
+					<div class="aspect-square rounded-lg overflow-hidden">
+						<img
+							src={siteAssets.artists.tehnVega}
+							alt="TEHN VEGA Artist Photo"
+							class="w-full h-full object-cover"
+						/>
+					</div>
+				</div>
+			</div>
+
+			<!-- Albums Section -->
+			<div>
+				<h2 class="text-4xl font-bold text-white mb-12">ALBUMS</h2>
+
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+					<!-- Haze Album - Spotify Embed -->
+					<div class="rounded-xl overflow-hidden">
+						<iframe
+							style="border-radius:12px"
+							src="https://open.spotify.com/embed/track/6N20wsFZVUZD73btApxCq3?utm_source=generator&theme=0"
+							width="100%"
+							height="352"
+							frameborder="0"
+							allowfullscreen=""
+							allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+							loading="lazy"
+						>
+						</iframe>
+					</div>
+
+					<!-- Partial Truth Album - Spotify Embed -->
+					<div class="rounded-xl overflow-hidden">
+						<iframe
+							style="border-radius:12px"
+							src="https://open.spotify.com/embed/track/7unGv9SlBsKwkirPaPDV78?utm_source=generator&theme=0"
+							width="100%"
+							height="352"
+							frameborder="0"
+							allowfullscreen=""
+							allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+							loading="lazy"
+						>
+						</iframe>
+					</div>
+
+					<!-- Stay Album - Spotify Embed -->
+					<div class="rounded-xl overflow-hidden">
+						<iframe
+							style="border-radius:12px"
+							src="https://open.spotify.com/embed/track/1dzfSwQzL4reVcsrRhwF77?utm_source=generator&theme=0"
+							width="100%"
+							height="352"
+							frameborder="0"
+							allowfullscreen=""
+							allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+							loading="lazy"
+						>
+						</iframe>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+</Layout>

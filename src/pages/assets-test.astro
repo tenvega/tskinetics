@@ -1,0 +1,288 @@
+---
+import Layout from "../layouts/Layout.astro";
+import {
+    fetchShopMetafields,
+    fetchProductMetafields,
+    getMetafieldValue,
+    siteAssets,
+    shopifyAssets,
+} from "../lib/shopify.ts";
+
+// Test different asset approaches
+let shopMetafields: any[] = [];
+let productMetafields: any[] = [];
+let errors: string[] = [];
+
+try {
+    // Fetch shop metafields (if you store asset URLs there)
+    shopMetafields = await fetchShopMetafields();
+} catch (error) {
+    errors.push(`Shop metafields: ${error}`);
+}
+
+try {
+    // Example: fetch metafields for a specific product
+    // You would replace this with an actual product ID from your store
+    const exampleProductId = "gid://shopify/Product/8521676505280"; // Replace with real ID
+    productMetafields = await fetchProductMetafields(exampleProductId);
+} catch (error) {
+    errors.push(`Product metafields: ${error}`);
+}
+---
+
+<Layout title="Asset Management Test - TSK Sound Kits">
+    <main class="min-h-screen bg-[#151515] text-white p-8">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-3xl font-bold mb-8">Asset Management Solutions</h1>
+
+            <!-- Error Display -->
+            {
+                errors.length > 0 && (
+                    <div class="bg-red-500/20 border border-red-500 rounded-lg p-4 mb-8">
+                        <h3 class="font-bold text-red-400 mb-2">Errors:</h3>
+                        <ul class="space-y-1">
+                            {errors.map((error) => (
+                                <li class="text-red-300 text-sm">• {error}</li>
+                            ))}
+                        </ul>
+                    </div>
+                )
+            }
+
+            <!-- Recommended Approach: Static Assets -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-bold mb-4 text-[#FF6B35]">
+                    ✅ Recommended: Static Assets
+                </h2>
+                <div
+                    class="bg-[#1A1A1A] rounded-lg p-6 border border-[#2A2A2A]"
+                >
+                    <p class="mb-4 text-[#B0B0B0]">
+                        Store images in your <code
+                            class="bg-[#2A2A2A] px-2 py-1 rounded"
+                            >public/images/</code
+                        > directory. This is the fastest and most reliable approach.
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <h4 class="font-semibold mb-2">
+                                Artist Image Example:
+                            </h4>
+                            <code
+                                class="bg-[#2A2A2A] px-3 py-2 rounded block text-sm text-green-400"
+                            >
+                                {siteAssets.artists.tehnVega}
+                            </code>
+                            <p class="text-xs text-[#B0B0B0] mt-1">
+                                Place tehn-vega.jpg in public/images/
+                            </p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold mb-2">Logo Example:</h4>
+                            <code
+                                class="bg-[#2A2A2A] px-3 py-2 rounded block text-sm text-green-400"
+                            >
+                                {siteAssets.logos.tskDiamond}
+                            </code>
+                            <p class="text-xs text-[#B0B0B0] mt-1">
+                                Place tsk-diamond.svg in public/images/
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Alternative: Shopify CDN -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-bold mb-4 text-[#FF6B35]">
+                    ⚡ Alternative: Shopify CDN
+                </h2>
+                <div
+                    class="bg-[#1A1A1A] rounded-lg p-6 border border-[#2A2A2A]"
+                >
+                    <p class="mb-4 text-[#B0B0B0]">
+                        If you have the direct CDN URLs from Shopify, you can
+                        use them directly. Upload images to Shopify Admin →
+                        Settings → Files, then get the clean URL.
+                    </p>
+
+                    <div class="mb-4">
+                        <h4 class="font-semibold mb-2">Example CDN URL:</h4>
+                        <code
+                            class="bg-[#2A2A2A] px-3 py-2 rounded block text-sm text-blue-400 break-all"
+                        >
+                            {shopifyAssets.artists.tehnVega}
+                        </code>
+                    </div>
+
+                    <div
+                        class="bg-yellow-500/20 border border-yellow-500 rounded p-3"
+                    >
+                        <p class="text-yellow-300 text-sm">
+                            <strong>Note:</strong> The @ symbol URLs you're seeing
+                            are redirect URLs. You need the direct CDN URLs instead.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Shop Metafields -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-bold mb-4 text-[#FF6B35]">
+                    🔧 Shop Metafields
+                </h2>
+                <div
+                    class="bg-[#1A1A1A] rounded-lg p-6 border border-[#2A2A2A]"
+                >
+                    {
+                        shopMetafields.length > 0 ? (
+                            <div>
+                                <p class="mb-4 text-[#B0B0B0]">
+                                    Found {shopMetafields.length} shop
+                                    metafields:
+                                </p>
+                                <div class="space-y-2 max-h-64 overflow-y-auto">
+                                    {shopMetafields.map((metafield, index) => (
+                                        <div class="bg-[#2A2A2A] rounded p-3">
+                                            <div class="text-sm">
+                                                <span class="text-blue-400">
+                                                    {metafield.namespace}
+                                                </span>
+                                                <span class="text-gray-400">
+                                                    .
+                                                </span>
+                                                <span class="text-green-400">
+                                                    {metafield.key}
+                                                </span>
+                                            </div>
+                                            <div class="text-xs text-[#B0B0B0] mt-1 break-all">
+                                                {metafield.value}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ) : (
+                            <p class="text-[#B0B0B0]">
+                                No shop metafields found. You can create custom
+                                metafields in Shopify Admin → Settings →
+                                Metafields to store asset URLs.
+                            </p>
+                        )
+                    }
+                </div>
+            </section>
+
+            <!-- Usage Instructions -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-bold mb-4 text-[#FF6B35]">
+                    📋 How to Fix Your Asset URLs
+                </h2>
+                <div
+                    class="bg-[#1A1A1A] rounded-lg p-6 border border-[#2A2A2A]"
+                >
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-semibold mb-2">
+                                Option 1: Download and Host Locally
+                                (Recommended)
+                            </h4>
+                            <ol
+                                class="list-decimal list-inside space-y-1 text-[#B0B0B0] text-sm ml-4"
+                            >
+                                <li>
+                                    Download your artist images from the current
+                                    site
+                                </li>
+                                <li>
+                                    Create a <code
+                                        class="bg-[#2A2A2A] px-1 rounded"
+                                        >public/images/</code
+                                    > directory
+                                </li>
+                                <li>
+                                    Place images there (e.g., <code
+                                        class="bg-[#2A2A2A] px-1 rounded"
+                                        >public/images/tehn-vega.jpg</code
+                                    >)
+                                </li>
+                                <li>
+                                    Reference them as <code
+                                        class="bg-[#2A2A2A] px-1 rounded"
+                                        >/images/tehn-vega.jpg</code
+                                    >
+                                </li>
+                            </ol>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold mb-2">
+                                Option 2: Get Clean Shopify CDN URLs
+                            </h4>
+                            <ol
+                                class="list-decimal list-inside space-y-1 text-[#B0B0B0] text-sm ml-4"
+                            >
+                                <li>Go to Shopify Admin → Settings → Files</li>
+                                <li>Upload your images there</li>
+                                <li>
+                                    Right-click on the image and "Copy image
+                                    address"
+                                </li>
+                                <li>
+                                    Use the clean URL (should look like: <code
+                                        class="bg-[#2A2A2A] px-1 rounded text-xs"
+                                        >https://cdn.shopify.com/s/files/1/...</code
+                                    >)
+                                </li>
+                            </ol>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold mb-2">
+                                Option 3: Use External CDN
+                            </h4>
+                            <p class="text-[#B0B0B0] text-sm">
+                                Upload to Cloudinary, AWS S3, or similar service
+                                for full control over assets.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Code Example -->
+            <section>
+                <h2 class="text-2xl font-bold mb-4 text-[#FF6B35]">
+                    💻 Usage in Components
+                </h2>
+                <div
+                    class="bg-[#1A1A1A] rounded-lg p-6 border border-[#2A2A2A]"
+                >
+                    <h4 class="font-semibold mb-2">
+                        Example in Astro component:
+                    </h4>
+                    <pre
+                        class="bg-[#0A0A0A] rounded p-4 overflow-x-auto text-sm"><code class="text-green-400">{`---
+import { siteAssets } from '../lib/shopify.ts';
+---
+
+<!-- Use static assets -->
+<img 
+  src={siteAssets.artists.tehnVega} 
+  alt="TEHN VEGA" 
+  class="w-48 h-48 object-cover rounded-lg"
+/>
+
+<!-- Or use direct CDN URL -->
+<img 
+  src="https://cdn.shopify.com/s/files/1/0744/3660/8256/files/tehn-vega.jpg" 
+  alt="TEHN VEGA" 
+  class="w-48 h-48 object-cover rounded-lg"
+/>`}</code></pre>
+                </div>
+            </section>
+        </div>
+    </main>
+</Layout>

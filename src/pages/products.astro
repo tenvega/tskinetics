@@ -1,0 +1,114 @@
+---
+import Layout from "../layouts/Layout.astro";
+import AddToCartButton from "../components/ui/AddToCartButton.astro";
+import { fetchProducts, getProductUrl, formatPrice } from "../lib/gumroad";
+import type { GumroadProduct } from "../lib/types";
+
+let products: GumroadProduct[] = [];
+let error: string | null = null;
+
+try {
+    products = await fetchProducts(12);
+} catch (e) {
+    error = e instanceof Error ? e.message : "Failed to fetch products";
+    console.error("Error fetching products:", e);
+}
+---
+
+<Layout title="TSK Products - Sound Kits & Samples">
+    <main class="bg-[#151515] py-20 min-h-screen">
+        <div class="max-w-7xl mx-auto px-4">
+            <!-- Page Header -->
+            <div class="text-center mb-16">
+                <h1 class="text-4xl font-bold text-white mb-4">ALL PRODUCTS</h1>
+                <p class="text-gray-400 text-lg">
+                    Explore our complete collection of sample packs, drum kits,
+                    and presets
+                </p>
+            </div>
+
+            {
+                error ? (
+                    <div class="text-center py-12">
+                        <div class="bg-red-900/50 border border-red-700 rounded-lg p-6 max-w-2xl mx-auto">
+                            <h3 class="text-red-400 font-semibold text-lg mb-2">
+                                Error Loading Products
+                            </h3>
+                            <p class="text-red-300 text-sm mb-4">{error}</p>
+                            <p class="text-gray-400 text-xs">
+                                Please check your Gumroad configuration in the
+                                .env file.
+                            </p>
+                        </div>
+                    </div>
+                ) : products.length > 0 ? (
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        {products.map((product) => {
+                            const imageUrl =
+                                product.thumbnail_url || product.cover_url;
+                            const price = product.price / 100; // Convert from cents to dollars
+                            const formattedPrice =
+                                product.formatted_price ||
+                                `$${price.toFixed(2)}`;
+                            const productUrl =
+                                product.url || `/products/${product.id}`;
+
+                            return (
+                                <div class="group">
+                                    <a href={productUrl} class="block">
+                                        <div class="aspect-square mb-4 overflow-hidden rounded-lg">
+                                            <img
+                                                src={
+                                                    imageUrl || "/images/bg.png"
+                                                }
+                                                alt={product.title}
+                                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                                loading="lazy"
+                                                onerror="this.src='/images/bg.png';"
+                                            />
+                                        </div>
+                                    </a>
+                                    <a href={productUrl} class="block">
+                                        <h3 class="text-white font-bold text-xl mb-2 uppercase hover:text-gray-300 transition-colors h-14 flex items-center">
+                                            {product.title}
+                                        </h3>
+                                    </a>
+                                    <p class="text-white text-xl font-semibold mb-4">
+                                        {formattedPrice}
+                                    </p>
+                                    <a
+                                        href={productUrl}
+                                        class="inline-block border border-white text-white px-6 py-2 hover:bg-white hover:text-black transition-colors duration-300 text-sm font-semibold"
+                                    >
+                                        VIEW PRODUCT
+                                    </a>
+                                </div>
+                            );
+                        })}
+                    </div>
+                ) : (
+                    <div class="text-center py-12">
+                        <div class="bg-gray-800 rounded-lg p-8 max-w-2xl mx-auto">
+                            <h3 class="text-white font-semibold text-lg mb-2">
+                                No Products Available
+                            </h3>
+                            <p class="text-gray-400 mb-4">
+                                We're currently updating our product catalog.
+                                Please check back soon!
+                            </p>
+                        </div>
+                    </div>
+                )
+            }
+        </div>
+    </main>
+</Layout>
+
+<style>
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>

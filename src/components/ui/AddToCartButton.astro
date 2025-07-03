@@ -1,0 +1,46 @@
+---
+export interface Props {
+    productId: string;
+    productTitle: string;
+    price: number; // Price in cents
+    productUrl: string;
+    formattedPrice?: string;
+}
+
+const { productId, productTitle, price, productUrl, formattedPrice } =
+    Astro.props;
+---
+
+<a
+    href={productUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="buy-now-btn bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors inline-block text-center"
+    data-product-id={productId}
+    data-product-title={productTitle}
+    data-price={price}
+>
+    Buy Now • {formattedPrice || `$${(price / 100).toFixed(2)}`}
+</a>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const buyNowButtons = document.querySelectorAll(".buy-now-btn");
+
+        buyNowButtons.forEach((button) => {
+            button.addEventListener("click", (e) => {
+                const btn = e.target as HTMLAnchorElement;
+                const productTitle = btn.dataset.productTitle;
+
+                // Optional: Track the purchase intent for analytics
+                console.log(`Purchase intent for: ${productTitle}`);
+
+                // Optional: Add visual feedback
+                btn.style.opacity = "0.7";
+                setTimeout(() => {
+                    btn.style.opacity = "1";
+                }, 200);
+            });
+        });
+    });
+</script>

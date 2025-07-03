@@ -1,0 +1,448 @@
+/// <reference types="astro/client" />
+
+import type {
+    GumroadProduct,
+    GumroadUser,
+    GumroadSale,
+    Cart,
+    CartItem,
+    Money
+} from './types';
+
+// Gumroad API Configuration
+const gumroadConfig = {
+    apiUrl: 'https://api.gumroad.com/v2',
+    accessToken: import.meta.env.GUMROAD_ACCESS_TOKEN || 'LzlFKFPQwAPss3llZD0PbQX4FHJWmcTbQPWLT6V6rv0',
+};
+
+// Generic API request helper
+async function gumroadFetch(endpoint: string, options: RequestInit = {}) {
+    const url = `${gumroadConfig.apiUrl}${endpoint}`;
+
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${gumroadConfig.accessToken}`,
+            'Content-Type': 'application/json',
+            ...options.headers,
+        },
+        ...options,
+    });
+
+    if (!response.ok) {
+        throw new Error(`Gumroad API error: ${response.status} ${response.statusText}`);
+    }
+
+    const result = await response.json();
+
+    if (result.success === false) {
+        console.error('Gumroad API error:', result.message);
+        throw new Error(`Gumroad API error: ${result.message}`);
+    }
+
+    return result;
+}
+
+// Fetch products from Gumroad
+export async function fetchProducts(limit = 10): Promise<GumroadProduct[]> {
+    try {
+        const data = await gumroadFetch('/products');
+
+        // Transform the data to match our interface
+        const products = (data.products || []).slice(0, limit).map((product: any): GumroadProduct => ({
+            id: product.id,
+            title: product.name || product.title,
+            name: product.name,
+            description: product.description || '',
+            price: Math.round((product.price || 0) * 100), // Convert to cents
+            formatted_price: formatPrice(product.price || 0),
+            currency: product.currency || 'USD',
+            url: product.short_url || product.url || `https://gumroad.com/p/${product.id}`,
+            preview_url: product.preview_url,
+            thumbnail_url: product.thumbnail_url || product.cover_url,
+            cover_url: product.cover_url,
+            tags: product.tags,
+            created_at: product.created_at,
+            updated_at: product.updated_at,
+            published: product.published !== false,
+            sales_count: product.sales_count || 0,
+            is_published: product.published !== false,
+            short_url: product.short_url,
+            preview: product.preview,
+            file_info: product.file_info,
+            content_rating: product.content_rating,
+            require_shipping: product.require_shipping || false,
+            customizable_price: product.customizable_price || false,
+            suggested_price: product.suggested_price,
+            minimum_price: product.minimum_price,
+            purchase_email: product.purchase_email,
+            variants: product.variants || []
+        }));
+
+        return products;
+    } catch (error) {
+        console.error('Error fetching products from Gumroad:', error);
+        // Return empty array on error to prevent breaking the UI
+        return [];
+    }
+}
+
+// Fetch single product by ID
+export async function fetchProductById(productId: string): Promise<GumroadProduct | null> {
+    try {
+        const data = await gumroadFetch(`/products/${productId}`);
+
+        if (!data.product) {
+            return null;
+        }
+
+        const product = data.product;
+        return {
+            id: product.id,
+            title: product.name || product.title,
+            name: product.name,
+            description: product.description || '',
+            price: Math.round((product.price || 0) * 100),
+            formatted_price: formatPrice(product.price || 0),
+            currency: product.currency || 'USD',
+            url: product.short_url || product.url || `https://gumroad.com/p/${product.id}`,
+            preview_url: product.preview_url,
+            thumbnail_url: product.thumbnail_url || product.cover_url,
+            cover_url: product.cover_url,
+            tags: product.tags,
+            created_at: product.created_at,
+            updated_at: product.updated_at,
+            published: product.published !== false,
+            sales_count: product.sales_count || 0,
+            is_published: product.published !== false,
+            short_url: product.short_url,
+            preview: product.preview,
+            file_info: product.file_info,
+            content_rating: product.content_rating,
+            require_shipping: product.require_shipping || false,
+            customizable_price: product.customizable_price || false,
+            suggested_price: product.suggested_price,
+            minimum_price: product.minimum_price,
+            purchase_email: product.purchase_email,
+            variants: product.variants || []
+        };
+    } catch (error) {
+        console.error(`Error fetching product ${productId} from Gumroad:`, error);
+        return null;
+    }
+}
+
+// Fetch user/seller information
+export async function fetchUser(): Promise<GumroadUser | null> {
+    try {
+        const data = await gumroadFetch('/user');
+
+        if (!data.user) {
+            return null;
+        }
+
+        const user = data.user;
+        return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            url: user.url,
+            twitter_handle: user.twitter_handle,
+            bio: user.bio,
+            profile_image_url: user.profile_image_url,
+            display_name: user.display_name
+        };
+    } catch (error) {
+        console.error('Error fetching user from Gumroad:', error);
+        return null;
+    }
+}
+
+// Fetch sales data
+export async function fetchSales(after?: string, before?: string): Promise<GumroadSale[]> {
+    try {
+        let endpoint = '/sales';
+        const params = new URLSearchParams();
+
+        if (after) params.append('after', after);
+        if (before) params.append('before', before);
+
+        if (params.toString()) {
+            endpoint += `?${params.toString()}`;
+        }
+
+        const data = await gumroadFetch(endpoint);
+
+        return (data.sales || []).map((sale: any): GumroadSale => ({
+            id: sale.id,
+            seller_id: sale.seller_id,
+            product_id: sale.product_id,
+            product_name: sale.product_name,
+            permalink: sale.permalink,
+            price: sale.price,
+            currency: sale.currency,
+            quantity: sale.quantity,
+            discover_fee_charged: sale.discover_fee_charged,
+            can_contact: sale.can_contact,
+            referrer: sale.referrer,
+            order_id: sale.order_id,
+            sale_id: sale.sale_id,
+            sale_timestamp: sale.sale_timestamp,
+            purchaser_id: sale.purchaser_id,
+            email: sale.email,
+            full_name: sale.full_name,
+            zip_code: sale.zip_code,
+            country: sale.country,
+            state: sale.state,
+            city: sale.city,
+            subscription_id: sale.subscription_id,
+            variants: sale.variants,
+            license_key: sale.license_key,
+            ip_country: sale.ip_country,
+            refunded: sale.refunded || false,
+            dispute_won: sale.dispute_won || false,
+            chargebacked: sale.chargebacked || false,
+            affiliate: sale.affiliate,
+            affiliate_credit_amount_cents: sale.affiliate_credit_amount_cents
+        }));
+    } catch (error) {
+        console.error('Error fetching sales from Gumroad:', error);
+        return [];
+    }
+}
+
+// Get product URL
+export function getProductUrl(productId: string): string {
+    return `https://gumroad.com/p/${productId}`;
+}
+
+// Get checkout URL for a product
+export function getCheckoutUrl(productId: string): string {
+    return `https://gumroad.com/l/${productId}`;
+}
+
+// Format price with currency
+export function formatPrice(amount: number, currencyCode: string = 'USD'): string {
+    const formatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: currencyCode,
+    });
+
+    return formatter.format(amount);
+}
+
+// Convert price from cents to dollars
+export function centsToDollars(cents: number): number {
+    return cents / 100;
+}
+
+// Convert price from dollars to cents
+export function dollarsToCents(dollars: number): number {
+    return Math.round(dollars * 100);
+}
+
+// Create a simple cart (Gumroad doesn't have a cart API, so this is local storage based)
+export function createCart(): Cart {
+    return {
+        items: [],
+        total: 0,
+        currency: 'USD',
+        checkout_url: undefined
+    };
+}
+
+// Add item to cart (local storage based)
+export function addToCart(product: GumroadProduct, quantity: number = 1): Cart {
+    const cart = getLocalCart();
+
+    const existingItemIndex = cart.items.findIndex(item => item.product_id === product.id);
+
+    if (existingItemIndex >= 0) {
+        cart.items[existingItemIndex].quantity += quantity;
+    } else {
+        cart.items.push({
+            product_id: product.id,
+            product_name: product.title,
+            price: product.price,
+            quantity: quantity,
+            url: product.url
+        });
+    }
+
+    cart.total = cart.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+
+    // For multiple items, we can't use Gumroad's direct checkout
+    // In a real implementation, you'd want to handle this differently
+    if (cart.items.length === 1) {
+        cart.checkout_url = getCheckoutUrl(cart.items[0].product_id);
+    }
+
+    setLocalCart(cart);
+    return cart;
+}
+
+// Get cart from local storage
+export function getLocalCart(): Cart {
+    if (typeof window === 'undefined') {
+        return createCart();
+    }
+
+    const cartData = localStorage.getItem('gumroad_cart');
+    if (cartData) {
+        try {
+            return JSON.parse(cartData);
+        } catch (error) {
+            console.error('Error parsing cart data:', error);
+        }
+    }
+
+    return createCart();
+}
+
+// Save cart to local storage
+export function setLocalCart(cart: Cart): void {
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('gumroad_cart', JSON.stringify(cart));
+    }
+}
+
+// Clear cart
+export function clearCart(): Cart {
+    const emptyCart = createCart();
+    setLocalCart(emptyCart);
+    return emptyCart;
+}
+
+// Remove item from cart
+export function removeFromCart(productId: string): Cart {
+    const cart = getLocalCart();
+    cart.items = cart.items.filter(item => item.product_id !== productId);
+    cart.total = cart.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+
+    if (cart.items.length === 1) {
+        cart.checkout_url = getCheckoutUrl(cart.items[0].product_id);
+    } else {
+        cart.checkout_url = undefined;
+    }
+
+    setLocalCart(cart);
+    return cart;
+}
+
+// Update cart item quantity
+export function updateCartItemQuantity(productId: string, quantity: number): Cart {
+    const cart = getLocalCart();
+    const itemIndex = cart.items.findIndex(item => item.product_id === productId);
+
+    if (itemIndex >= 0) {
+        if (quantity <= 0) {
+            cart.items.splice(itemIndex, 1);
+        } else {
+            cart.items[itemIndex].quantity = quantity;
+        }
+    }
+
+    cart.total = cart.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+
+    if (cart.items.length === 1) {
+        cart.checkout_url = getCheckoutUrl(cart.items[0].product_id);
+    } else {
+        cart.checkout_url = undefined;
+    }
+
+    setLocalCart(cart);
+    return cart;
+}
+
+// Get cart item count
+export function getCartItemCount(): number {
+    const cart = getLocalCart();
+    return cart.items.reduce((total, item) => total + item.quantity, 0);
+}
+
+// Mock collections/categories (Gumroad doesn't have built-in collections)
+export async function fetchCollections(): Promise<any[]> {
+    // Since Gumroad doesn't have collections, we can group by tags or return empty
+    try {
+        const products = await fetchProducts(50); // Get more products to analyze tags
+        const tags = new Set<string>();
+
+        products.forEach(product => {
+            if (product.tags) {
+                product.tags.split(',').forEach(tag => tags.add(tag.trim()));
+            }
+        });
+
+        return Array.from(tags).map(tag => ({
+            id: tag.toLowerCase().replace(/\s+/g, '-'),
+            title: tag,
+            handle: tag.toLowerCase().replace(/\s+/g, '-'),
+            description: `Products tagged with ${tag}`
+        }));
+    } catch (error) {
+        console.error('Error fetching collections:', error);
+        return [];
+    }
+}
+
+// Mock collection by handle (filter products by tag)
+export async function fetchCollectionByHandle(handle: string): Promise<any | null> {
+    try {
+        const products = await fetchProducts(50);
+        const tagName = handle.replace(/-/g, ' ');
+
+        const filteredProducts = products.filter(product =>
+            product.tags && product.tags.toLowerCase().includes(tagName.toLowerCase())
+        );
+
+        return {
+            id: handle,
+            title: tagName.charAt(0).toUpperCase() + tagName.slice(1),
+            handle: handle,
+            description: `Products tagged with ${tagName}`,
+            products: filteredProducts
+        };
+    } catch (error) {
+        console.error(`Error fetching collection ${handle}:`, error);
+        return null;
+    }
+}
+
+// Site assets for backward compatibility
+export const siteAssets = {
+    logos: {
+        tskMain: '/images/tenvga_isometric_logo_2.png'
+    },
+    background: '/images/bg.png',
+    artists: {
+        tehnVega: '/images/tehn_vega.jpg'
+    },
+    products: {
+        sonicEntropy: '/images/entropy.jpg',
+        bundles: '/images/bundles_curated.jpg',
+        drumKits: '/images/drum_kits_curated.jpg',
+        oneShots: '/images/one_shots.jpg',
+        presets: '/images/presets_curated.jpg',
+        fmPercussion: '/images/fm_Percussion_Bundle.jpg',
+        threehundredFree: '/images/threehundred_free.jpg'
+    },
+    bundles: {
+        sonicEntropy: '/images/entropy.jpg',
+        fmPercussion: '/images/fm_Percussion_Bundle.jpg'
+    },
+    freeKits: {
+        threehundredFree: '/images/threehundred_free.jpg'
+    },
+    curatedSelections: {
+        drumKits: '/images/drum_kits_curated.jpg',
+        oneShots: '/images/one_shots.jpg',
+        presets: '/images/presets_curated.jpg',
+        bundles: '/images/bundles_curated.jpg'
+    }
+};
+
+// For backward compatibility with existing components  
+export { fetchProductById as fetchProductByHandle };
+
+// Legacy aliases for easier migration
+// All assets are now consolidated under siteAssets 

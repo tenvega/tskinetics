@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #151515;
+  --text-primary: #FFFFFF;
+  --text-secondary: #B0B0B0;
+  --accent: #FF6B35;
+  --border: #2A2A2A;
+  --gradient-hero: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+  --gradient-card: linear-gradient(145deg, #1A1A1A 0%, #2D2D2D 100%);
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+}
+
+/* Line clamp utility for better title handling */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+} 

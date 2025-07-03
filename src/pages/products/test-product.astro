@@ -1,0 +1,291 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AddToCartButton from '../../components/ui/AddToCartButton.astro';
+
+// Mock product data for testing the new design
+const mockProduct = {
+  id: 'test-product',
+  title: 'TSK MEGA PACK - Electronic Vibes',
+  handle: 'test-product',
+  description: 'A premium collection of cutting-edge electronic sounds, featuring deep basslines, crisp percussion, and atmospheric textures. Perfect for modern electronic music production.',
+  vendor: 'TSK Sound',
+  productType: 'Sample Pack',
+  tags: ['electronic', 'bass', 'drums', 'new', 'premium'],
+  images: [
+    {
+      originalSrc: '/images/entropy.jpg',
+      altText: 'TSK MEGA PACK Cover Art'
+    },
+    {
+      originalSrc: '/images/drum_kits_curated.jpg',
+      altText: 'Drum Kit Preview'
+    },
+    {
+      originalSrc: '/images/presets_curated.jpg',
+      altText: 'Preset Preview'
+    }
+  ],
+  priceRange: {
+    minVariantPrice: {
+      amount: '29.99',
+      currencyCode: 'USD'
+    },
+    maxVariantPrice: {
+      amount: '29.99',
+      currencyCode: 'USD'
+    }
+  },
+  variants: [
+    {
+      id: 'variant-1',
+      title: 'WAV + MIDI Bundle',
+      price: {
+        amount: '29.99',
+        currencyCode: 'USD'
+      }
+    },
+    {
+      id: 'variant-2',
+      title: 'WAV Only',
+      price: {
+        amount: '19.99',
+        currencyCode: 'USD'
+      }
+    }
+  ],
+  collections: [
+    {
+      title: 'Electronic',
+      handle: 'electronic'
+    },
+    {
+      title: 'New Releases',
+      handle: 'new-releases'
+    }
+  ]
+};
+
+// Mock audio samples
+const audioSamples = [
+  {
+    name: 'Deep Bass Loop',
+    url: '#',
+  },
+  {
+    name: 'Electronic Drums',
+    url: '#',
+  },
+  {
+    name: 'Atmospheric Pad',
+    url: '#',
+  },
+  {
+    name: 'Synth Lead',
+    url: '#',
+  }
+];
+---
+
+<Layout title={mockProduct.title}>
+  <main class="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-800 relative overflow-hidden">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-10">
+      <div class="absolute inset-0 bg-[url('/images/bg.png')] bg-cover bg-center bg-no-repeat"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="relative z-10 pt-20 pb-16 px-4">
+      <!-- Product Hero Section -->
+      <div class="max-w-6xl mx-auto mb-16">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+          <!-- Left: Product Image -->
+          <div class="space-y-6">
+            <div class="relative group">
+              <div class="aspect-square bg-black/40 backdrop-blur-sm rounded-2xl overflow-hidden border border-purple-500/20 shadow-2xl">
+                <img 
+                  src={mockProduct.images[0].originalSrc}
+                  alt={mockProduct.images[0].altText}
+                  class="main-product-image w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
+                />
+              </div>
+              
+              <!-- Image badges -->
+              <div class="absolute top-4 left-4 space-y-2">
+                <div class="bg-purple-600/90 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
+                  {mockProduct.productType}
+                </div>
+                {mockProduct.tags.includes('new') && (
+                  <div class="bg-green-500/90 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
+                    NEW
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <!-- Thumbnail Images -->
+            <div class="grid grid-cols-4 gap-3">
+              {mockProduct.images.slice(1, 5).map((image) => (
+                <button 
+                  class="aspect-square bg-black/30 backdrop-blur-sm rounded-xl overflow-hidden border border-purple-500/20 hover:border-purple-400/50 transition-all duration-300 hover:scale-105"
+                  onclick={`document.querySelector('.main-product-image').src = '${image.originalSrc}'`}
+                >
+                  <img 
+                    src={image.originalSrc}
+                    alt={image.altText}
+                    class="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <!-- Right: Product Details -->
+          <div class="space-y-8">
+            <!-- Header -->
+            <div class="space-y-4">
+              <div class="text-purple-400 text-lg font-medium tracking-wider">
+                {mockProduct.vendor}
+              </div>
+              <h1 class="text-4xl md:text-5xl font-bold text-white leading-tight bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
+                {mockProduct.title}
+              </h1>
+            </div>
+
+            <!-- Price -->
+            <div class="bg-black/30 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/20">
+              <div class="text-3xl font-bold text-white mb-2">
+                ${mockProduct.priceRange.minVariantPrice.amount}
+                <span class="text-lg text-purple-400 ml-2">
+                  {mockProduct.priceRange.minVariantPrice.currencyCode}
+                </span>
+              </div>
+              <div class="text-purple-300 text-sm">
+                Instant digital download
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="bg-black/20 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/20">
+              <h3 class="text-white font-semibold mb-3">About This Pack</h3>
+              <p class="text-gray-300 leading-relaxed">
+                {mockProduct.description}
+              </p>
+            </div>
+
+            <!-- Variants / Add to Cart -->
+            <div class="space-y-6">
+              <div class="bg-black/20 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/20">
+                <label class="block text-white font-semibold mb-3">
+                  Select Format:
+                </label>
+                <select 
+                  id="variant-select"
+                  class="w-full bg-black/40 backdrop-blur-sm border border-purple-500/30 text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                >
+                  {mockProduct.variants.map(variant => (
+                    <option 
+                      value={variant.id}
+                      data-price={variant.price.amount}
+                    >
+                      {variant.title} - ${variant.price.amount}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div class="transform hover:scale-105 transition-transform duration-200">
+                <AddToCartButton 
+                  variantId={mockProduct.variants[0].id}
+                  productTitle={mockProduct.title}
+                  price={mockProduct.variants[0].price.amount}
+                  currencyCode={mockProduct.variants[0].price.currencyCode}
+                />
+              </div>
+            </div>
+
+            <!-- Tags -->
+            <div class="space-y-3">
+              <h3 class="text-white font-semibold">Tags</h3>
+              <div class="flex flex-wrap gap-2">
+                {mockProduct.tags.map(tag => (
+                  <span class="px-3 py-1 bg-purple-600/20 backdrop-blur-sm text-purple-300 text-sm rounded-full border border-purple-500/30 hover:bg-purple-600/30 transition-colors">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Audio Previews Section -->
+      <div class="max-w-6xl mx-auto mb-16">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-white mb-4">Audio Previews</h2>
+          <p class="text-purple-300">Listen to samples from this pack</p>
+        </div>
+        
+        <div class="grid md:grid-cols-2 gap-6">
+          {audioSamples.map((sample, index) => (
+            <div class="bg-black/30 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/20 hover:border-purple-400/40 transition-all duration-300">
+              <div class="flex items-center justify-between mb-6">
+                <h3 class="font-semibold text-white text-lg">{sample.name}</h3>
+                <button 
+                  class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-6 py-3 rounded-xl transition-all duration-300 flex items-center gap-3 shadow-lg hover:shadow-purple-500/25 transform hover:scale-105"
+                  onclick="alert('Audio preview would play here')"
+                >
+                  <span class="text-lg">▶</span>
+                  <span class="font-medium">Play</span>
+                </button>
+              </div>
+              
+              <!-- Enhanced Waveform -->
+              <div class="h-20 bg-black/40 rounded-xl border border-purple-500/20 flex items-center justify-center overflow-hidden mb-4">
+                <div class="w-full h-full flex items-center justify-center px-6">
+                  <div class="flex items-end space-x-1 w-full h-12">
+                    {Array.from({length: 32}).map((_, i) => (
+                      <div 
+                        class="bg-gradient-to-t from-purple-600 to-purple-400 rounded-sm flex-1 opacity-70 animate-pulse"
+                        style={`height: ${Math.random() * 100}%; animation-delay: ${i * 0.1}s`}
+                      ></div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Audio Progress Bar -->
+              <div class="space-y-3">
+                <div class="w-full bg-purple-900/30 rounded-full h-2 cursor-pointer hover:h-3 transition-all duration-200 border border-purple-500/20">
+                  <div class="bg-gradient-to-r from-purple-500 to-purple-400 h-full rounded-full w-0 transition-all duration-300 shadow-lg"></div>
+                </div>
+                <div class="flex justify-between text-sm text-purple-300">
+                  <span>0:00</span>
+                  <span>2:45</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Collections Section -->
+      <div class="max-w-6xl mx-auto mb-16">
+        <div class="text-center mb-8">
+          <h2 class="text-3xl font-bold text-white mb-4">Part of Collections</h2>
+          <p class="text-purple-300">Explore related sound packs</p>
+        </div>
+        
+        <div class="flex flex-wrap justify-center gap-4">
+          {mockProduct.collections.map(collection => (
+            <a 
+              href={`/collections/${collection.handle}`}
+              class="bg-black/30 backdrop-blur-sm hover:bg-black/40 text-white px-6 py-3 rounded-xl transition-all duration-300 border border-purple-500/20 hover:border-purple-400/50 transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25"
+            >
+              <span class="font-medium">{collection.title}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout> 
