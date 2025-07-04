@@ -22,8 +22,8 @@ export interface GumroadProduct {
     title: string;
     name?: string; // Some APIs use 'name' instead of 'title'
     description: string;
-    price: number; // Price in cents
-    formatted_price: string; // Formatted price string like "$29.99"
+    price: number; // Price in cents from Gumroad API
+    formatted_price: string;
     currency: string;
     url: string; // Product page URL
     preview_url?: string;
@@ -51,14 +51,17 @@ export interface GumroadProduct {
 }
 
 export interface GumroadVariant {
-    id: string;
     title: string;
-    price: number;
-    formatted_price: string;
-    is_default?: boolean;
-    options?: { [key: string]: string };
+    options: GumroadVariantOption[];
 }
 
+export interface GumroadVariantOption {
+    name: string;
+    price_difference: number;
+    is_pay_what_you_want: boolean;
+    recurrence_prices?: any;
+    url?: string;
+}
 export interface GumroadUser {
     id: string;
     name: string;
@@ -111,18 +114,4 @@ export interface Money {
     currency_code: string;
 }
 
-// Cart interfaces (simplified since Gumroad handles checkout)
-export interface CartItem {
-    product_id: string;
-    product_name: string;
-    price: number;
-    quantity: number;
-    url: string;
-}
-
-export interface Cart {
-    items: CartItem[];
-    total: number;
-    currency: string;
-    checkout_url?: string;
-} 
+ 

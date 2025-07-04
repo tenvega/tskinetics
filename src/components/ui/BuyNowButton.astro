@@ -1,0 +1,61 @@
+---
+export interface Props {
+    productId: string;
+    productTitle: string;
+    price: number; // Price in cents from Gumroad API
+    productUrl: string;
+    formattedPrice?: string;
+}
+
+const { productId, productTitle, price, productUrl, formattedPrice } = Astro.props;
+
+// Extract product ID from short_url for dynamic checkout
+// Format: https://tehnvega.gumroad.com/l/{PRODUCT_ID}
+const extractProductId = (url: string): string => {
+  try {
+    const match = url.match(/\/l\/([^\/\?]+)/);
+    return match ? match[1] : productId;
+  } catch {
+    return productId;
+  }
+};
+
+const extractedProductId = extractProductId(productUrl);
+const checkoutUrl = `https://gumroad.com/checkout?product=${extractedProductId}&quantity=1`;
+---
+
+<a
+    href={checkoutUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="buy-now-btn bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors inline-block text-center w-full"
+    data-product-id={productId}
+    data-product-title={productTitle}
+    data-price={price}
+    data-extracted-id={extractedProductId}
+>
+    Buy Now • {formattedPrice || `$${(price / 100).toFixed(2)}`}
+</a>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const buyNowButtons = document.querySelectorAll(".buy-now-btn");
+
+        buyNowButtons.forEach((button) => {
+            button.addEventListener("click", (e) => {
+                const btn = e.target as HTMLAnchorElement;
+                const productTitle = btn.dataset.productTitle || '';
+
+                // Visual feedback
+                btn.style.opacity = "0.7";
+                btn.textContent = "Redirecting...";
+                
+                // Track the purchase intent for analytics (optional)
+                console.log(`Purchase intent for: ${productTitle}`);
+
+                // Let the default link behavior handle the redirect to Gumroad
+                // The href is already set to the correct checkout URL
+            });
+        });
+    });
+</script>

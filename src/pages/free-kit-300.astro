@@ -236,94 +236,36 @@ import Layout from "../layouts/Layout.astro";
                     <h3 class="text-2xl font-bold text-white mb-8">
                         Preview the Sounds
                     </h3>
-                    <div
-                        class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto"
-                    >
-                        <!-- Audio Player Placeholders -->
-                        <div
-                            class="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50"
-                        >
-                            <div class="flex items-center space-x-3">
-                                <button
-                                    class="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-700 transition-colors"
-                                >
-                                    <svg
-                                        class="w-5 h-5 text-white ml-1"
-                                        fill="currentColor"
-                                        viewBox="0 0 20 20"
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
+                        {Array.from({ length: 8 }, (_, i) => {
+                            const sampleNames = [
+                                { name: "Stick_1", type: "Drum Hit" },
+                                { name: "Kick_BD_15", type: "Bass Drum" },
+                                { name: "A4_Cycle_Comp_ATAB", type: "Melodic Loop" },
+                                { name: "Snare_SP_02", type: "Snare Hit" },
+                                { name: "Hihat_Closed_07", type: "Hi-Hat" },
+                                { name: "Chord_Progression_C", type: "Chord Loop" },
+                                { name: "Bass_Line_Am", type: "Bass Loop" },
+                                { name: "Atmospheric_Pad", type: "Ambient Sound" }
+                            ];
+                            const sample = sampleNames[i] || { name: `Sample_${i + 1}`, type: "Audio Sample" };
+                            
+                            return (
+                                <div class="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+                                    <h4 class="text-white font-medium mb-2 text-sm">{sample.name}</h4>
+                                    <p class="text-gray-400 text-xs mb-3">{sample.type}</p>
+                                    <audio 
+                                        controls 
+                                        class="w-full h-8 bg-gray-700 rounded"
+                                        preload="none"
                                     >
-                                        <path
-                                            fill-rule="evenodd"
-                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
-                                            clip-rule="evenodd"></path>
-                                    </svg>
-                                </button>
-                                <div class="flex-1 text-left">
-                                    <div class="text-white font-medium text-sm">
-                                        Stick_1
-                                    </div>
-                                    <div class="text-gray-400 text-xs">
-                                        Drum Hit
-                                    </div>
+                                        <source src={`/audio/free-kit/sample-${i + 1}.mp3`} type="audio/mpeg" />
+                                        <source src={`/audio/free-kit/sample-${i + 1}.wav`} type="audio/wav" />
+                                        Your browser does not support the audio element.
+                                    </audio>
                                 </div>
-                            </div>
-                        </div>
-                        <div
-                            class="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50"
-                        >
-                            <div class="flex items-center space-x-3">
-                                <button
-                                    class="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-700 transition-colors"
-                                >
-                                    <svg
-                                        class="w-5 h-5 text-white ml-1"
-                                        fill="currentColor"
-                                        viewBox="0 0 20 20"
-                                    >
-                                        <path
-                                            fill-rule="evenodd"
-                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
-                                            clip-rule="evenodd"></path>
-                                    </svg>
-                                </button>
-                                <div class="flex-1 text-left">
-                                    <div class="text-white font-medium text-sm">
-                                        Kick_BD_15
-                                    </div>
-                                    <div class="text-gray-400 text-xs">
-                                        Bass Drum
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                            class="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50"
-                        >
-                            <div class="flex items-center space-x-3">
-                                <button
-                                    class="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-700 transition-colors"
-                                >
-                                    <svg
-                                        class="w-5 h-5 text-white ml-1"
-                                        fill="currentColor"
-                                        viewBox="0 0 20 20"
-                                    >
-                                        <path
-                                            fill-rule="evenodd"
-                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
-                                            clip-rule="evenodd"></path>
-                                    </svg>
-                                </button>
-                                <div class="flex-1 text-left">
-                                    <div class="text-white font-medium text-sm">
-                                        A4_Cycle_Comp_ATAB
-                                    </div>
-                                    <div class="text-gray-400 text-xs">
-                                        Melodic Loop
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                            );
+                        })}
                     </div>
                 </div>
             </div>

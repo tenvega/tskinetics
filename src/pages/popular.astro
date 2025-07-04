@@ -9,7 +9,12 @@ let error: string | null = null;
 
 try {
     console.log("Fetching popular products...");
-    products = await fetchProducts(10); // Fetch more products for popular section
+    const allProducts = await fetchProducts(50); // Fetch more products to sort by sales
+    
+    // Sort by sales count (highest first) and limit to 8
+    products = allProducts
+        .sort((a, b) => (b.sales_count || 0) - (a.sales_count || 0))
+        .slice(0, 8);
     console.log(`Successfully fetched ${products.length} popular products`);
 } catch (e) {
     error = e instanceof Error ? e.message : "Failed to fetch products";
@@ -49,12 +54,12 @@ try {
                         {products.map((product) => {
                             const imageUrl =
                                 product.thumbnail_url || product.cover_url;
-                            const price = product.price / 100; // Convert from cents to dollars
+                            const price = product.price / 100; // Convert cents to dollars
                             const formattedPrice =
                                 product.formatted_price ||
                                 `$${price.toFixed(2)}`;
                             const productUrl =
-                                product.url || `/products/${product.id}`;
+                                `/products/${product.id}`;
 
                             return (
                                 <div class="group">

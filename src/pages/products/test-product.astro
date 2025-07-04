@@ -1,6 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import AddToCartButton from '../../components/ui/AddToCartButton.astro';
+import BuyNowButton from '../../components/ui/BuyNowButton.astro';
 
 // Mock product data for testing the new design
 const mockProduct = {
@@ -194,7 +194,7 @@ const audioSamples = [
               </div>
 
               <div class="transform hover:scale-105 transition-transform duration-200">
-                <AddToCartButton 
+                <BuyNowButton 
                   variantId={mockProduct.variants[0].id}
                   productTitle={mockProduct.title}
                   price={mockProduct.variants[0].price.amount}

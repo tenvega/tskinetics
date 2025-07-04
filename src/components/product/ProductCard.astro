@@ -12,14 +12,14 @@ const imageUrl = product.thumbnail_url || product.cover_url || "/images/bg.png";
 const imageAlt = product.title;
 
 // Format price
-const price = product.price / 100; // Convert from cents to dollars
+const price = product.price / 100; // Convert cents to dollars
 const formattedPrice = product.formatted_price || `$${price.toFixed(2)}`;
 
-// Product URL - use Gumroad URL or fallback to local URL
-const productUrl = product.url || `/products/${product.id}`;
+// Product URL - always use local product page
+const productUrl = `/products/${product.id}`;
 
 // Check if it's a new product
-const isNew = product.tags?.includes("new") || false;
+const isNew = product.tags ? String(product.tags).toLowerCase().includes("new") : false;
 ---
 
 <div class="group">

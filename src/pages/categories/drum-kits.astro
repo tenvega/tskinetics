@@ -1,33 +1,39 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import ProductGrid from "../components/product/ProductGrid.astro";
-import { fetchCollectionByHandle } from "../lib/gumroad";
-import type { GumroadProduct } from "../lib/types";
+import Layout from "../../layouts/Layout.astro";
+import { fetchProducts } from "../../lib/gumroad";
+import type { GumroadProduct } from "../../lib/types";
 
 let products: GumroadProduct[] = [];
 let error: string | null = null;
 
 try {
-  console.log("Fetching new releases collection...");
-  const collection = await fetchCollectionByHandle("new-releases");
-  if (collection && collection.products) {
-    products = collection.products;
-  }
-  console.log(`Successfully fetched ${products.length} new products`);
+  console.log("Fetching drum kits products...");
+  const allProducts = await fetchProducts(50);
+  
+  // Filter products by tags containing "drums", "sample pack", "drumkits"
+  const drumKitsKeywords = ['drums', 'sample pack', 'drumkits', 'drum kits', 'drum kit'];
+  
+  products = allProducts.filter(product => {
+    if (!product.tags) return false;
+    const tags = typeof product.tags === 'string' ? product.tags.toLowerCase() : String(product.tags).toLowerCase();
+    return drumKitsKeywords.some(keyword => tags.includes(keyword));
+  });
+  
+  console.log(`Successfully fetched ${products.length} drum kits products`);
 } catch (e) {
-  error = e instanceof Error ? e.message : "Failed to fetch new products";
-  console.error("Error fetching new products:", e);
+  error = e instanceof Error ? e.message : "Failed to fetch drum kits products";
+  console.error("Error fetching drum kits products:", e);
 }
 ---
 
-<Layout title="New Kits - Latest TSK Releases">
+<Layout title="Drum Kits - TSK Sound Kits">
   <main class="bg-[#151515] py-20 min-h-screen">
     <div class="max-w-7xl mx-auto px-4">
       <!-- Page Header -->
       <div class="text-center mb-16">
-        <h1 class="text-4xl font-bold text-white mb-4">NEW RELEASES</h1>
+        <h1 class="text-4xl font-bold text-white mb-4">DRUM KITS</h1>
         <p class="text-gray-400 text-lg">
-          The latest sound packs, drum kits, and presets
+          Complete drum kits and sample packs for your productions
         </p>
       </div>
 
@@ -48,9 +54,6 @@ try {
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {products.map((product) => {
               const imageUrl = product.thumbnail_url || product.cover_url;
-              const price = product.price / 100; // Convert cents to dollars
-              const formattedPrice =
-                product.formatted_price || `$${price.toFixed(2)}`;
               const productUrl = `/products/${product.id}`;
 
               return (
@@ -72,7 +75,7 @@ try {
                     </h3>
                   </a>
                   <p class="text-white text-xl font-semibold mb-4">
-                    {formattedPrice}
+                    {product.formatted_price}
                   </p>
                   <a
                     href={productUrl}
@@ -88,10 +91,10 @@ try {
           <div class="text-center py-12">
             <div class="bg-gray-800 rounded-lg p-8 max-w-2xl mx-auto">
               <h3 class="text-white font-semibold text-lg mb-2">
-                No New Products Available
+                No Drum Kits Available
               </h3>
               <p class="text-gray-400 mb-4">
-                We're currently working on new releases. Please check back soon!
+                We're currently working on adding more drum kits. Please check back soon!
               </p>
             </div>
           </div>

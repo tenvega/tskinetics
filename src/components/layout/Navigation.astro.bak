@@ -1,23 +1,7 @@
 ---
 // Static navigation - collections are hardcoded in the dropdown
-const { currentPage } = Astro.props;
-
-// Function to check if current page matches the link
-const isActivePage = (page: string) => {
-  if (currentPage === page) return true;
-  if (currentPage === "/" && page === "home") return true;
-  if (currentPage === "/popular" && page === "popular") return true;
-  if (currentPage === "/new-releases" && page === "new-releases") return true;
-  if (currentPage === "/products" && page === "products") return true;
-  if (currentPage === "/free-kit-300" && page === "free-kit") return true;
-  if (currentPage === "/contact" && page === "contact") return true;
-  return false;
-};
-
-// Active link classes
-const activeLinkClass = "text-white relative after:absolute after:bottom-[-8px] after:left-0 after:right-0 after:h-0.5 after:bg-white after:content-['']";
-const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
 ---
+
 <header class="bg-[#151515] border-b border-gray-800 sticky top-0 z-50">
   <nav class="container mx-auto px-4">
     <div class="flex items-center justify-between h-16">
@@ -26,9 +10,9 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
         <a href="/" class="flex items-center space-x-3">
           <!-- TSK Diamond Logo -->
           <div
-            class="w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-600 transform rotate-45 flex items-center justify-center"
+            class="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 transform rotate-45 flex items-center justify-center"
           >
-            <span class="text-white font-bold text-xl transform -rotate-45"
+            <span class="text-white font-bold text-lg transform -rotate-45"
               >TSK</span
             >
           </div>
@@ -38,22 +22,22 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
 
       <!-- Desktop Navigation -->
       <div class="hidden md:flex items-center space-x-8">
-        <a href="/" class={isActivePage("home") ? activeLinkClass : inactiveLinkClass}>
+        <a href="/" class="text-gray-300 hover:text-white transition-colors">
           HOME
         </a>
 
         <a
           href="/popular"
-          class={isActivePage("popular") ? activeLinkClass : inactiveLinkClass}
+          class="text-gray-300 hover:text-white transition-colors"
         >
           POPULAR
         </a>
 
         <a
-          href="/new-releases"
-          class={isActivePage("new-releases") ? activeLinkClass : inactiveLinkClass}
+          href="/new-kits"
+          class="text-gray-300 hover:text-white transition-colors"
         >
-          NEW RELEASES
+          NEW KITS
         </a>
 
         <!-- Categories Dropdown -->
@@ -88,28 +72,34 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
                 ALL PRODUCTS
               </a>
               <a
-                href="/categories/one-shots"
-                class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
-              >
-                ONE SHOTS
-              </a>
-              <a
-                href="/categories/drum-kits"
+                href="/collections/drum-kits"
                 class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
               >
                 DRUM KITS
               </a>
               <a
-                href="/categories/presets"
+                href="/collections/one-shots"
+                class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
+              >
+                ONE SHOTS
+              </a>
+              <a
+                href="/collections/presets"
                 class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
               >
                 PRESETS
               </a>
               <a
-                href="/categories/midi"
+                href="/collections/bundles"
                 class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
               >
-                MIDI
+                BUNDLES
+              </a>
+              <a
+                href="/collections/0a0a"
+                class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
+              >
+                /0A0A/
               </a>
             </div>
           </div>
@@ -117,21 +107,21 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
 
         <a
           href="/free-kit-300"
-          class={isActivePage("free-kit") ? activeLinkClass : inactiveLinkClass}
+          class="text-gray-300 hover:text-white transition-colors"
         >
           FREE KIT 300+
         </a>
 
         <a
           href="/contact"
-          class={isActivePage("contact") ? activeLinkClass : inactiveLinkClass}
+          class="text-gray-300 hover:text-white transition-colors"
         >
           CONTACT
         </a>
 
-        <!-- Shopping Cart -->
+        <!-- Browse Products -->
         <a
-          href="/cart"
+          href="/products"
           class="text-gray-300 hover:text-white transition-colors relative"
         >
           <svg
@@ -144,12 +134,29 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
               stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
-              d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13v6a2 2 0 002 2h6a2 2 0 002-2v-6m-8 0V9a2 2 0 012-2h4a2 2 0 012 2v4.01"
-            ></path>
+              d="M19 11H5m0 0l4-4m-4 4l4 4"></path>
           </svg>
-          <span id="cart-count" class="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
         </a>
 
+        <!-- User Account -->
+        <a
+          href="/account"
+          class="text-gray-300 hover:text-white transition-colors"
+        >
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+            ></path>
+          </svg>
+        </a>
 
         <!-- Currency Selector -->
         <div class="text-gray-300 text-sm">United States | USD $</div>
@@ -195,10 +202,10 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
           POPULAR
         </a>
         <a
-          href="/new-releases"
+          href="/new-kits"
           class="block px-3 py-2 text-gray-300 hover:text-white transition-colors"
         >
-          NEW RELEASES
+          NEW KITS
         </a>
 
         <!-- Mobile Categories -->
@@ -213,28 +220,34 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
             All Products
           </a>
           <a
-            href="/categories/one-shots"
-            class="block px-6 py-2 text-gray-300 hover:text-white transition-colors"
-          >
-            One Shots
-          </a>
-          <a
-            href="/categories/drum-kits"
+            href="/collections/drum-kits"
             class="block px-6 py-2 text-gray-300 hover:text-white transition-colors"
           >
             Drum Kits
           </a>
           <a
-            href="/categories/presets"
+            href="/collections/one-shots"
+            class="block px-6 py-2 text-gray-300 hover:text-white transition-colors"
+          >
+            One Shots
+          </a>
+          <a
+            href="/collections/presets"
             class="block px-6 py-2 text-gray-300 hover:text-white transition-colors"
           >
             Presets
           </a>
           <a
-            href="/categories/midi"
+            href="/collections/bundles"
             class="block px-6 py-2 text-gray-300 hover:text-white transition-colors"
           >
-            MIDI
+            Bundles
+          </a>
+          <a
+            href="/collections/0a0a"
+            class="block px-6 py-2 text-gray-300 hover:text-white transition-colors"
+          >
+            /0A0A/
           </a>
         </div>
 
@@ -273,38 +286,4 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
       mobileMenu.classList.toggle("hidden");
     });
   }
-
-  // Cart count functionality
-  function updateCartCount() {
-    try {
-      const cartData = localStorage.getItem('gumroad_cart');
-      let count = 0;
-      
-      if (cartData) {
-        const cart = JSON.parse(cartData);
-        count = cart.items ? cart.items.reduce((total: number, item: any) => total + item.quantity, 0) : 0;
-      }
-      
-      const cartCountElement = document.getElementById('cart-count');
-      if (cartCountElement) {
-        cartCountElement.textContent = count.toString();
-        cartCountElement.classList.toggle('hidden', count === 0);
-      }
-    } catch (error) {
-      console.error('Error updating cart count:', error);
-    }
-  }
-
-  // Update cart count on page load
-  document.addEventListener('DOMContentLoaded', updateCartCount);
-
-  // Listen for cart updates from other pages
-  window.addEventListener('storage', (e) => {
-    if (e.key === 'gumroad_cart') {
-      updateCartCount();
-    }
-  });
-
-  // Update cart count when focus returns to window
-  window.addEventListener('focus', updateCartCount);
 </script>

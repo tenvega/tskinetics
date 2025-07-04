@@ -1,14 +1,30 @@
 ---
 import "../styles/globals.css";
 import { siteAssets } from "../lib/gumroad";
-import CartIndicator from "../components/ui/CartIndicator.astro";
-import CartDropdown from "../components/ui/CartDropdown.astro";
 
 export interface Props {
     title?: string;
 }
 
 const { title = "TSK Sound Kits" } = Astro.props;
+
+// Get current page path for active navigation state
+const currentPath = Astro.url.pathname;
+
+// Function to check if current page matches the link
+const isActivePage = (page: string) => {
+  if (currentPath === "/" && page === "home") return true;
+  if (currentPath === "/popular" && page === "popular") return true;
+  if (currentPath === "/new-releases" && page === "new-releases") return true;
+  if (currentPath === "/products" && page === "products") return true;
+  if (currentPath === "/free-kit-300" && page === "free-kit") return true;
+  if (currentPath === "/contact" && page === "contact") return true;
+  return false;
+};
+
+// Active link classes
+const activeLinkClass = "text-white border-b border-white";
+const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
 ---
 
 <!doctype html>
@@ -50,32 +66,31 @@ const { title = "TSK Sound Kits" } = Astro.props;
                 <nav class="hidden md:flex items-center space-x-8">
                     <a
                         href="/"
-                        class="text-white hover:text-gray-300 transition-colors border-b border-white"
+                        class={isActivePage("home") ? activeLinkClass : inactiveLinkClass}
                         >HOME</a
                     >
                     <a
                         href="/products"
-                        class="text-white hover:text-gray-300 transition-colors"
+                        class={isActivePage("products") ? activeLinkClass : inactiveLinkClass}
                         >PRODUCTS</a
                     >
                     <a
                         href="/popular"
-                        class="text-white hover:text-gray-300 transition-colors"
+                        class={isActivePage("popular") ? activeLinkClass : inactiveLinkClass}
                         >POPULAR</a
                     >
                     <a
-                        href="/new-kits"
-                        class="text-white hover:text-gray-300 transition-colors"
-                        >NEW KITS</a
+                        href="/new-releases"
+                        class={isActivePage("new-releases") ? activeLinkClass : inactiveLinkClass}
+                        >NEW RELEASES</a
                     >
                     <div class="relative group">
-                        <a
-                            href="/categories"
+                        <button
                             class="text-white hover:text-gray-300 transition-colors flex items-center"
                         >
                             CATEGORIES
                             <svg
-                                class="w-4 h-4 ml-1"
+                                class="w-4 h-4 ml-1 transition-transform group-hover:rotate-180"
                                 fill="currentColor"
                                 viewBox="0 0 20 20"
                             >
@@ -84,7 +99,28 @@ const { title = "TSK Sound Kits" } = Astro.props;
                                     d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
                                     clip-rule="evenodd"></path>
                             </svg>
-                        </a>
+                        </button>
+                        
+                        <!-- Dropdown Menu -->
+                        <div class="absolute left-0 mt-2 w-48 bg-[#1a1a1a] border border-gray-700 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                            <div class="py-2">
+                                <a href="/products" class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">
+                                    ALL PRODUCTS
+                                </a>
+                                <a href="/categories/one-shots" class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">
+                                    ONE SHOTS
+                                </a>
+                                <a href="/categories/drum-kits" class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">
+                                    DRUM KITS
+                                </a>
+                                <a href="/categories/presets" class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">
+                                    PRESETS
+                                </a>
+                                <a href="/categories/midi" class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">
+                                    MIDI
+                                </a>
+                            </div>
+                        </div>
                     </div>
                     <a
                         href="/free-kit-300"
@@ -103,41 +139,6 @@ const { title = "TSK Sound Kits" } = Astro.props;
                     <span class="text-sm text-gray-300"
                         >United States | USD $</span
                     >
-                    <button class="text-white hover:text-gray-300">
-                        <svg
-                            class="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                            ></path>
-                        </svg>
-                    </button>
-                    <button class="text-white hover:text-gray-300">
-                        <svg
-                            class="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                            ></path>
-                        </svg>
-                    </button>
-                    <!-- Cart with Dropdown -->
-                    <div class="relative">
-                        <CartIndicator />
-                        <CartDropdown />
-                    </div>
                 </div>
             </div>
         </header>
@@ -201,7 +202,7 @@ const { title = "TSK Sound Kits" } = Astro.props;
                         <button
                             class="bg-purple-600 text-white px-4 py-2 rounded text-sm font-semibold hover:bg-purple-700 transition-colors"
                         >
-                            Follow on Shop
+                            Subscribe
                         </button>
                     </div>
 

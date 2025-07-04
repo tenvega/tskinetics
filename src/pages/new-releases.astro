@@ -1,26 +1,47 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import ProductGrid from "../components/product/ProductGrid.astro";
-import { fetchCollectionByHandle } from "../lib/gumroad";
+import { fetchProducts } from "../lib/gumroad";
 import type { GumroadProduct } from "../lib/types";
 
 let products: GumroadProduct[] = [];
 let error: string | null = null;
 
 try {
-  console.log("Fetching new releases collection...");
-  const collection = await fetchCollectionByHandle("new-releases");
-  if (collection && collection.products) {
-    products = collection.products;
+  console.log("Fetching new releases...");
+  const allProducts = await fetchProducts(50);
+  
+  // Define the specific order as per requirements
+  const newReleasesOrder = [
+    "FM Percussion",
+    "Sonic Entropy", 
+    "TSK + /0A0A/ INTRO KIT",
+    "FM Vapor Drums-Green",
+    "FM Vapor Drums-Red"
+  ];
+  
+  // Sort products according to the specified order
+  const sortedProducts = [];
+  for (const targetName of newReleasesOrder) {
+    const product = allProducts.find(p => {
+      const title = p.title || p.name || '';
+      const name = p.name || p.title || '';
+      return title.toLowerCase().includes(targetName.toLowerCase()) || 
+             name.toLowerCase().includes(targetName.toLowerCase());
+    });
+    if (product) {
+      sortedProducts.push(product);
+    }
   }
-  console.log(`Successfully fetched ${products.length} new products`);
+  
+  products = sortedProducts;
+  console.log(`Successfully fetched ${products.length} new releases`);
 } catch (e) {
-  error = e instanceof Error ? e.message : "Failed to fetch new products";
-  console.error("Error fetching new products:", e);
+  error = e instanceof Error ? e.message : "Failed to fetch new releases";
+  console.error("Error fetching new releases:", e);
 }
 ---
 
-<Layout title="New Kits - Latest TSK Releases">
+<Layout title="New Releases - Latest TSK Sound Kits">
   <main class="bg-[#151515] py-20 min-h-screen">
     <div class="max-w-7xl mx-auto px-4">
       <!-- Page Header -->
@@ -48,9 +69,6 @@ try {
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {products.map((product) => {
               const imageUrl = product.thumbnail_url || product.cover_url;
-              const price = product.price / 100; // Convert cents to dollars
-              const formattedPrice =
-                product.formatted_price || `$${price.toFixed(2)}`;
               const productUrl = `/products/${product.id}`;
 
               return (
@@ -72,7 +90,7 @@ try {
                     </h3>
                   </a>
                   <p class="text-white text-xl font-semibold mb-4">
-                    {formattedPrice}
+                    {product.formatted_price}
                   </p>
                   <a
                     href={productUrl}

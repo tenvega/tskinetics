@@ -1,6 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import AddToCartButton from "../components/ui/AddToCartButton.astro";
+import BuyNowButton from "../components/ui/BuyNowButton.astro";
 import { fetchProducts, getProductUrl, formatPrice } from "../lib/gumroad";
 import type { GumroadProduct } from "../lib/types";
 
@@ -46,12 +46,12 @@ try {
                         {products.map((product) => {
                             const imageUrl =
                                 product.thumbnail_url || product.cover_url;
-                            const price = product.price / 100; // Convert from cents to dollars
+                            const price = product.price / 100; // Convert cents to dollars
                             const formattedPrice =
                                 product.formatted_price ||
                                 `$${price.toFixed(2)}`;
                             const productUrl =
-                                product.url || `/products/${product.id}`;
+                                `/products/${product.id}`;
 
                             return (
                                 <div class="group">
