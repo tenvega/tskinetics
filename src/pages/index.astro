@@ -296,14 +296,14 @@ const latestProduct = products.length > 0 ? products[0] : null;
 						{latestProduct ? (
 							<a
 								href={`/products/${latestProduct.id}`}
-								class="inline-flex items-center justify-center px-6 py-2 bg-[#151515] border border-[#f3f3f3] text-[#f3f3f3] text-base md:text-lg font-bold leading-relaxed rounded-lg hover:bg-[#2266ff] hover:text-[#f3f3f3] transition-colors duration-300"
+								class="btn-smooth inline-flex items-center justify-center px-6 py-2 bg-[#151515] border border-[#f3f3f3] text-[#f3f3f3] text-base md:text-lg font-bold leading-relaxed rounded-lg hover:bg-[#2266ff] hover:text-[#f3f3f3]"
 							>
 								LEARN MORE
 							</a>
 						) : (
 							<a
 								href="/products"
-								class="inline-flex items-center justify-center px-6 py-2 bg-[#151515] border border-[#f3f3f3] text-[#f3f3f3] text-base md:text-lg font-bold leading-relaxed rounded-lg hover:bg-[#2266ff] hover:text-[#f3f3f3] transition-colors duration-300"
+								class="btn-smooth inline-flex items-center justify-center px-6 py-2 bg-[#151515] border border-[#f3f3f3] text-[#f3f3f3] text-base md:text-lg font-bold leading-relaxed rounded-lg hover:bg-[#2266ff] hover:text-[#f3f3f3]"
 							>
 								VIEW PRODUCTS
 							</a>
@@ -316,10 +316,8 @@ const latestProduct = products.length > 0 ? products[0] : null;
 					<div class="w-full max-w-lg">
 						{latestProduct ? (
 							<a
-								href={latestProduct.url}
-								target="_blank"
-								rel="noopener noreferrer"
-								class="block rounded-lg overflow-hidden"
+								href={`/products/${latestProduct.id}`}
+								class="cover-hover block rounded-lg overflow-hidden"
 							>
 								<img
 									src={latestProduct.thumbnail_url || latestProduct.cover_url || "/api/placeholder/400/400"}

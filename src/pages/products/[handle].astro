@@ -165,11 +165,11 @@ try {
                     {cleanText(product.description).length > 200 && (
                       <button 
                         id="description-toggle"
-                        class="text-gray-500 hover:text-gray-400 text-sm mt-2 transition-colors"
+                        class="description-toggle text-sm mt-2"
                         data-full-description={cleanText(product.description)}
                         data-truncated-description={cleanText(product.description).substring(0, 200) + '...'}
                       >
-                        View less
+                        View more
                       </button>
                     )}
                   </div>
@@ -202,13 +202,13 @@ try {
               
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 {relatedProducts.map((relatedProduct) => (
-                  <div class="group">
+                  <div class="group card-hover rounded-lg p-4">
                     <a href={`/products/${relatedProduct.id}`} class="block">
-                      <div class="aspect-square mb-4 overflow-hidden rounded-lg">
+                      <div class="cover-hover aspect-square mb-4 overflow-hidden rounded-lg">
                         <img
                           src={relatedProduct.thumbnail_url || relatedProduct.cover_url || "/images/bg.png"}
                           alt={relatedProduct.title}
-                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          class="w-full h-full object-cover"
                           loading="lazy"
                           onerror="this.src='/images/bg.png';"
                         />
@@ -243,14 +243,14 @@ try {
           const fullDescription = toggleButton.getAttribute('data-full-description');
           const truncatedDescription = toggleButton.getAttribute('data-truncated-description');
           
-          if (isExpanded) {
-            descriptionContent.textContent = truncatedDescription;
-            toggleButton.textContent = 'View more';
-            isExpanded = false;
-          } else {
+          if (!isExpanded) {
             descriptionContent.textContent = fullDescription;
             toggleButton.textContent = 'View less';
             isExpanded = true;
+          } else {
+            descriptionContent.textContent = truncatedDescription;
+            toggleButton.textContent = 'View more';
+            isExpanded = false;
           }
         });
       }
