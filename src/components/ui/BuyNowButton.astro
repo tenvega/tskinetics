@@ -28,13 +28,15 @@ const checkoutUrl = `https://gumroad.com/checkout?product=${extractedProductId}&
     href={checkoutUrl}
     target="_blank"
     rel="noopener noreferrer"
-    class="buy-now-btn bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors inline-block text-center w-full"
+    class="buy-now-btn bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors inline-block text-center w-full flex items-center justify-center space-x-2"
     data-product-id={productId}
     data-product-title={productTitle}
     data-price={price}
     data-extracted-id={extractedProductId}
 >
-    Buy Now • {formattedPrice || `$${(price / 100).toFixed(2)}`}
+    <span>Get Pack</span>
+    <span>•</span>
+    <span>{formattedPrice || `$${(price / 100).toFixed(2)}`}</span>
 </a>
 
 <script>
@@ -48,7 +50,7 @@ const checkoutUrl = `https://gumroad.com/checkout?product=${extractedProductId}&
 
                 // Visual feedback
                 btn.style.opacity = "0.7";
-                btn.textContent = "Redirecting...";
+                btn.innerHTML = "<span>Redirecting...</span>";
                 
                 // Track the purchase intent for analytics (optional)
                 console.log(`Purchase intent for: ${productTitle}`);

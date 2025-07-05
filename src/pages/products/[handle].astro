@@ -13,6 +13,18 @@ if (!handle) {
   throw new Error('Product ID is required');
 }
 
+// Helper function to clean markdown and HTML from text
+function cleanText(text: string): string {
+  if (!text) return '';
+  return text
+    .replace(/<[^>]*>/g, '') // Remove HTML tags
+    .replace(/\*\*(.*?)\*\*/g, '$1') // Remove markdown bold
+    .replace(/\*(.*?)\*/g, '$1') // Remove markdown italic
+    .replace(/\[(.*?)\]\(.*?\)/g, '$1') // Remove markdown links
+    .replace(/#{1,6}\s*/g, '') // Remove markdown headers
+    .replace(/`([^`]*)`/g, '$1'); // Remove markdown code backticks
+}
+
 // Fetch the specific product
 let product: GumroadProduct | null = null;
 let relatedProducts: GumroadProduct[] = [];
@@ -42,7 +54,7 @@ try {
 ---
 
 <Layout title={product?.title || 'Product Not Found'}>
-  <main class="min-h-screen bg-[#151515] relative">
+  <main class="min-h-screen relative" style="background: linear-gradient(141deg, #0F0F23, #0A0A0A)">
     <!-- Main Content -->
     <div class="pt-20 pb-16 px-4">
       {error && (
@@ -56,156 +68,129 @@ try {
       {product && (
         <>
           <!-- Product Hero Section -->
-          <div class="max-w-6xl mx-auto mb-16">
-            <div class="grid lg:grid-cols-2 gap-12 items-start">
-              <!-- Left: Product Image -->
-              <div class="space-y-6">
-                <div class="relative group">
-                  <div class="aspect-square bg-gray-800 overflow-hidden border border-gray-700 shadow-lg rounded-lg">
-                    {product.preview_url || product.thumbnail_url || product.cover_url ? (
-                      <img 
-                        src={product.preview_url || product.thumbnail_url || product.cover_url}
-                        alt={product.title}
-                        class="main-product-image w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div class="w-full h-full flex items-center justify-center text-gray-400">
-                        <div class="text-center">
-                          <div class="text-6xl mb-4">🎵</div>
-                          <span class="text-lg">No image available</span>
-                        </div>
+          <div class="max-w-5xl mx-auto mb-12">
+            <div class="flex flex-col lg:flex-row gap-8">
+              <!-- Left: Cover Art (Bigger) -->
+              <div class="lg:w-96 flex-shrink-0">
+                <div class="aspect-square rounded-lg overflow-hidden bg-gray-900">
+                  {product.preview_url || product.thumbnail_url || product.cover_url ? (
+                    <img 
+                      src={product.preview_url || product.thumbnail_url || product.cover_url}
+                      alt={product.title}
+                      class="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div class="w-full h-full flex items-center justify-center text-gray-400">
+                      <div class="text-center">
+                        <div class="text-6xl mb-4">🎵</div>
+                        <span class="text-lg">No image available</span>
                       </div>
-                    )}
-                  </div>
-                  
-                  <!-- Image badges -->
-                  <div class="absolute top-4 left-4 space-y-2">
-                    <div class="bg-orange-600 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
-                      Digital Product
                     </div>
-                    {product.tags && String(product.tags).toLowerCase().includes('new') && (
-                      <div class="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
-                        NEW
-                      </div>
-                    )}
-                  </div>
+                  )}
                 </div>
               </div>
 
-              <!-- Right: Product Details -->
-              <div class="space-y-6">
-                <!-- Header -->
-                <div class="space-y-4">
-                  <div class="text-gray-400 text-lg font-medium tracking-wider">
-                    TSK Sound Kits
+              <!-- Right: Audio Samples Card (Same Height as Cover) -->
+              <div class="flex-1">
+                <div class="bg-[#1a1a1a] rounded-lg p-6 border border-gray-700 h-96 overflow-y-auto">
+                  <!-- Section Header -->
+                  <div class="mb-6">
+                    <h2 class="text-xl font-semibold text-white">Previews</h2>
                   </div>
-                  <div class="min-h-[4rem] flex items-start">
-                    <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight line-clamp-3">
-                      {product.title}
-                    </h1>
+
+                  <!-- Sample List -->
+                  <div class="space-y-3">
+                    {Array.from({ length: 8 }, (_, i) => (
+                      <div class="flex items-center space-x-3 p-2 hover:bg-gray-800/50 rounded transition-colors group">
+                        <!-- Play Button -->
+                        <button class="w-6 h-6 bg-purple-600 hover:bg-purple-700 rounded-full flex items-center justify-center text-white text-xs transition-colors">
+                          ▶
+                        </button>
+                        
+                        <!-- Waveform Visualization -->
+                        <div class="flex-1 h-8 bg-gray-800 rounded flex items-center px-2 overflow-hidden">
+                          <div class="flex items-end space-x-px w-full h-5">
+                            {Array.from({ length: 40 }, (_, j) => (
+                              <div 
+                                class="bg-purple-500 rounded-sm flex-1 opacity-60"
+                                style={`height: ${Math.random() * 100}%`}
+                              ></div>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        <!-- Sample Info -->
+                        <div class="min-w-0 w-32">
+                          <div class="text-white text-xs font-medium truncate">
+                            Sample_{String(i + 1).padStart(2, '0')}.wav
+                          </div>
+                          <div class="text-gray-400 text-xs">
+                            {Math.floor(Math.random() * 60 + 60)}s
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
 
-                <!-- Price -->
-                <div class="bg-gray-800 p-6 border border-gray-700 rounded-lg">
-                  <div class="text-3xl font-bold text-white mb-2">
-                    {product.formatted_price || `$${(product.price / 100).toFixed(2)}`}
-                    <span class="text-lg text-gray-400 ml-2">
-                      {product.currency || 'USD'}
+          <!-- Product Info Section (Below Cover and Audio) -->
+          <div class="max-w-5xl mx-auto mb-12">
+            <div class="flex flex-col lg:flex-row gap-8">
+              <!-- Left: Title and Description (aligned with cover) -->
+              <div class="lg:w-96 flex-shrink-0 space-y-6">
+                <!-- Title -->
+                <div>
+                  <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">
+                    {product.title}
+                  </h1>
+                  {product.tags && String(product.tags).toLowerCase().includes('new') && (
+                    <span class="inline-block bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium">
+                      NEW
                     </span>
-                  </div>
-                  <div class="text-gray-400 text-sm">
-                    Instant digital download
-                  </div>
-                  {product.file_info && product.file_info.Size && (
-                    <div class="text-gray-400 text-sm mt-1">
-                      File size: {product.file_info.Size}
-                    </div>
                   )}
                 </div>
 
                 <!-- Description -->
                 {product.description && (
-                  <div class="bg-gray-800 p-6 border border-gray-700 rounded-lg">
-                    <h3 class="text-white font-semibold mb-3">About This Pack</h3>
-                    <div class="text-gray-300 leading-relaxed">
-                      <div id="description-text" class="description-text" set:html={product.description} />
+                  <div class="text-gray-300 text-sm leading-relaxed">
+                    <div id="description-content">
+                      {cleanText(product.description).length > 200 ? 
+                        cleanText(product.description).substring(0, 200) + '...' : 
+                        cleanText(product.description)
+                      }
                     </div>
-                  </div>
-                )}
-
-                <!-- Add to Cart / Buy Now -->
-                <div class="space-y-6">
-                  <div class="transform hover:scale-105 transition-transform duration-200">
-                    <BuyNowButton 
-                      productId={product.id}
-                      productTitle={product.title}
-                      price={product.price}
-                      productUrl={product.url}
-                      formattedPrice={product.formatted_price}
-                    />
-                  </div>
-                </div>
-
-                <!-- Tags -->
-                {product.tags && (
-                  <div class="space-y-3">
-                    <h3 class="text-white font-semibold">Tags</h3>
-                    <div class="flex flex-wrap gap-2">
-                      {String(product.tags).split(',').map(tag => (
-                        <span class="px-3 py-1 bg-gray-700 text-gray-200 text-sm rounded-full border border-gray-600 hover:bg-gray-600 transition-colors">
-                          {tag.trim()}
-                        </span>
-                      ))}
-                    </div>
+                    {cleanText(product.description).length > 200 && (
+                      <button 
+                        id="description-toggle"
+                        class="text-gray-500 hover:text-gray-400 text-sm mt-2 transition-colors"
+                        data-full-description={cleanText(product.description)}
+                        data-truncated-description={cleanText(product.description).substring(0, 200) + '...'}
+                      >
+                        View less
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
-            </div>
-          </div>
 
-          <!-- Audio Examples Section -->
-          <div class="max-w-6xl mx-auto mb-16">
-            <div class="bg-gray-800 p-8 border border-gray-700 rounded-lg">
-              <h2 class="text-2xl font-bold text-white mb-6">Audio Examples</h2>
-              <p class="text-gray-400 mb-6">Listen to preview samples from this pack</p>
-              <div class="grid md:grid-cols-2 gap-4">
-                {Array.from({ length: 8 }, (_, i) => (
-                  <div class="bg-gray-700 p-4 rounded-lg border border-gray-600">
-                    <h4 class="text-white font-medium mb-2">Sample {i + 1}</h4>
-                    <audio 
-                      controls 
-                      class="w-full h-10 bg-gray-600 rounded"
-                      preload="none"
-                    >
-                      <source src={`/audio/samples/sample-${i + 1}.mp3`} type="audio/mpeg" />
-                      <source src={`/audio/samples/sample-${i + 1}.wav`} type="audio/wav" />
-                      Your browser does not support the audio element.
-                    </audio>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <!-- Product Info Section -->
-          <div class="max-w-6xl mx-auto mb-16">
-            <div class="bg-gray-800 p-8 border border-gray-700 rounded-lg">
-              <h2 class="text-2xl font-bold text-white mb-6">Product Details</h2>
-              <div class="grid md:grid-cols-2 gap-6">
-                <div>
-                  <h3 class="font-semibold text-white mb-2">Sales</h3>
-                  <p class="text-gray-400">{product.sales_count || 0} sales</p>
-                </div>
-                <div>
-                  <h3 class="font-semibold text-white mb-2">Published</h3>
-                  <p class="text-gray-400">
-                    {product.created_at ? new Date(product.created_at).toLocaleDateString() : 'N/A'}
-                  </p>
+              <!-- Right: Action Button (aligned with audio card) -->
+              <div class="flex-1">
+                <div class="max-w-xs">
+                  <BuyNowButton 
+                    productId={product.id}
+                    productTitle={product.title}
+                    price={product.price}
+                    productUrl={product.url}
+                    formattedPrice={product.formatted_price}
+                  />
                 </div>
               </div>
             </div>
           </div>
+
 
           <!-- Related Products -->
           {relatedProducts.length > 0 && (
@@ -248,10 +233,10 @@ try {
     <script>
     // Description toggle functionality
     document.addEventListener('DOMContentLoaded', function() {
-      const toggleButton = document.getElementById('toggle-description');
-      const descriptionText = document.getElementById('description-text');
+      const toggleButton = document.getElementById('description-toggle');
+      const descriptionContent = document.getElementById('description-content');
       
-      if (toggleButton && descriptionText) {
+      if (toggleButton && descriptionContent) {
         let isExpanded = false;
         
         toggleButton.addEventListener('click', function() {
@@ -259,16 +244,16 @@ try {
           const truncatedDescription = toggleButton.getAttribute('data-truncated-description');
           
           if (isExpanded) {
-            descriptionText.textContent = truncatedDescription;
-            toggleButton.textContent = 'See more';
+            descriptionContent.textContent = truncatedDescription;
+            toggleButton.textContent = 'View more';
             isExpanded = false;
           } else {
-            descriptionText.textContent = fullDescription;
-            toggleButton.textContent = 'See less';
+            descriptionContent.textContent = fullDescription;
+            toggleButton.textContent = 'View less';
             isExpanded = true;
           }
         });
-        }
-      });
+      }
+    });
     </script>
 </Layout> 
