@@ -23,6 +23,8 @@ const isActivePage = (page: string) => {
   if (currentPath === "/popular" && page === "popular") return true;
   if (currentPath === "/new-releases" && page === "new-releases") return true;
   if (currentPath === "/products" && page === "products") return true;
+  if (currentPath === "/blog" && page === "blog") return true;
+  if (currentPath?.startsWith("/blog/") && page === "blog") return true;
   if (currentPath === "/free-kit-300" && page === "free-kit") return true;
   if (currentPath === "/contact" && page === "contact") return true;
   return false;
@@ -103,6 +105,11 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
                         href="/new-releases"
                         class={isActivePage("new-releases") ? activeLinkClass : inactiveLinkClass}
                         >NEW RELEASES</a
+                    >
+                    <a
+                        href="/blog"
+                        class={isActivePage("blog") ? activeLinkClass : inactiveLinkClass}
+                        >BLOG</a
                     >
                     <div class="relative group">
                         <button
@@ -246,9 +253,16 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
                             </li>
                             <li>
                                 <a
-                                    href="/new-kits"
+                                    href="/new-releases"
                                     class="hover:text-white transition-colors"
-                                    >NEW KITS</a
+                                    >NEW RELEASES</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="/blog"
+                                    class="hover:text-white transition-colors"
+                                    >BLOG</a
                                 >
                             </li>
                             <li>
