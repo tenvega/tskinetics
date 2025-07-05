@@ -1,6 +1,6 @@
 ---
 import "../styles/globals.css";
-import { siteAssets } from "../lib/gumroad";
+import { siteAssets, fetchProducts } from "../lib/gumroad";
 
 export interface Props {
     title?: string;
@@ -13,6 +13,10 @@ const {
     description = "Premium sound kits and samples for music producers",
     image = "/images/og-default.jpg"
 } = Astro.props;
+
+// Get latest release for dynamic marquee
+const products = await fetchProducts(1);
+const latestProduct = products.length > 0 ? products[0] : null;
 
 // Get current page path for active navigation state
 const currentPath = Astro.url.pathname;
@@ -42,10 +46,6 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
         <meta name="description" content={description} />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <link
-            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-            rel="stylesheet"
-        />
         <title>{title}</title>
         
         <!-- Open Graph / Facebook -->
@@ -75,7 +75,7 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
             >
                 <!-- TSK Logo -->
                 <div class="flex items-center">
-                    <div class="h-12">
+                    <div class="h-14">
                         <img
                             src={siteAssets.logos.tskMain}
                             alt="TSK Logo"
@@ -84,8 +84,8 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
                     </div>
                 </div>
 
-                <!-- Navigation Menu -->
-                <nav class="hidden md:flex items-center space-x-8">
+                <!-- Navigation Menu (Desktop) -->
+                <nav class="hidden lg:flex items-center space-x-6 xl:space-x-8 absolute left-1/2 transform -translate-x-1/2">
                     <a
                         href="/"
                         class={isActivePage("home") ? activeLinkClass : inactiveLinkClass}
@@ -151,7 +151,7 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
                     </div>
                     <a
                         href="/free-kit-300"
-                        class="text-white hover:text-gray-300 transition-colors"
+                        class="text-white hover:text-gray-300 transition-colors whitespace-nowrap"
                         >FREE KIT 300+</a
                     >
                     <a
@@ -161,28 +161,138 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
                     >
                 </nav>
 
+                <!-- Mobile Menu Button -->
+                <div class="lg:hidden">
+                    <button
+                        id="mobile-menu-button"
+                        class="text-gray-300 hover:text-white transition-colors"
+                        aria-label="Toggle mobile menu"
+                    >
+                        <svg
+                            class="w-6 h-6"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16"
+                            ></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="lg:hidden hidden bg-[#151515] border-t border-gray-800">
+                <div class="px-4 pt-2 pb-3 space-y-1">
+                    <a
+                        href="/"
+                        class="block px-3 py-2 text-gray-300 hover:text-white transition-colors"
+                        >HOME</a
+                    >
+                    <a
+                        href="/products"
+                        class="block px-3 py-2 text-gray-300 hover:text-white transition-colors"
+                        >PRODUCTS</a
+                    >
+                    <a
+                        href="/popular"
+                        class="block px-3 py-2 text-gray-300 hover:text-white transition-colors"
+                        >POPULAR</a
+                    >
+                    <a
+                        href="/new-releases"
+                        class="block px-3 py-2 text-gray-300 hover:text-white transition-colors"
+                        >NEW RELEASES</a
+                    >
+                    <a
+                        href="/blog"
+                        class="block px-3 py-2 text-gray-300 hover:text-white transition-colors"
+                        >BLOG</a
+                    >
+                    
+                    <!-- Mobile Categories -->
+                    <div class="border-t border-gray-700 pt-2 mt-2">
+                        <div class="px-3 py-2 text-gray-400 text-sm font-semibold">
+                            CATEGORIES
+                        </div>
+                        <a
+                            href="/products"
+                            class="block px-6 py-2 text-gray-300 hover:text-white transition-colors"
+                        >
+                            All Products
+                        </a>
+                        <a
+                            href="/categories/one-shots"
+                            class="block px-6 py-2 text-gray-300 hover:text-white transition-colors"
+                        >
+                            One Shots
+                        </a>
+                        <a
+                            href="/categories/drum-kits"
+                            class="block px-6 py-2 text-gray-300 hover:text-white transition-colors"
+                        >
+                            Drum Kits
+                        </a>
+                        <a
+                            href="/categories/presets"
+                            class="block px-6 py-2 text-gray-300 hover:text-white transition-colors"
+                        >
+                            Presets
+                        </a>
+                        <a
+                            href="/categories/midi"
+                            class="block px-6 py-2 text-gray-300 hover:text-white transition-colors"
+                        >
+                            MIDI
+                        </a>
+                    </div>
+
+                    <a
+                        href="/free-kit-300"
+                        class="block px-3 py-2 text-gray-300 hover:text-white transition-colors"
+                        >FREE KIT 300+</a
+                    >
+                    <a
+                        href="/contact"
+                        class="block px-3 py-2 text-gray-300 hover:text-white transition-colors"
+                        >CONTACT</a
+                    >
+                </div>
             </div>
         </header>
 
         <!-- Scrolling Banner -->
-        <div class="marquee-bar mt-20">
-            <div class="marquee-content">
-                <span class="marquee-text"
-                    >NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW
-                    RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW
-                    RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW
-                    RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW
-                    RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE •
-                </span>
-                <span class="marquee-text"
-                    >NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW
-                    RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW
-                    RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW
-                    RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW
-                    RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE •
-                </span>
+        {latestProduct && (
+            <a href={`/products/${latestProduct.id}`} class="block">
+                <div class="marquee-bar mt-20">
+                    <div class="marquee-content">
+                        <span class="marquee-text">
+                            NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • 
+                        </span>
+                        <span class="marquee-text">
+                            NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • 
+                        </span>
+                    </div>
+                </div>
+            </a>
+        )}
+        
+        {!latestProduct && (
+            <div class="marquee-bar mt-20">
+                <div class="marquee-content">
+                    <span class="marquee-text">
+                        NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • 
+                    </span>
+                    <span class="marquee-text">
+                        NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • 
+                    </span>
+                </div>
             </div>
-        </div>
+        )}
 
         <!-- Main Content -->
         <main>
@@ -372,7 +482,7 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
                     black 90%,
                     black
                 );
-                font-family: "Poppins", sans-serif;
+                font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             }
 
             .marquee-content {
@@ -401,5 +511,17 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
                 }
             }
         </style>
+
+        <script>
+            // Mobile menu toggle functionality
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+        </script>
     </body>
 </html>
