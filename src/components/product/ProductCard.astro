@@ -22,9 +22,9 @@ const productUrl = `/products/${product.id}`;
 const isNew = product.tags ? String(product.tags).toLowerCase().includes("new") : false;
 ---
 
-<div class="group card-hover rounded-lg p-4">
+<div class="group">
     <a href={productUrl} class="block">
-        <div class="cover-hover aspect-square mb-4 overflow-hidden rounded-lg">
+        <div class="aspect-square mb-4 overflow-hidden rounded-lg">
             <img
                 src={imageUrl}
                 alt={imageAlt}
@@ -46,7 +46,7 @@ const isNew = product.tags ? String(product.tags).toLowerCase().includes("new") 
     </p>
     <a
         href={productUrl}
-        class="btn-smooth inline-block border border-white text-white px-6 py-2 hover:bg-white hover:text-black text-sm font-semibold rounded"
+        class="inline-block border border-white text-white px-6 py-2 hover:bg-white hover:text-black text-sm font-semibold rounded"
     >
         VIEW PRODUCT
     </a>
