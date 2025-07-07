@@ -909,31 +909,33 @@ const latestProduct = products.length > 0 ? products[0] : null;
 		</div>
 	</section>
 
-	<!-- Artist Profile & Albums Section -->
+	<!-- TSK Brand Section -->
 	<section
 		class="py-20"
-		style="background: linear-gradient(141deg, #040E17, #C0093B)"
+		style="background: linear-gradient(130deg, #000503, #52FFF3)"
 	>
 		<div class="max-w-7xl mx-auto px-4">
-			<!-- Artist Profile -->
+			<!-- TSK Profile -->
 			<div
-				class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20"
+				class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
 			>
-				<!-- Left Side - Artist Info -->
+				<!-- Left Side - Brand Info -->
 				<div class="space-y-6">
-					<h2 class="text-5xl font-bold text-white">TEHN VEGA</h2>
+					<h2 class="text-5xl font-bold text-white">TSK</h2>
 					<p class="text-gray-200 text-lg leading-relaxed">
-						I'm a sound designer, composer, and beatmaker with a
-						passion for crafting intricate sonic worlds. Merging
-						precise rhythms with organic textures, my work spans
-						everything from creating experimental sound packs to
-						sonic branding and music production. I've also created
-						sound effects for a sci-fi-themed collectible item tied
-						to a prominent entertainment universe.
+						TSK is a premier sound design collective specializing in 
+						cutting-edge electronic music production. We craft intricate 
+						sonic worlds that merge precise rhythms with organic textures, 
+						spanning experimental sound packs, modular synthesis, and 
+						forward-thinking music production. Our work pushes the 
+						boundaries of sound design, delivering premium audio content 
+						for producers and composers worldwide.
 					</p>
 					<div class="flex space-x-4">
 						<a
-							href="#"
+							href="https://www.instagram.com/tehnsoundkits/"
+							target="_blank"
+							rel="noopener noreferrer"
 							class="text-white hover:text-gray-300 transition-colors"
 							aria-label="Instagram"
 						>
@@ -965,66 +967,16 @@ const latestProduct = products.length > 0 ? products[0] : null;
 					</div>
 				</div>
 
-				<!-- Right Side - Artist Image -->
+				<!-- Right Side - TSK Logo -->
 				<div class="relative">
-					<div class="aspect-square rounded-lg overflow-hidden">
-						<img
-							src={siteAssets.artists.tehnVega}
-							alt="TEHN VEGA Artist Photo"
-							class="w-full h-full object-cover"
-						/>
-					</div>
-				</div>
-			</div>
-
-			<!-- Albums Section -->
-			<div>
-				<h2 class="text-4xl font-bold text-white mb-12">ALBUMS</h2>
-
-				<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-					<!-- Haze Album - Spotify Embed -->
-					<div class="rounded-xl overflow-hidden">
-						<iframe
-							style="border-radius:12px"
-							src="https://open.spotify.com/embed/track/6N20wsFZVUZD73btApxCq3?utm_source=generator&theme=0"
-							width="100%"
-							height="352"
-							frameborder="0"
-							allowfullscreen=""
-							allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-							loading="lazy"
-						>
-						</iframe>
-					</div>
-
-					<!-- Partial Truth Album - Spotify Embed -->
-					<div class="rounded-xl overflow-hidden">
-						<iframe
-							style="border-radius:12px"
-							src="https://open.spotify.com/embed/track/7unGv9SlBsKwkirPaPDV78?utm_source=generator&theme=0"
-							width="100%"
-							height="352"
-							frameborder="0"
-							allowfullscreen=""
-							allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-							loading="lazy"
-						>
-						</iframe>
-					</div>
-
-					<!-- Stay Album - Spotify Embed -->
-					<div class="rounded-xl overflow-hidden">
-						<iframe
-							style="border-radius:12px"
-							src="https://open.spotify.com/embed/track/1dzfSwQzL4reVcsrRhwF77?utm_source=generator&theme=0"
-							width="100%"
-							height="352"
-							frameborder="0"
-							allowfullscreen=""
-							allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-							loading="lazy"
-						>
-						</iframe>
+					<div class="flex justify-center items-center">
+						<div class="w-96 h-96 flex items-center justify-center">
+							<img
+								src={siteAssets.logos.tskMain}
+								alt="TSK Logo"
+								class="w-full h-full object-contain filter drop-shadow-2xl"
+							/>
+						</div>
 					</div>
 				</div>
 			</div>

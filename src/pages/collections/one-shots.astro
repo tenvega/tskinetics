@@ -1,0 +1,107 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import ProductGrid from "../../components/product/ProductGrid.astro";
+import { fetchProducts } from "../../lib/gumroad";
+
+let products: any[] = [];
+let error: string | null = null;
+
+try {
+    console.log("Fetching one-shots products for collection...");
+    const allProducts = await fetchProducts(50);
+    
+    // Filter products by tags - exclude preset packs and bundles
+    products = allProducts.filter(product => {
+        if (!product.tags) return false;
+        
+        // Handle tags as array (from API) or convert to array
+        const tagsArray = Array.isArray(product.tags) ? product.tags : String(product.tags).split(',').map(t => t.trim());
+        const title = product.title.toLowerCase();
+        
+        // Exclude preset packs and bundles (these take precedence)
+        const excludeTags = ['presets', 'synth presets', 'preset pack', 'bundle'];
+        const isExcluded = tagsArray.some(tag => excludeTags.includes(tag.toLowerCase())) || 
+                          title.includes('preset') || title.includes('bundle');
+        
+        if (isExcluded) return false;
+        
+        // Look for one-shot specific tags
+        const oneShotTags = ['one shots', 'oneshot', 'one-shot', 'samples', 'sounds'];
+        const hasOneShotTag = tagsArray.some(tag => oneShotTags.includes(tag.toLowerCase()));
+        
+        // Title-based one-shot detection
+        const titleHasOneShot = title.includes('one shot') || title.includes('oneshot') || title.includes('samples');
+        
+        return hasOneShotTag || titleHasOneShot;
+    });
+    
+    console.log(`Successfully fetched ${products.length} one-shots products for collection`);
+} catch (e) {
+    error = e instanceof Error ? e.message : "Failed to fetch one-shots products";
+    console.error("Error fetching one-shots products for collection:", e);
+}
+---
+
+<Layout title="One Shots Collection - TSK Sound Kits">
+    <main class="min-h-screen bg-[#151515] py-12">
+        <div class="container mx-auto px-4">
+            <!-- Collection Header -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
+                    ONE SHOTS
+                </h1>
+                <p class="text-gray-400 text-lg max-w-2xl mx-auto">
+                    Individual samples, sounds, and one-shot audio files. 
+                    Perfect building blocks for your next hit.
+                </p>
+            </div>
+
+            <!-- Breadcrumb -->
+            <div class="mb-8">
+                <nav class="flex items-center space-x-2 text-sm text-gray-400">
+                    <a href="/" class="hover:text-white transition-colors">Home</a>
+                    <span>/</span>
+                    <a href="/collections" class="hover:text-white transition-colors">Collections</a>
+                    <span>/</span>
+                    <span class="text-white">One Shots</span>
+                </nav>
+            </div>
+
+            <!-- Products or Error/Empty State -->
+            {
+                error ? (
+                    <div class="text-center py-12">
+                        <div class="bg-red-900/50 border border-red-700 rounded-lg p-6 max-w-2xl mx-auto">
+                            <h3 class="text-red-400 font-semibold text-lg mb-2">
+                                Error Loading Products
+                            </h3>
+                            <p class="text-red-300 text-sm mb-4">{error}</p>
+                            <p class="text-gray-400 text-xs">
+                                Please check your Gumroad configuration in the .env file.
+                            </p>
+                        </div>
+                    </div>
+                ) : products.length > 0 ? (
+                    <ProductGrid products={products} />
+                ) : (
+                    <div class="text-center py-12">
+                        <div class="bg-gray-800 rounded-lg p-8 max-w-2xl mx-auto">
+                            <h3 class="text-white font-semibold text-lg mb-2">
+                                No One Shots Available
+                            </h3>
+                            <p class="text-gray-400 mb-4">
+                                We're currently working on adding more one-shot samples to this collection. Please check back soon!
+                            </p>
+                            <a
+                                href="/collections"
+                                class="btn-smooth inline-block mt-4 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                            >
+                                Explore Other Collections
+                            </a>
+                        </div>
+                    </div>
+                )
+            }
+        </div>
+    </main>
+</Layout>

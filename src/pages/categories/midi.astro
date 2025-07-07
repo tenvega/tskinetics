@@ -1,5 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import ProductCard from "../../components/product/ProductCard.astro";
 import { fetchProducts } from "../../lib/gumroad";
 import type { GumroadProduct } from "../../lib/types";
 
@@ -10,13 +11,22 @@ try {
   console.log("Fetching MIDI products...");
   const allProducts = await fetchProducts(50);
   
-  // Filter products by tags containing "midi"
-  const midiKeywords = ['midi', 'mid'];
-  
+  // Filter products by tags - look for MIDI specific content
   products = allProducts.filter(product => {
     if (!product.tags) return false;
-    const tags = typeof product.tags === 'string' ? product.tags.toLowerCase() : String(product.tags).toLowerCase();
-    return midiKeywords.some(keyword => tags.includes(keyword));
+    
+    // Handle tags as array (from API) or convert to array
+    const tagsArray = Array.isArray(product.tags) ? product.tags : String(product.tags).split(',').map(t => t.trim());
+    const title = product.title.toLowerCase();
+    
+    // Look for MIDI specific tags
+    const midiTags = ['midi', 'mid', 'musical instrument digital interface'];
+    const hasMidiTag = tagsArray.some(tag => midiTags.includes(tag.toLowerCase()));
+    
+    // Title-based MIDI detection
+    const titleHasMidi = title.includes('midi') || title.includes('sequence') || title.includes('pattern');
+    
+    return hasMidiTag || titleHasMidi;
   });
   
   console.log(`Successfully fetched ${products.length} MIDI products`);
@@ -51,41 +61,10 @@ try {
             </div>
           </div>
         ) : products.length > 0 ? (
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {products.map((product) => {
-              const imageUrl = product.thumbnail_url || product.cover_url;
-              const productUrl = `/products/${product.id}`;
-
-              return (
-                <div class="group">
-                  <a href={productUrl} class="block">
-                    <div class="aspect-square mb-4 overflow-hidden rounded-lg">
-                      <img
-                        src={imageUrl || "/images/bg.png"}
-                        alt={product.title}
-                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        loading="lazy"
-                        onerror="this.src='/images/bg.png';"
-                      />
-                    </div>
-                  </a>
-                  <a href={productUrl} class="block">
-                    <h3 class="text-white font-bold text-xl mb-2 uppercase hover:text-gray-300 transition-colors h-14 flex items-center">
-                      {product.title}
-                    </h3>
-                  </a>
-                  <p class="text-white text-xl font-semibold mb-4">
-                    {product.formatted_price}
-                  </p>
-                  <a
-                    href={productUrl}
-                    class="inline-block border border-white text-white px-6 py-2 hover:bg-white hover:text-black transition-colors duration-300 text-sm font-semibold"
-                  >
-                    VIEW PRODUCT
-                  </a>
-                </div>
-              );
-            })}
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {products.map((product) => (
+              <ProductCard product={product} />
+            ))}
           </div>
         ) : (
           <div class="text-center py-12">

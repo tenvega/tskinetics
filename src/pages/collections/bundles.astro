@@ -8,13 +8,23 @@ let products: any[] = [];
 try {
     console.log("Fetching products for bundles collection...");
     const allProducts = await fetchProducts(20);
-    // Filter products that might be bundles (could be enhanced with proper collection filtering)
-    products = allProducts.filter(
-        (product: any) =>
-            product.tags?.some((tag: string) =>
-                tag.toLowerCase().includes("bundle"),
-            ) || product.title.toLowerCase().includes("bundle"),
-    );
+    // Filter products by bundle tags
+    products = allProducts.filter((product: any) => {
+        if (!product.tags) return false;
+        
+        // Handle tags as array (from API) or convert to array
+        const tagsArray = Array.isArray(product.tags) ? product.tags : String(product.tags).split(',').map(t => t.trim());
+        const title = product.title.toLowerCase();
+        
+        // Look for bundle specific tags
+        const bundleTags = ['bundle'];
+        const hasBundleTag = tagsArray.some(tag => bundleTags.includes(tag.toLowerCase()));
+        
+        // Title-based bundle detection
+        const titleHasBundle = title.includes('bundle');
+        
+        return hasBundleTag || titleHasBundle;
+    });
     console.log(`Successfully fetched ${products.length} bundle products`);
 } catch (error) {
     console.error("Failed to fetch bundle products:", error);
@@ -46,7 +56,7 @@ try {
                         </p>
                         <a
                             href="/products"
-                            class="inline-block mt-4 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                            class="btn-smooth inline-block mt-4 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
                         >
                             Browse All Products
                         </a>

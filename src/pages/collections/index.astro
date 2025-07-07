@@ -1,0 +1,109 @@
+---
+import Layout from "../../layouts/Layout.astro";
+
+const collections = [
+    {
+        title: "DRUM KITS",
+        description: "Complete drum kits and sample packs for your productions",
+        href: "/collections/drum-kits",
+        image: "/images/collection-drum-kits.jpg"
+    },
+    {
+        title: "ONE SHOTS",
+        description: "Individual samples, sounds, and one-shot audio files",
+        href: "/collections/one-shots",
+        image: "/images/collection-one-shots.jpg"
+    },
+    {
+        title: "PRESETS",
+        description: "Synthesizer presets and sound bank configurations",
+        href: "/collections/presets",
+        image: "/images/collection-presets.jpg"
+    },
+    {
+        title: "MIDI",
+        description: "MIDI files and musical sequences for your DAW",
+        href: "/collections/midi",
+        image: "/images/collection-midi.jpg"
+    },
+    {
+        title: "BUNDLES",
+        description: "Curated bundles of sound packs, presets, and samples",
+        href: "/collections/bundles",
+        image: "/images/collection-bundles.jpg"
+    }
+];
+---
+
+<Layout title="Collections - TSK Sound Kits">
+    <main class="min-h-screen bg-[#151515] py-12">
+        <div class="container mx-auto px-4">
+            <!-- Collections Header -->
+            <div class="text-center mb-16">
+                <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
+                    CURATED SOUND SELECTIONS
+                </h1>
+                <p class="text-gray-400 text-lg max-w-3xl mx-auto">
+                    Explore our carefully organized collections of high-quality sound kits, 
+                    samples, and production tools designed to elevate your music.
+                </p>
+            </div>
+
+            <!-- Collections Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                {collections.map((collection) => (
+                    <a 
+                        href={collection.href}
+                        class="group card-hover bg-[#1a1a1a] rounded-lg overflow-hidden border border-gray-700 hover:border-orange-500/50 transition-all duration-300"
+                    >
+                        <!-- Collection Image Placeholder -->
+                        <div class="aspect-video bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center cover-hover">
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg class="w-8 h-8 text-orange-500" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                </div>
+                                <h3 class="text-white text-xl font-bold group-hover:text-orange-400 transition-colors">
+                                    {collection.title}
+                                </h3>
+                            </div>
+                        </div>
+                        
+                        <!-- Collection Info -->
+                        <div class="p-6">
+                            <p class="text-gray-400 text-sm leading-relaxed">
+                                {collection.description}
+                            </p>
+                            
+                            <div class="mt-4 flex items-center text-orange-500 text-sm font-semibold">
+                                <span>Explore Collection</span>
+                                <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </a>
+                ))}
+            </div>
+
+            <!-- Call to Action -->
+            <div class="text-center mt-16">
+                <div class="bg-gray-800/30 backdrop-blur-sm rounded-2xl p-8 max-w-2xl mx-auto border border-gray-700/30">
+                    <h3 class="text-2xl font-bold text-white mb-4">
+                        Can't Find What You're Looking For?
+                    </h3>
+                    <p class="text-gray-400 mb-6">
+                        Browse our complete catalog of sound kits and production tools.
+                    </p>
+                    <a 
+                        href="/products" 
+                        class="btn-smooth inline-block bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-lg transition-colors"
+                    >
+                        View All Products
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+</Layout>

@@ -1,0 +1,100 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import ProductGrid from "../../components/product/ProductGrid.astro";
+import { fetchProducts } from "../../lib/gumroad";
+
+let products: any[] = [];
+let error: string | null = null;
+
+try {
+    console.log("Fetching presets products for collection...");
+    const allProducts = await fetchProducts(50);
+    
+    // Filter products by tags - prioritize preset-specific tags
+    products = allProducts.filter(product => {
+        if (!product.tags) return false;
+        
+        // Handle tags as array (from API) or convert to array
+        const tagsArray = Array.isArray(product.tags) ? product.tags : String(product.tags).split(',').map(t => t.trim());
+        const title = product.title.toLowerCase();
+        
+        // High-priority preset indicators (these take precedence)
+        const presetTags = ['presets', 'synth presets', 'preset pack'];
+        const hasPresetTag = tagsArray.some(tag => presetTags.includes(tag.toLowerCase()));
+        
+        // Title-based preset detection
+        const titleHasPreset = title.includes('preset') || title.includes('synth') || title.includes('patch') || title.includes('argon');
+        
+        return hasPresetTag || titleHasPreset;
+    });
+    
+    console.log(`Successfully fetched ${products.length} presets products for collection`);
+} catch (e) {
+    error = e instanceof Error ? e.message : "Failed to fetch presets products";
+    console.error("Error fetching presets products for collection:", e);
+}
+---
+
+<Layout title="Presets Collection - TSK Sound Kits">
+    <main class="min-h-screen bg-[#151515] py-12">
+        <div class="container mx-auto px-4">
+            <!-- Collection Header -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
+                    PRESETS
+                </h1>
+                <p class="text-gray-400 text-lg max-w-2xl mx-auto">
+                    Synthesizer presets and sound bank configurations. 
+                    Professional sounds ready to load into your favorite synths.
+                </p>
+            </div>
+
+            <!-- Breadcrumb -->
+            <div class="mb-8">
+                <nav class="flex items-center space-x-2 text-sm text-gray-400">
+                    <a href="/" class="hover:text-white transition-colors">Home</a>
+                    <span>/</span>
+                    <a href="/collections" class="hover:text-white transition-colors">Collections</a>
+                    <span>/</span>
+                    <span class="text-white">Presets</span>
+                </nav>
+            </div>
+
+            <!-- Products or Error/Empty State -->
+            {
+                error ? (
+                    <div class="text-center py-12">
+                        <div class="bg-red-900/50 border border-red-700 rounded-lg p-6 max-w-2xl mx-auto">
+                            <h3 class="text-red-400 font-semibold text-lg mb-2">
+                                Error Loading Products
+                            </h3>
+                            <p class="text-red-300 text-sm mb-4">{error}</p>
+                            <p class="text-gray-400 text-xs">
+                                Please check your Gumroad configuration in the .env file.
+                            </p>
+                        </div>
+                    </div>
+                ) : products.length > 0 ? (
+                    <ProductGrid products={products} />
+                ) : (
+                    <div class="text-center py-12">
+                        <div class="bg-gray-800 rounded-lg p-8 max-w-2xl mx-auto">
+                            <h3 class="text-white font-semibold text-lg mb-2">
+                                No Presets Available
+                            </h3>
+                            <p class="text-gray-400 mb-4">
+                                We're currently working on adding more presets to this collection. Please check back soon!
+                            </p>
+                            <a
+                                href="/collections"
+                                class="btn-smooth inline-block mt-4 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                            >
+                                Explore Other Collections
+                            </a>
+                        </div>
+                    </div>
+                )
+            }
+        </div>
+    </main>
+</Layout>

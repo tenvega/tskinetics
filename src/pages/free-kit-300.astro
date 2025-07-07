@@ -1,318 +1,229 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { fetchProducts, siteAssets } from "../lib/gumroad";
+import type { GumroadProduct } from "../lib/types";
 
-// Free kit download page - simplified without email integration
+let products: GumroadProduct[] = [];
+let freeProduct: GumroadProduct | null = null;
+
+try {
+	products = await fetchProducts(20);
+	
+	// Find the free product (price = 0 or contains "intro" or "free" in name)
+	freeProduct =
+		products.find(
+			(product) =>
+				product.price === 0 ||
+				product.title.toLowerCase().includes("intro") ||
+				product.title.toLowerCase().includes("free") ||
+				product.name?.toLowerCase().includes("intro") ||
+				product.name?.toLowerCase().includes("free"),
+		) || null;
+} catch (e) {
+	console.error("Error fetching products:", e);
+}
 ---
 
-<Layout title="Free Kit 300+ Sounds - TSK Sound Kits">
-    <main
-        class="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-800 relative overflow-hidden"
-    >
-        <!-- Background Pattern -->
-        <div class="absolute inset-0 opacity-10">
-            <div
-                class="absolute inset-0 bg-[url('/images/bg.png')] bg-cover bg-center bg-no-repeat"
-            >
-            </div>
-        </div>
+<Layout title="TSK Intro Kit 300+ - Free Sound Pack">
+	<!-- TSK Intro Kit Section -->
+	<section
+		class="py-20"
+		style="background: linear-gradient(141deg, #0F0F23, #0A0A0A)"
+	>
+		<div class="max-w-6xl mx-auto px-4">
+			<!-- Header Section -->
+			<div class="text-center mb-12">
+				<p
+					class="text-purple-400 text-lg font-medium mb-4 tracking-wider"
+				>
+					EXPERIENCE OUR SIGNATURE SOUND
+				</p>
+				<h1
+					class="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight"
+				>
+					{
+						freeProduct
+							? freeProduct.title.toUpperCase()
+							: "TSK INTRO KIT"
+					}
+					<span class="text-purple-400">300+</span>
+				</h1>
+				<p
+					class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed"
+				>
+					Get started with our massive collection of premium sounds.
+					This exclusive free kit includes 300+ carefully crafted drum
+					hits, melodic loops, and signature presets.
+				</p>
+			</div>
 
-        <!-- Main Content -->
-        <div class="relative z-10 pt-20 pb-16 px-4">
-            <div class="max-w-6xl mx-auto">
-                <!-- Header Section -->
-                <div class="text-center mb-12">
-                    <p
-                        class="text-purple-400 text-lg font-medium mb-4 tracking-wider"
-                    >
-                        EXPERIENCE OUR SIGNATURE SOUND
-                    </p>
-                    <h1
-                        class="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight"
-                    >
-                        TSK INTRO KIT <span class="text-purple-400">300+</span>
-                    </h1>
-                    <p
-                        class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed"
-                    >
-                        Get started with our massive collection of premium
-                        sounds. This exclusive free kit includes 300+ carefully
-                        crafted drum hits, melodic loops, and signature presets.
-                    </p>
-                </div>
+			<!-- Main Content Grid -->
+			<div
+				class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16"
+			>
+				<!-- Kit Image -->
+				<div class="order-2 lg:order-1">
+					<div class="relative">
+						<img
+							src={freeProduct?.thumbnail_url ||
+								freeProduct?.cover_url ||
+								"/images/threehundred_free.jpg"}
+							alt="TSK Intro Kit 300+ - Free Sound Pack"
+							class="w-full max-w-lg mx-auto rounded-2xl shadow-2xl border border-purple-500/20"
+						/>
+						<!-- Floating Stats -->
+						<div
+							class="absolute -top-4 -right-4 bg-purple-600 text-white px-4 py-2 rounded-full font-bold shadow-lg"
+						>
+							FREE
+						</div>
+						<div
+							class="absolute -bottom-4 -left-4 bg-gray-800/90 backdrop-blur-sm text-purple-400 px-4 py-2 rounded-full font-bold shadow-lg border border-purple-500/30"
+						>
+							300+ Sounds
+						</div>
+					</div>
+				</div>
 
-                <!-- Main Content Grid -->
-                <div
-                    class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
-                >
-                    <!-- Kit Image -->
-                    <div class="order-2 lg:order-1">
-                        <div class="relative">
-                            <img
-                                src="/images/threehundred_free.jpg"
-                                alt="TSK Intro Kit 300+ - Free Sound Pack"
-                                class="w-full max-w-lg mx-auto rounded-2xl shadow-2xl border border-purple-500/20"
-                            />
-                            <!-- Floating Stats -->
-                            <div
-                                class="absolute -top-4 -right-4 bg-purple-600 text-white px-4 py-2 rounded-full font-bold shadow-lg"
-                            >
-                                FREE
-                            </div>
-                            <div
-                                class="absolute -bottom-4 -left-4 bg-gray-800/90 backdrop-blur-sm text-purple-400 px-4 py-2 rounded-full font-bold shadow-lg border border-purple-500/30"
-                            >
-                                300+ Sounds
-                            </div>
-                        </div>
-                    </div>
+				<!-- Download Section -->
+				<div class="order-1 lg:order-2">
+					<div
+						class="bg-gray-800/50 backdrop-blur-md rounded-2xl p-8 border border-gray-700/50 shadow-xl"
+					>
+						<h2
+							class="text-3xl font-bold text-white mb-6 text-center"
+						>
+							Download Your Free Kit
+						</h2>
 
-                    <!-- Download Form -->
-                    <div class="order-1 lg:order-2">
-                        <div
-                            class="bg-gray-800/50 backdrop-blur-md rounded-2xl p-8 border border-gray-700/50 shadow-xl"
-                        >
-                            <h2
-                                class="text-3xl font-bold text-white mb-6 text-center"
-                            >
-                                Download Your Free Kit
-                            </h2>
+						<!-- Stats Grid -->
+						<div
+							class="flex justify-center items-center gap-8 mb-8"
+						>
+							<div class="text-center">
+								<div
+									class="text-2xl font-bold text-purple-400 mb-1"
+								>
+									300+
+								</div>
+								<div class="text-sm text-gray-400">Sounds</div>
+							</div>
+							<div class="w-px h-12 bg-gray-600"></div>
+							<div class="text-center">
+								<div
+									class="text-2xl font-bold text-purple-400 mb-1"
+								>
+									FREE
+								</div>
+								<div class="text-sm text-gray-400">
+									Download
+								</div>
+							</div>
+						</div>
 
-                            <!-- Stats Grid -->
-                            <div class="grid grid-cols-3 gap-4 mb-8">
-                                <div class="text-center">
-                                    <div
-                                        class="text-2xl font-bold text-purple-400 mb-1"
-                                    >
-                                        300+
-                                    </div>
-                                    <div class="text-sm text-gray-400">
-                                        Sounds
-                                    </div>
-                                </div>
-                                <div class="text-center">
-                                    <div
-                                        class="text-2xl font-bold text-purple-400 mb-1"
-                                    >
-                                        50+
-                                    </div>
-                                    <div class="text-sm text-gray-400">
-                                        Kits
-                                    </div>
-                                </div>
-                                <div class="text-center">
-                                    <div
-                                        class="text-2xl font-bold text-purple-400 mb-1"
-                                    >
-                                        FREE
-                                    </div>
-                                    <div class="text-sm text-gray-400">
-                                        Download
-                                    </div>
-                                </div>
-                            </div>
+						<!-- Download Button -->
+						<a
+							href={freeProduct?.url ||
+								freeProduct?.short_url ||
+								"/free-kit-300"}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="w-full bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-4 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg text-center block"
+						>
+							{
+								freeProduct
+									? "TSK INTRO KIT DOWNLOAD"
+									: "TSK INTRO KIT DOWNLOAD"
+							}
+						</a>
 
-                            <!-- Email Form -->
-                            <form id="download-form" class="space-y-4">
-                                <div>
-                                    <input
-                                        type="email"
-                                        id="email-input"
-                                        placeholder="Enter your email address"
-                                        class="w-full px-4 py-4 rounded-lg bg-gray-700/50 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <input
-                                        type="text"
-                                        id="name-input"
-                                        placeholder="Your name (optional)"
-                                        class="w-full px-4 py-4 rounded-lg bg-gray-700/50 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
-                                    />
-                                </div>
-                                <button
-                                    type="submit"
-                                    class="w-full bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-4 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
-                                >
-                                    TSK INTRO KIT DOWNLOAD
-                                </button>
-                            </form>
+						<!-- Trust Indicators -->
+						<div class="mt-6 text-center">
+							<div
+								class="flex justify-center items-center space-x-6 text-gray-500 text-xs"
+							>
+								<span class="flex items-center">
+									<svg
+										class="w-3 h-3 mr-1 text-green-500"
+										fill="currentColor"
+										viewBox="0 0 20 20"
+									>
+										<path
+											fill-rule="evenodd"
+											d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+											clip-rule="evenodd"></path>
+									</svg>
+									Instant Download
+								</span>
+								<span class="flex items-center">
+									<svg
+										class="w-3 h-3 mr-1 text-green-500"
+										fill="currentColor"
+										viewBox="0 0 20 20"
+									>
+										<path
+											fill-rule="evenodd"
+											d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+											clip-rule="evenodd"></path>
+									</svg>
+									Commercial License
+								</span>
+								<span class="flex items-center">
+									<svg
+										class="w-3 h-3 mr-1 text-green-500"
+										fill="currentColor"
+										viewBox="0 0 20 20"
+									>
+										<path
+											fill-rule="evenodd"
+											d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+											clip-rule="evenodd"></path>
+									</svg>
+									100% Royalty Free
+								</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 
-                            <!-- Trust Indicators -->
-                            <div class="mt-6 text-center">
-                                <p class="text-gray-400 text-sm mb-3">
-                                    🔒 Your email is safe with us. No spam, just
-                                    quality sounds.
-                                </p>
-                                <div
-                                    class="flex justify-center items-center space-x-6 text-gray-500 text-xs"
-                                >
-                                    <span class="flex items-center">
-                                        <svg
-                                            class="w-3 h-3 mr-1 text-green-500"
-                                            fill="currentColor"
-                                            viewBox="0 0 20 20"
-                                        >
-                                            <path
-                                                fill-rule="evenodd"
-                                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                clip-rule="evenodd"></path>
-                                        </svg>
-                                        Instant Download
-                                    </span>
-                                    <span class="flex items-center">
-                                        <svg
-                                            class="w-3 h-3 mr-1 text-green-500"
-                                            fill="currentColor"
-                                            viewBox="0 0 20 20"
-                                        >
-                                            <path
-                                                fill-rule="evenodd"
-                                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                clip-rule="evenodd"></path>
-                                        </svg>
-                                        Commercial License
-                                    </span>
-                                    <span class="flex items-center">
-                                        <svg
-                                            class="w-3 h-3 mr-1 text-green-500"
-                                            fill="currentColor"
-                                            viewBox="0 0 20 20"
-                                        >
-                                            <path
-                                                fill-rule="evenodd"
-                                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                clip-rule="evenodd"></path>
-                                        </svg>
-                                        100% Royalty Free
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Kit Features Section -->
-                <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div
-                        class="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30 text-center"
-                    >
-                        <div class="text-3xl mb-4">🥁</div>
-                        <h3 class="text-xl font-bold text-white mb-2">
-                            DRUMS • PADS • CHORDS • SFX
-                        </h3>
-                        <p class="text-gray-400 text-sm">
-                            Premium drum hits and percussion elements crafted
-                            for modern production
-                        </p>
-                    </div>
-                    <div
-                        class="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30 text-center"
-                    >
-                        <div class="text-3xl mb-4">🎹</div>
-                        <h3 class="text-xl font-bold text-white mb-2">
-                            Melodic Loops
-                        </h3>
-                        <p class="text-gray-400 text-sm">
-                            Inspiring melodies and harmonic progressions ready
-                            for your tracks
-                        </p>
-                    </div>
-                    <div
-                        class="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30 text-center"
-                    >
-                        <div class="text-3xl mb-4">🎛️</div>
-                        <h3 class="text-xl font-bold text-white mb-2">
-                            Signature Presets
-                        </h3>
-                        <p class="text-gray-400 text-sm">
-                            Custom synthesizer presets that define the TSK sound
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Audio Preview Section -->
-                <div class="mt-16 text-center">
-                    <h3 class="text-2xl font-bold text-white mb-8">
-                        Preview the Sounds
-                    </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
-                        {Array.from({ length: 8 }, (_, i) => {
-                            const sampleNames = [
-                                { name: "Stick_1", type: "Drum Hit" },
-                                { name: "Kick_BD_15", type: "Bass Drum" },
-                                { name: "A4_Cycle_Comp_ATAB", type: "Melodic Loop" },
-                                { name: "Snare_SP_02", type: "Snare Hit" },
-                                { name: "Hihat_Closed_07", type: "Hi-Hat" },
-                                { name: "Chord_Progression_C", type: "Chord Loop" },
-                                { name: "Bass_Line_Am", type: "Bass Loop" },
-                                { name: "Atmospheric_Pad", type: "Ambient Sound" }
-                            ];
-                            const sample = sampleNames[i] || { name: `Sample_${i + 1}`, type: "Audio Sample" };
-                            
-                            return (
-                                <div class="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
-                                    <h4 class="text-white font-medium mb-2 text-sm">{sample.name}</h4>
-                                    <p class="text-gray-400 text-xs mb-3">{sample.type}</p>
-                                    <audio 
-                                        controls 
-                                        class="w-full h-8 bg-gray-700 rounded"
-                                        preload="none"
-                                    >
-                                        <source src={`/audio/free-kit/sample-${i + 1}.mp3`} type="audio/mpeg" />
-                                        <source src={`/audio/free-kit/sample-${i + 1}.wav`} type="audio/wav" />
-                                        Your browser does not support the audio element.
-                                    </audio>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Simple Form Handling Script -->
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                const form = document.getElementById(
-                    "download-form",
-                ) as HTMLFormElement;
-                const emailInput = document.getElementById(
-                    "email-input",
-                ) as HTMLInputElement;
-                const nameInput = document.getElementById(
-                    "name-input",
-                ) as HTMLInputElement;
-
-                if (form && emailInput && nameInput) {
-                    form.addEventListener("submit", function (e) {
-                        e.preventDefault();
-
-                        const email = emailInput.value.trim();
-                        const name = nameInput.value.trim();
-
-                        if (email) {
-                            // Show success message
-                            form.innerHTML = `
-                                <div class="text-center py-8">
-                                    <div class="text-purple-400 text-4xl mb-4">✅</div>
-                                    <h3 class="text-white text-xl font-bold mb-2">Thank you${name ? ", " + name : ""}!</h3>
-                                    <p class="text-gray-400">
-                                        We've received your request for the TSK Intro Kit 300+.<br/>
-                                        Check your email for the download link!
-                                    </p>
-                                    <p class="text-gray-500 text-sm mt-3">
-                                        Don't forget to check your spam folder if you don't see it in a few minutes.
-                                    </p>
-                                </div>
-                            `;
-
-                            // Here you would typically send the data to your backend
-                            console.log("Form submitted:", { email, name });
-                        }
-                    });
-                }
-            });
-        </script>
-    </main>
+			<!-- Kit Features Section -->
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+				<div
+					class="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30 text-center"
+				>
+					<div class="text-3xl mb-4">🥁</div>
+					<h3 class="text-xl font-bold text-white mb-2">
+						DRUMS • ONE SHOTS
+					</h3>
+					<p class="text-gray-400 text-sm">
+						Premium drum hits and percussion one-shots crafted for
+						modern production
+					</p>
+				</div>
+				<div
+					class="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30 text-center"
+				>
+					<div class="text-3xl mb-4">🎹</div>
+					<h3 class="text-xl font-bold text-white mb-2">
+						Chords & Atmos
+					</h3>
+					<p class="text-gray-400 text-sm">
+						Inspiring chords and atmospheric textures for your
+						tracks
+					</p>
+				</div>
+				<div
+					class="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30 text-center"
+				>
+					<div class="text-3xl mb-4">🎛️</div>
+					<h3 class="text-xl font-bold text-white mb-2">SFX</h3>
+					<p class="text-gray-400 text-sm">
+						Creative sound effects and unique audio elements to
+						enhance your productions
+					</p>
+				</div>
+			</div>
+		</div>
+	</section>
 </Layout>

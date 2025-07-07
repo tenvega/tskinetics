@@ -15,7 +15,7 @@ const formatDate = (date: Date) => {
 };
 ---
 
-<article class={`group bg-[#1a1a1a] rounded-lg border border-gray-700 overflow-hidden hover:border-purple-500/50 transition-all duration-300 ${featured ? 'md:col-span-2' : ''}`}>
+<article class={`group card-hover bg-[#1a1a1a] rounded-lg border border-gray-700 overflow-hidden hover:border-purple-500/50 transition-all duration-300 ${featured ? 'md:col-span-2' : ''}`}>
   <!-- Image -->
   {post.data.image && (
     <div class="aspect-video overflow-hidden">
@@ -42,7 +42,7 @@ const formatDate = (date: Date) => {
 
     <!-- Title -->
     <h3 class="text-xl font-bold mb-2 line-clamp-2">
-      <a href={`/blog/${post.slug}`} class="text-white hover:text-purple-400 transition-colors">
+<a href={`/blog/${post.slug}`} class="btn-smooth text-white hover:text-purple-400 transition-colors">
         {post.data.title}
       </a>
     </h3>
