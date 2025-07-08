@@ -17,9 +17,11 @@ const isActivePage = (page: string) => {
 };
 
 // Active link classes
-const activeLinkClass = "text-white relative after:absolute after:bottom-[-8px] after:left-0 after:right-0 after:h-0.5 after:bg-white after:content-['']";
+const activeLinkClass =
+  "text-white relative after:absolute after:bottom-[-8px] after:left-0 after:right-0 after:h-0.5 after:bg-white after:content-['']";
 const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
 ---
+
 <header class="bg-[#151515] border-b border-gray-800 sticky top-0 z-50">
   <nav class="container mx-auto px-4">
     <div class="flex items-center justify-between h-16">
@@ -40,7 +42,10 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
 
       <!-- Desktop Navigation -->
       <div class="hidden md:flex items-center space-x-8">
-        <a href="/" class={isActivePage("home") ? activeLinkClass : inactiveLinkClass}>
+        <a
+          href="/"
+          class={isActivePage("home") ? activeLinkClass : inactiveLinkClass}
+        >
           HOME
         </a>
 
@@ -53,16 +58,11 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
 
         <a
           href="/new-releases"
-          class={isActivePage("new-releases") ? activeLinkClass : inactiveLinkClass}
+          class={isActivePage("new-releases")
+            ? activeLinkClass
+            : inactiveLinkClass}
         >
           NEW RELEASES
-        </a>
-
-        <a
-          href="/blog"
-          class={isActivePage("blog") ? activeLinkClass : inactiveLinkClass}
-        >
-          BLOG
         </a>
 
         <!-- Categories Dropdown -->
@@ -156,9 +156,12 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
               d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13v6a2 2 0 002 2h6a2 2 0 002-2v-6m-8 0V9a2 2 0 012-2h4a2 2 0 012 2v4.01"
             ></path>
           </svg>
-          <span id="cart-count" class="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
+          <span
+            id="cart-count"
+            class="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden"
+            >0</span
+          >
         </a>
-
 
         <!-- Currency Selector -->
         <div class="text-gray-300 text-sm">United States | USD $</div>
@@ -208,13 +211,6 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
           class="block px-3 py-2 text-gray-300 hover:text-white transition-colors"
         >
           NEW RELEASES
-        </a>
-        
-        <a
-          href="/blog"
-          class="block px-3 py-2 text-gray-300 hover:text-white transition-colors"
-        >
-          BLOG
         </a>
 
         <!-- Mobile Categories -->
@@ -293,34 +289,39 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
   // Cart count functionality
   function updateCartCount() {
     try {
-      const cartData = localStorage.getItem('gumroad_cart');
+      const cartData = localStorage.getItem("gumroad_cart");
       let count = 0;
-      
+
       if (cartData) {
         const cart = JSON.parse(cartData);
-        count = cart.items ? cart.items.reduce((total: number, item: any) => total + item.quantity, 0) : 0;
+        count = cart.items
+          ? cart.items.reduce(
+              (total: number, item: any) => total + item.quantity,
+              0,
+            )
+          : 0;
       }
-      
-      const cartCountElement = document.getElementById('cart-count');
+
+      const cartCountElement = document.getElementById("cart-count");
       if (cartCountElement) {
         cartCountElement.textContent = count.toString();
-        cartCountElement.classList.toggle('hidden', count === 0);
+        cartCountElement.classList.toggle("hidden", count === 0);
       }
     } catch (error) {
-      console.error('Error updating cart count:', error);
+      console.error("Error updating cart count:", error);
     }
   }
 
   // Update cart count on page load
-  document.addEventListener('DOMContentLoaded', updateCartCount);
+  document.addEventListener("DOMContentLoaded", updateCartCount);
 
   // Listen for cart updates from other pages
-  window.addEventListener('storage', (e) => {
-    if (e.key === 'gumroad_cart') {
+  window.addEventListener("storage", (e) => {
+    if (e.key === "gumroad_cart") {
       updateCartCount();
     }
   });
 
   // Update cart count when focus returns to window
-  window.addEventListener('focus', updateCartCount);
+  window.addEventListener("focus", updateCartCount);
 </script>

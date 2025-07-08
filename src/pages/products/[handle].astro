@@ -160,8 +160,13 @@ export async function getStaticPaths() {
                 {product.description && (
                   <div class="text-gray-300 text-sm max-w-2xl leading-relaxed text-left">
                     <div id="description-outer" style="overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1); max-height: 120px;">
-                      <div id="description-text">
-                        {cleanText(product.description).length > 160 ? `${cleanText(product.description).slice(0, 160)}...` : cleanText(product.description)}
+                      <div id="description-text" style="position: relative;">
+                        <span id="desc-truncated" style="position: absolute; left: 0; right: 0; top: 0; opacity: 1; transition: opacity 0.3s;">
+                          {cleanText(product.description).length > 160 ? `${cleanText(product.description).slice(0, 160)}...` : cleanText(product.description)}
+                        </span>
+                        <span id="desc-full" style="opacity: 0; transition: opacity 0.3s;">
+                          {cleanText(product.description)}
+                        </span>
                       </div>
                     </div>
                     {cleanText(product.description).length > 160 && (
@@ -673,28 +678,51 @@ export async function getStaticPaths() {
         }
       });
 
-      // Description toggle functionality
+      // Improved smooth description toggle logic
+      const descToggle = document.getElementById('description-toggle');
+      const descTruncated = document.getElementById('desc-truncated');
+      const descFull = document.getElementById('desc-full');
       const descOuter = document.getElementById('description-outer');
       const descText = document.getElementById('description-text');
-      const toggleBtn = document.getElementById('description-toggle');
-      if (descOuter && descText && toggleBtn) {
-        let expanded = false;
-        let collapsedHeight = 120;
-        let fullHeight = descText.scrollHeight;
-        descOuter.style.maxHeight = collapsedHeight + 'px';
-        toggleBtn.addEventListener('click', function() {
-          expanded = !expanded;
-          if (expanded) {
-            fullHeight = descText.scrollHeight;
+      let descExpanded = false;
+      if (descToggle && descTruncated && descFull && descOuter && descText) {
+        descToggle.addEventListener('click', function() {
+          if (!descExpanded) {
+            // Expanding: show both, animate max-height, then fade in full text
+            descTruncated.style.opacity = '1';
+            descTruncated.style.position = 'absolute';
+            descFull.style.opacity = '0';
+            descFull.style.position = 'static';
+            descFull.style.display = '';
+            // Animate max-height to fit full content
+            const fullHeight = descText.scrollHeight;
             descOuter.style.maxHeight = fullHeight + 'px';
-            toggleBtn.textContent = 'View Less';
+            descToggle.textContent = 'View Less';
+            setTimeout(() => {
+              descTruncated.style.opacity = '0';
+              descFull.style.opacity = '1';
+              descTruncated.style.position = 'absolute';
+              descFull.style.position = 'static';
+            }, 350); // match transition duration
+            descExpanded = true;
           } else {
-            descOuter.style.maxHeight = collapsedHeight + 'px';
-            toggleBtn.textContent = 'View More';
-            descOuter.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            // Collapsing: fade out full text first, then animate max-height
+            descFull.style.opacity = '0';
+            descTruncated.style.opacity = '1';
+            descTruncated.style.position = 'static';
+            descFull.style.position = 'absolute';
+            descToggle.textContent = 'View More';
+            
+            // Wait for opacity transition, then animate height
+            setTimeout(() => {
+              descOuter.style.maxHeight = '120px';
+              // Smooth scroll after height animation starts
+              setTimeout(() => {
+                descOuter.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+              }, 100);
+            }, 200); // let opacity transition finish first
+            descExpanded = false;
           }
-          // Re-apply gradient in case image loads late or layout shifts
-          setTimeout(updateGradientFromCover, 400);
         });
       }
       // Always call gradient update on page load
