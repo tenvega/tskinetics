@@ -673,12 +673,10 @@ const latestProduct = products.length > 0 ? products[0] : null;
 
 						<!-- Download Button -->
 						<a
-							href={freeProduct?.url ||
-								freeProduct?.short_url ||
-								"/free-kit-300"}
+							href="https://tehnvega.gumroad.com/l/hvhjo"
 							target="_blank"
 							rel="noopener noreferrer"
-							class="w-full bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-4 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg text-center block"
+							class="btn-smooth w-full bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-4 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg text-center block"
 						>
 							{
 								freeProduct
@@ -778,16 +776,16 @@ const latestProduct = products.length > 0 ? products[0] : null;
 	</section>
 
 	<!-- Curated Sound Selections Section -->
-	<section class="bg-gray-100 py-20">
+	<section class="py-20" style="background: linear-gradient(141deg, #0A0A0A, #0F0F23)">
 		<div class="max-w-7xl mx-auto px-4">
 			<div class="text-center mb-16">
 				<a
 					href="/collections"
-					class="text-black hover:text-gray-600 transition-colors underline text-sm"
+					class="text-gray-300 hover:text-white transition-colors underline text-sm"
 				>
 					View All Collections Here
 				</a>
-				<h2 class="text-4xl font-bold text-black mt-4">
+				<h2 class="text-4xl font-bold text-white mt-4">
 					CHECK OUT CURATED SOUND SELECTIONS
 				</h2>
 			</div>
@@ -795,19 +793,19 @@ const latestProduct = products.length > 0 ? products[0] : null;
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 				<!-- Drum Kits -->
 				<div
-					class="bg-[#151515] rounded-lg p-8 flex items-center space-x-6"
+					class="bg-white rounded-lg p-8 flex items-center space-x-6 card-hover"
 				>
 					<div class="flex-1">
-						<h3 class="text-white text-2xl font-bold mb-4">
+						<h3 class="text-black text-2xl font-bold mb-4">
 							DRUM KITS ({curatedCollections.drumKits.length})
 						</h3>
-						<p class="text-gray-300 mb-6 leading-relaxed">
+						<p class="text-gray-700 mb-6 leading-relaxed">
 							Curated collections of punchy, nuanced drum sounds,
 							designed to add depth and character to your beats.
 						</p>
 						<a
 							href="/collections/drum-kits"
-							class="text-white underline hover:text-gray-300 transition-colors"
+							class="btn-smooth text-black underline hover:text-gray-600 transition-colors"
 						>
 							Click to View Products
 						</a>
@@ -823,19 +821,19 @@ const latestProduct = products.length > 0 ? products[0] : null;
 
 				<!-- One Shots -->
 				<div
-					class="bg-[#151515] rounded-lg p-8 flex items-center space-x-6"
+					class="bg-white rounded-lg p-8 flex items-center space-x-6 card-hover"
 				>
 					<div class="flex-1">
-						<h3 class="text-white text-2xl font-bold mb-4">
+						<h3 class="text-black text-2xl font-bold mb-4">
 							ONE SHOTS ({curatedCollections.oneShots.length})
 						</h3>
-						<p class="text-gray-300 mb-6 leading-relaxed">
+						<p class="text-gray-700 mb-6 leading-relaxed">
 							A versatile mix of drum hits, chords, SFX, ideal for
 							detailed sound design and creative layering.
 						</p>
 						<a
 							href="/collections/one-shots"
-							class="text-white underline hover:text-gray-300 transition-colors"
+							class="btn-smooth text-black underline hover:text-gray-600 transition-colors"
 						>
 							Click to View Products
 						</a>
@@ -851,20 +849,20 @@ const latestProduct = products.length > 0 ? products[0] : null;
 
 				<!-- Presets -->
 				<div
-					class="bg-[#151515] rounded-lg p-8 flex items-center space-x-6"
+					class="bg-white rounded-lg p-8 flex items-center space-x-6 card-hover"
 				>
 					<div class="flex-1">
-						<h3 class="text-white text-2xl font-bold mb-4">
+						<h3 class="text-black text-2xl font-bold mb-4">
 							PRESETS ({curatedCollections.presets.length})
 						</h3>
-						<p class="text-gray-300 mb-6 leading-relaxed">
+						<p class="text-gray-700 mb-6 leading-relaxed">
 							Custom designed sound patches for VSTs and hardware.
 							Designed to adapt to a broad spectrum of musical
 							styles and moods.
 						</p>
 						<a
 							href="/collections/presets"
-							class="text-white underline hover:text-gray-300 transition-colors"
+							class="btn-smooth text-black underline hover:text-gray-600 transition-colors"
 						>
 							Click to View Products
 						</a>
@@ -880,19 +878,19 @@ const latestProduct = products.length > 0 ? products[0] : null;
 
 				<!-- Bundles -->
 				<div
-					class="bg-[#151515] rounded-lg p-8 flex items-center space-x-6"
+					class="bg-white rounded-lg p-8 flex items-center space-x-6 card-hover"
 				>
 					<div class="flex-1">
-						<h3 class="text-white text-2xl font-bold mb-4">
+						<h3 class="text-black text-2xl font-bold mb-4">
 							BUNDLES ({curatedCollections.bundles.length})
 						</h3>
-						<p class="text-gray-300 mb-6 leading-relaxed">
+						<p class="text-gray-700 mb-6 leading-relaxed">
 							Convenient collections that combine multiple sound
 							packs, offering variety and savings in one package.
 						</p>
 						<a
 							href="/collections/bundles"
-							class="text-white underline hover:text-gray-300 transition-colors"
+							class="btn-smooth text-black underline hover:text-gray-600 transition-colors"
 						>
 							Click to View Products
 						</a>

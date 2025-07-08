@@ -5,6 +5,7 @@ import Layout from '../../layouts/Layout.astro';
 import { fetchProductById, fetchProducts } from '../../lib/gumroad';
 import BuyNowButton from '../../components/ui/BuyNowButton.astro';
 import type { GumroadProduct } from '../../lib/types';
+import { getAudioPackByProductId, getAllAudioPacks } from '../../data/audio-packs';
 
 // Get the product handle (ID) from the URL
 const { handle } = Astro.params;
@@ -25,10 +26,21 @@ function cleanText(text: string): string {
     .replace(/`([^`]*)`/g, '$1'); // Remove markdown code backticks
 }
 
+// Helper function to format duration (will be updated with real duration via JS)
+function formatDuration(filename: string): string {
+  // Return placeholder that will be updated by JavaScript
+  return '--:--';
+}
+
 // Fetch the specific product
 let product: GumroadProduct | null = null;
 let relatedProducts: GumroadProduct[] = [];
 let error: string | null = null;
+
+// Get audio pack for this product
+const audioPack = getAudioPackByProductId(String(handle));
+console.log('Product handle:', handle);
+console.log('Audio pack found:', audioPack ? `Yes: ${audioPack.name}` : 'No');
 
 try {
   console.log(`Fetching product: ${handle}`);
@@ -49,30 +61,28 @@ try {
   error = e instanceof Error ? e.message : 'Failed to fetch product';
   console.error('Error fetching product:', e);
 }
-
-
 ---
 
 <Layout title={product?.title || 'Product Not Found'}>
-  <main class="min-h-screen relative" style="background: linear-gradient(141deg, #0F0F23, #0A0A0A)">
-    <!-- Main Content -->
-    <div class="pt-20 pb-16 px-4">
-      {error && (
-        <div class="max-w-6xl mx-auto mb-8">
-          <div class="bg-red-900/50 border border-red-700 text-red-300 px-6 py-4 rounded-xl">
-            <strong>Error:</strong> {error}
-          </div>
+  <main id="main-content" class="min-h-screen text-white">
+    <!-- Error Display -->
+    {error && (
+      <div class="max-w-6xl mx-auto pt-20 px-6">
+        <div class="bg-red-900/50 border border-red-700 text-red-300 px-6 py-4 rounded-xl">
+          <strong>Error:</strong> {error}
         </div>
-      )}
+      </div>
+    )}
 
-      {product && (
-        <>
-          <!-- Product Hero Section -->
-          <div class="max-w-5xl mx-auto mb-12">
-            <div class="flex flex-col lg:flex-row gap-8">
-              <!-- Left: Cover Art (Bigger) -->
-              <div class="lg:w-96 flex-shrink-0">
-                <div class="aspect-square rounded-lg overflow-hidden bg-gray-900">
+    {product && (
+      <>
+        <!-- Product Header Section -->
+        <div class="pt-20 pb-8 px-6">
+          <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col lg:flex-row gap-8 items-end">
+              <!-- Product Artwork -->
+              <div class="w-60 h-60 flex-shrink-0">
+                <div class="w-full h-full rounded-lg overflow-hidden bg-gray-800 shadow-2xl">
                   {product.preview_url || product.thumbnail_url || product.cover_url ? (
                     <img 
                       src={product.preview_url || product.thumbnail_url || product.cover_url}
@@ -83,128 +93,163 @@ try {
                     <div class="w-full h-full flex items-center justify-center text-gray-400">
                       <div class="text-center">
                         <div class="text-6xl mb-4">🎵</div>
-                        <span class="text-lg">No image available</span>
+                        <span class="text-sm">No image available</span>
                       </div>
                     </div>
                   )}
                 </div>
               </div>
 
-              <!-- Right: Audio Samples Card (Same Height as Cover) -->
-              <div class="flex-1">
-                <div class="bg-[#1a1a1a] rounded-lg p-6 border border-gray-700 h-96 overflow-y-auto">
-                  <!-- Section Header -->
-                  <div class="mb-6">
-                    <h2 class="text-xl font-semibold text-white">Previews</h2>
-                  </div>
-
-                  <!-- Sample List -->
-                  <div class="space-y-3">
-                    {Array.from({ length: 8 }, (_, i) => (
-                      <div class="flex items-center space-x-3 p-2 hover:bg-gray-800/50 rounded transition-colors group">
-                        <!-- Play Button -->
-                        <button class="w-6 h-6 bg-purple-600 hover:bg-purple-700 rounded-full flex items-center justify-center text-white text-xs transition-colors">
-                          ▶
-                        </button>
-                        
-                        <!-- Waveform Visualization -->
-                        <div class="flex-1 h-8 bg-gray-800 rounded flex items-center px-2 overflow-hidden">
-                          <div class="flex items-end space-x-px w-full h-5">
-                            {Array.from({ length: 40 }, (_, j) => (
-                              <div 
-                                class="bg-purple-500 rounded-sm flex-1 opacity-60"
-                                style={`height: ${Math.random() * 100}%`}
-                              ></div>
-                            ))}
-                          </div>
-                        </div>
-                        
-                        <!-- Sample Info -->
-                        <div class="min-w-0 w-32">
-                          <div class="text-white text-xs font-medium truncate">
-                            Sample_{String(i + 1).padStart(2, '0')}.wav
-                          </div>
-                          <div class="text-gray-400 text-xs">
-                            {Math.floor(Math.random() * 60 + 60)}s
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+              <!-- Product Metadata -->
+              <div class="flex-1 space-y-4">
+                <!-- Product Type -->
+                <div class="text-sm font-medium text-gray-300 uppercase tracking-wide">
+                  Sample Pack
                 </div>
-              </div>
-            </div>
-          </div>
 
-          <!-- Product Info Section (Below Cover and Audio) -->
-          <div class="max-w-5xl mx-auto mb-12">
-            <div class="flex flex-col lg:flex-row gap-8">
-              <!-- Left: Title and Description (aligned with cover) -->
-              <div class="lg:w-96 flex-shrink-0 space-y-6">
-                <!-- Title -->
-                <div>
-                  <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">
-                    {product.title}
-                  </h1>
-                  {product.tags && String(product.tags).toLowerCase().includes('new') && (
-                    <span class="inline-block bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium">
-                      NEW
-                    </span>
+                <!-- Product Title -->
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-black text-white leading-tight">
+                  {product.title}
+                </h1>
+
+                <!-- Product Info -->
+                <div class="flex items-center gap-1 text-sm text-gray-300">
+                  <span class="font-medium text-white">Tehn Vega</span>
+                  {audioPack && (
+                    <>
+                      <span>•</span>
+                      <span>{audioPack.audioFiles.length} samples</span>
+                    </>
                   )}
+                  <span>•</span>
+                  <span>{product.formatted_price}</span>
                 </div>
 
                 <!-- Description -->
                 {product.description && (
-                  <div class="text-gray-300 text-sm leading-relaxed">
-                    <div id="description-content">
-                      {cleanText(product.description).length > 200 ? 
-                        cleanText(product.description).substring(0, 200) + '...' : 
+                  <div class="text-gray-300 text-sm max-w-2xl leading-relaxed">
+                    <div id="description-text">
+                      {cleanText(product.description).length > 150 ? 
+                        <>
+                          <span id="description-short">{cleanText(product.description).substring(0, 150)}...</span>
+                          <span id="description-full" class="hidden">{cleanText(product.description)}</span>
+                          <button id="description-toggle" class="text-white hover:text-gray-300 ml-2 underline">
+                            View More
+                          </button>
+                        </> : 
                         cleanText(product.description)
                       }
                     </div>
-                    {cleanText(product.description).length > 200 && (
-                      <button 
-                        id="description-toggle"
-                        class="description-toggle text-sm mt-2"
-                        data-full-description={cleanText(product.description)}
-                        data-truncated-description={cleanText(product.description).substring(0, 200) + '...'}
-                      >
-                        View more
-                      </button>
-                    )}
                   </div>
                 )}
               </div>
-
-              <!-- Right: Action Button (aligned with audio card) -->
-              <div class="flex-1">
-                <div class="max-w-xs">
-                  <BuyNowButton 
-                    productId={product.id}
-                    productTitle={product.title}
-                    price={product.price}
-                    productUrl={product.url}
-                    formattedPrice={product.formatted_price}
-                  />
-                </div>
-              </div>
             </div>
           </div>
+        </div>
 
+        <!-- Controls Section -->
+        <div class="px-6 pb-8">
+          <div class="max-w-6xl mx-auto">
+            <div class="flex items-center gap-8">
+              <!-- Play All Button -->
+              <button id="play-all-btn" class="w-14 h-14 bg-[#151515] hover:bg-gray-800 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-105 shadow-lg aspect-square">
+                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24" style="margin-left: 2px;">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+              </button>
 
-          <!-- Related Products -->
-          {relatedProducts.length > 0 && (
-            <div class="max-w-6xl mx-auto">
-              <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-white mb-4">You Might Also Like</h2>
-                <p class="text-gray-400">Discover more sounds from our collection</p>
+              <!-- Download/Purchase Button -->
+              <BuyNowButton 
+                productId={product.id}
+                productTitle={product.title}
+                price={product.price}
+                productUrl={product.url}
+                formattedPrice={product.formatted_price}
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Sample List Section -->
+        <div class="px-6 pb-12">
+          <div class="max-w-6xl mx-auto">
+            {audioPack ? (
+              <div class="bg-black/20 rounded-lg overflow-hidden">
+                <!-- Table Header -->
+                <div class="grid grid-cols-12 gap-4 px-6 py-3 text-xs font-medium text-gray-400 uppercase tracking-wide border-b border-gray-700/50">
+                  <div class="col-span-1 text-center">#</div>
+                  <div class="col-span-6">Title</div>
+                  <div class="col-span-3">Pack</div>
+                  <div class="col-span-2 text-right">Duration</div>
+                </div>
+
+                <!-- Sample Rows -->
+                <div class="sample-list">
+                  {audioPack.audioFiles.map((audioFile, index) => (
+                    <div class="sample-row grid grid-cols-12 gap-4 px-6 py-3 hover:bg-white/5 transition-colors cursor-pointer group" data-audio-src={audioFile.path}>
+                      <!-- Track Number / Play Button -->
+                      <div class="col-span-1 flex items-center justify-center">
+                        <span class="track-number text-gray-400 text-sm group-hover:hidden">{index + 1}</span>
+                        <button class="play-btn hidden group-hover:block w-8 h-8 bg-white rounded-full flex items-center justify-center hover:scale-105 transition-transform">
+                          <svg class="w-4 h-4 text-black ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z"/>
+                          </svg>
+                        </button>
+                      </div>
+
+                      <!-- Track Info -->
+                      <div class="col-span-6 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded overflow-hidden bg-gray-700 flex-shrink-0">
+                          {product.preview_url || product.thumbnail_url || product.cover_url ? (
+                            <img 
+                              src={product.preview_url || product.thumbnail_url || product.cover_url}
+                              alt={audioFile.name}
+                              class="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div class="w-full h-full flex items-center justify-center">
+                              <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+                              </svg>
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <div class="text-white font-medium text-sm">{audioFile.name}</div>
+                        </div>
+                      </div>
+
+                      <!-- Pack Name -->
+                      <div class="col-span-3 flex items-center">
+                        <span class="text-gray-400 text-sm">{audioPack.name}</span>
+                      </div>
+
+                      <!-- Duration -->
+                      <div class="col-span-2 flex items-center justify-end">
+                        <span class="duration-display text-gray-400 text-sm" data-audio-src={audioFile.path}>{formatDuration(audioFile.filename)}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-              
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            ) : (
+              <div class="text-center py-12">
+                <div class="text-gray-400 mb-4">No audio samples available for this product</div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <!-- Related Products -->
+        {relatedProducts.length > 0 && (
+          <div class="px-6 pb-12">
+            <div class="max-w-6xl mx-auto">
+              <h2 class="text-2xl font-bold text-white mb-8">More from Tehn Vega</h2>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {relatedProducts.map((relatedProduct) => (
-                  <div class="group">
-                    <a href={`/products/${relatedProduct.id}`} class="block">
-                      <div class="aspect-square mb-4 overflow-hidden rounded-lg">
+                  <a href={`/products/${relatedProduct.id}`} class="group">
+                    <div class="bg-gray-800/50 p-4 rounded-lg hover:bg-gray-700/50 transition-colors">
+                      <div class="aspect-square mb-4 overflow-hidden rounded">
                         <img
                           src={relatedProduct.thumbnail_url || relatedProduct.cover_url || "/images/bg.png"}
                           alt={relatedProduct.title}
@@ -213,47 +258,452 @@ try {
                           onerror="this.src='/images/bg.png';"
                         />
                       </div>
-                      <h3 class="text-white font-bold text-lg mb-2 group-hover:text-gray-300 transition-colors line-clamp-2">
+                      <h3 class="text-white font-medium text-sm mb-1 line-clamp-2">
                         {relatedProduct.title}
                       </h3>
-                      <p class="text-gray-400 font-semibold">
-                        {relatedProduct.formatted_price || `$${(relatedProduct.price / 100).toFixed(2)}`}
+                      <p class="text-gray-400 text-xs">
+                        {relatedProduct.formatted_price}
                       </p>
-                    </a>
-                  </div>
+                    </div>
+                  </a>
                 ))}
               </div>
             </div>
-          )}
-        </>
-      )}
-    </div>
+          </div>
+        )}
+      </>
+    )}
+
+    <!-- Hidden Audio Element -->
+    <audio id="audio-player" preload="none"></audio>
   </main>
 
-    <script>
-    // Description toggle functionality
+  <script>
     document.addEventListener('DOMContentLoaded', function() {
-      const toggleButton = document.getElementById('description-toggle');
-      const descriptionContent = document.getElementById('description-content');
+      const audioPlayer = document.getElementById('audio-player') as HTMLAudioElement;
+      const playAllBtn = document.getElementById('play-all-btn');
+      const sampleRows = document.querySelectorAll('.sample-row');
+      const playButtons = document.querySelectorAll('.play-btn');
+      const mainContent = document.getElementById('main-content');
+      const durationDisplays = document.querySelectorAll('.duration-display');
       
-      if (toggleButton && descriptionContent) {
+      let currentPlayingRow: HTMLElement | null = null;
+      let currentTrackIndex = -1;
+      let isPlaying = false;
+      let audioFiles: any[] = [];
+      let durationsLoaded = false;
+
+      // Extract audio files data from the page
+      sampleRows.forEach((row, index) => {
+        const audioSrc = (row as HTMLElement).getAttribute('data-audio-src');
+        if (audioSrc) {
+          audioFiles.push({
+            src: audioSrc,
+            index: index,
+            row: row as HTMLElement
+          });
+        }
+      });
+
+      // Function to extract colors from cover art and update gradient
+      function updateGradientFromCover() {
+        const coverImage = document.querySelector('.w-60.h-60 img') as HTMLImageElement;
+        if (!coverImage || !mainContent) {
+          console.log('Cover image or main content not found');
+          setDefaultGradient();
+          return;
+        }
+
+        console.log('Extracting colors from:', coverImage.src);
+
+        // Set initial gradient immediately to avoid delay
+        setDefaultGradient();
+
+        const extractColors = () => {
+          try {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+              setTitleBasedGradient();
+              return;
+            }
+
+            // Use a reasonable size for color sampling
+            canvas.width = 64;
+            canvas.height = 64;
+
+            // Try to draw the image directly (works for same-origin images)
+            try {
+              ctx.drawImage(coverImage, 0, 0, 64, 64);
+              
+              const imageData = ctx.getImageData(0, 0, 64, 64);
+              const data = imageData.data;
+              
+              // Advanced color analysis
+              const colors: { [key: string]: number } = {};
+              const brightnesses: number[] = [];
+              
+              // Sample every 4th pixel for performance
+              for (let i = 0; i < data.length; i += 16) {
+                const r = data[i];
+                const g = data[i + 1];
+                const b = data[i + 2];
+                const alpha = data[i + 3];
+                
+                // Skip transparent or very dark pixels
+                if (alpha < 200) continue;
+                
+                const brightness = (r * 0.299 + g * 0.587 + b * 0.114);
+                if (brightness < 30) continue;
+                
+                brightnesses.push(brightness);
+                
+                // Quantize colors to reduce noise
+                const rq = Math.floor(r / 16) * 16;
+                const gq = Math.floor(g / 16) * 16;
+                const bq = Math.floor(b / 16) * 16;
+                
+                const colorKey = `${rq},${gq},${bq}`;
+                colors[colorKey] = (colors[colorKey] || 0) + 1;
+              }
+              
+              // Find the most frequent color
+              let dominantColor = '64,64,64'; // fallback gray
+              let maxCount = 0;
+              
+              Object.entries(colors).forEach(([color, count]) => {
+                if (count > maxCount) {
+                  maxCount = count;
+                  dominantColor = color;
+                }
+              });
+              
+              const [r, g, b] = dominantColor.split(',').map(Number);
+              
+              console.log('Dominant color extracted:', { r, g, b });
+              
+              // Create sophisticated gradient
+              const baseColor = `rgb(${r}, ${g}, ${b})`;
+              const brightColor = `rgb(${Math.min(255, r + 60)}, ${Math.min(255, g + 60)}, ${Math.min(255, b + 60)})`;
+              const mediumColor = `rgb(${Math.floor(r * 0.7)}, ${Math.floor(g * 0.7)}, ${Math.floor(b * 0.7)})`;
+              const darkColor = `rgb(${Math.floor(r * 0.3)}, ${Math.floor(g * 0.3)}, ${Math.floor(b * 0.3)})`;
+              
+              // Apply gradient immediately
+              const gradient = `linear-gradient(to bottom, ${brightColor}, ${baseColor}, ${mediumColor}, ${darkColor}, #000000)`;
+              console.log('Applying extracted gradient');
+              mainContent.style.background = gradient;
+              
+            } catch (canvasError) {
+              console.warn('Canvas extraction failed:', canvasError);
+              setTitleBasedGradient();
+            }
+            
+          } catch (error) {
+            console.error('Color extraction error:', error);
+            setTitleBasedGradient();
+          }
+        };
+
+        function setDefaultGradient() {
+          // Start with a neutral gradient
+          mainContent.style.background = 'linear-gradient(to bottom, #404040, #2a2a2a, #1a1a1a, #000000)';
+        }
+
+        function setTitleBasedGradient() {
+          // Fallback: generate colors from product title
+          const productTitle = document.querySelector('h1')?.textContent || '';
+          let hash = 0;
+          for (let i = 0; i < productTitle.length; i++) {
+            hash = ((hash << 5) - hash + productTitle.charCodeAt(i)) & 0xffffffff;
+          }
+          
+          const hue = Math.abs(hash) % 360;
+          const saturation = 50 + (Math.abs(hash) % 30); // 50-80%
+          
+          const color1 = `hsl(${hue}, ${saturation}%, 40%)`;
+          const color2 = `hsl(${hue}, ${saturation}%, 25%)`;
+          const color3 = `hsl(${hue}, ${saturation}%, 15%)`;
+          
+          console.log('Applying title-based gradient with hue:', hue);
+          mainContent.style.background = `linear-gradient(to bottom, ${color1}, ${color2}, ${color3}, #000000)`;
+        }
+
+        // Try immediate extraction if image is ready
+        if (coverImage.complete && coverImage.naturalWidth > 0) {
+          extractColors();
+        } else {
+          // Set up listener for when image loads
+          const imageLoadHandler = () => {
+            extractColors();
+            coverImage.removeEventListener('load', imageLoadHandler);
+          };
+          coverImage.addEventListener('load', imageLoadHandler);
+          
+          // Fallback after timeout
+          setTimeout(() => {
+            if (!coverImage.complete) {
+              setTitleBasedGradient();
+            }
+          }, 2000);
+        }
+      }
+
+      // Function to load real audio durations
+      function loadAudioDurations() {
+        if (durationsLoaded) return;
+        
+        console.log('Loading audio durations for', durationDisplays.length, 'files');
+        let loadedCount = 0;
+        const totalCount = durationDisplays.length;
+
+        durationDisplays.forEach((display, index) => {
+          const audioSrc = (display as HTMLElement).getAttribute('data-audio-src');
+          if (!audioSrc) {
+            console.warn('No audio src found for display', index);
+            loadedCount++;
+            return;
+          }
+
+          console.log('Loading duration for:', audioSrc);
+          const tempAudio = new Audio();
+          tempAudio.preload = 'metadata';
+          tempAudio.crossOrigin = 'anonymous';
+          
+          const handleMetadata = () => {
+            const duration = tempAudio.duration;
+            if (isNaN(duration) || !isFinite(duration)) {
+              console.warn('Invalid duration for:', audioSrc);
+              (display as HTMLElement).textContent = '--:--';
+            } else {
+              const minutes = Math.floor(duration / 60);
+              const seconds = Math.floor(duration % 60);
+              const formattedDuration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+              
+              console.log('Duration loaded:', audioSrc, formattedDuration);
+              (display as HTMLElement).textContent = formattedDuration;
+            }
+            
+            loadedCount++;
+            if (loadedCount === totalCount) {
+              durationsLoaded = true;
+              console.log('All durations loaded');
+            }
+          };
+
+          const handleError = () => {
+            console.error('Error loading audio metadata:', audioSrc);
+            (display as HTMLElement).textContent = '--:--';
+            loadedCount++;
+            
+            if (loadedCount === totalCount) {
+              durationsLoaded = true;
+            }
+          };
+
+          tempAudio.addEventListener('loadedmetadata', handleMetadata);
+          tempAudio.addEventListener('error', handleError);
+          tempAudio.addEventListener('abort', handleError);
+
+          // Set source and start loading
+          tempAudio.src = audioSrc;
+        });
+      }
+
+      function updatePlayButton(button: Element, isPlaying: boolean) {
+        const svg = button.querySelector('svg');
+        if (svg) {
+          if (isPlaying) {
+            svg.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'; // Pause icon
+          } else {
+            svg.innerHTML = '<path d="M8 5v14l11-7z"/>'; // Play icon
+          }
+        }
+      }
+
+      function updatePlayAllButton(isPlaying: boolean) {
+        const svg = playAllBtn?.querySelector('svg');
+        if (svg) {
+          if (isPlaying) {
+            svg.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'; // Pause icon
+          } else {
+            svg.innerHTML = '<path d="M8 5v14l11-7z"/>'; // Play icon
+          }
+        }
+      }
+
+      function resetAllPlayButtons() {
+        playButtons.forEach(btn => updatePlayButton(btn, false));
+        updatePlayAllButton(false);
+      }
+
+      function playTrack(index: number) {
+        if (index < 0 || index >= audioFiles.length) return;
+
+        const audioFile = audioFiles[index];
+        currentTrackIndex = index;
+        currentPlayingRow = audioFile.row;
+
+        // Reset all visual states
+        sampleRows.forEach(row => row.classList.remove('bg-purple-900/30'));
+        resetAllPlayButtons();
+
+        // Update current track visual state
+        audioFile.row.classList.add('bg-purple-900/30');
+        const playBtn = audioFile.row.querySelector('.play-btn');
+        if (playBtn) updatePlayButton(playBtn, true);
+        updatePlayAllButton(true);
+
+        // Load and play audio
+        audioPlayer.src = audioFile.src;
+        audioPlayer.play().then(() => {
+          isPlaying = true;
+        }).catch(error => {
+          console.error('Error playing audio:', error);
+          resetAllPlayButtons();
+          currentPlayingRow?.classList.remove('bg-purple-900/30');
+        });
+      }
+
+      function togglePlayPause() {
+        if (currentTrackIndex === -1) {
+          // Start playing first track
+          playTrack(0);
+        } else {
+          // Toggle current track
+          if (isPlaying) {
+            audioPlayer.pause();
+          } else {
+            audioPlayer.play();
+          }
+        }
+      }
+
+      function nextTrack() {
+        if (currentTrackIndex < audioFiles.length - 1) {
+          playTrack(currentTrackIndex + 1);
+        }
+      }
+
+      // Event Listeners
+      playAllBtn?.addEventListener('click', togglePlayPause);
+
+      // Individual track play buttons
+      sampleRows.forEach((row, index) => {
+        const playBtn = row.querySelector('.play-btn');
+        playBtn?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (currentTrackIndex === index && isPlaying) {
+            audioPlayer.pause();
+          } else {
+            playTrack(index);
+          }
+        });
+
+        // Row click to play
+        row.addEventListener('click', () => {
+          if (currentTrackIndex === index && isPlaying) {
+            audioPlayer.pause();
+          } else {
+            playTrack(index);
+          }
+        });
+      });
+
+      // Audio player events
+      audioPlayer.addEventListener('play', () => {
+        isPlaying = true;
+        if (currentPlayingRow) {
+          const playBtn = currentPlayingRow.querySelector('.play-btn');
+          if (playBtn) updatePlayButton(playBtn, true);
+        }
+        updatePlayAllButton(true);
+      });
+
+      audioPlayer.addEventListener('pause', () => {
+        isPlaying = false;
+        if (currentPlayingRow) {
+          const playBtn = currentPlayingRow.querySelector('.play-btn');
+          if (playBtn) updatePlayButton(playBtn, false);
+        }
+        updatePlayAllButton(false);
+      });
+
+      audioPlayer.addEventListener('ended', () => {
+        nextTrack();
+      });
+
+      // Keyboard shortcuts
+      document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space' && e.target === document.body) {
+          e.preventDefault();
+          togglePlayPause();
+        }
+      });
+
+      // Description toggle functionality
+      const descriptionToggle = document.getElementById('description-toggle');
+      const descriptionShort = document.getElementById('description-short');
+      const descriptionFull = document.getElementById('description-full');
+      
+      if (descriptionToggle && descriptionShort && descriptionFull) {
         let isExpanded = false;
         
-        toggleButton.addEventListener('click', function() {
-          const fullDescription = toggleButton.getAttribute('data-full-description');
-          const truncatedDescription = toggleButton.getAttribute('data-truncated-description');
+        descriptionToggle.addEventListener('click', () => {
+          isExpanded = !isExpanded;
           
-          if (!isExpanded) {
-            descriptionContent.textContent = fullDescription;
-            toggleButton.textContent = 'View less';
-            isExpanded = true;
+          if (isExpanded) {
+            descriptionShort.classList.add('hidden');
+            descriptionFull.classList.remove('hidden');
+            descriptionToggle.textContent = 'View Less';
           } else {
-            descriptionContent.textContent = truncatedDescription;
-            toggleButton.textContent = 'View more';
-            isExpanded = false;
+            descriptionShort.classList.remove('hidden');
+            descriptionFull.classList.add('hidden');
+            descriptionToggle.textContent = 'View More';
           }
         });
       }
+
+      // Initialize features immediately
+      console.log('Initializing features...');
+      updateGradientFromCover();
+      loadAudioDurations();
     });
-    </script>
-</Layout> 
+  </script>
+
+  <style>
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .sample-row {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .sample-row:last-child {
+      border-bottom: none;
+    }
+
+    .sample-row:hover .track-number {
+      display: none;
+    }
+
+    .sample-row:hover .play-btn {
+      display: flex;
+    }
+
+    .play-btn {
+      display: none;
+    }
+
+    .sample-row.bg-purple-900\/30 .play-btn {
+      display: flex;
+    }
+
+    .sample-row.bg-purple-900\/30 .track-number {
+      display: none;
+    }
+  </style>
+</Layout>
