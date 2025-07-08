@@ -342,21 +342,22 @@ export async function getStaticPaths() {
       // Function to extract colors from cover art and update gradient
       function updateGradientFromCover() {
         const coverImage = document.getElementById('cover-img') as HTMLImageElement;
+        const mainContent = document.getElementById('main-content');
+        
         if (!coverImage || !mainContent) {
-          console.log('Cover image or main content not found');
-          setDefaultGradient();
+          console.warn('Cover image or main content not found');
+          setTitleBasedGradient();
           return;
         }
 
-        console.log('Extracting colors from:', coverImage.src);
+        // Set crossOrigin to try to avoid CORS issues
+        coverImage.crossOrigin = 'anonymous';
 
-        // Set initial gradient immediately to avoid delay
-        setDefaultGradient();
-
-        const extractColors = () => {
+        function extractColors() {
           try {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
+            
             if (!ctx) {
               setTitleBasedGradient();
               return;
@@ -428,7 +429,8 @@ export async function getStaticPaths() {
               mainContent.style.background = gradient;
               
             } catch (canvasError) {
-              console.warn('Canvas extraction failed:', canvasError);
+              console.warn('Canvas extraction failed (likely CORS issue):', canvasError);
+              // Fall back to title-based gradient
               setTitleBasedGradient();
             }
             
@@ -436,7 +438,7 @@ export async function getStaticPaths() {
             console.error('Color extraction error:', error);
             setTitleBasedGradient();
           }
-        };
+        }
 
         function setDefaultGradient() {
           // Start with a neutral gradient
