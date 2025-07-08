@@ -21,6 +21,7 @@ export interface GumroadProduct {
     id: string;
     title: string;
     name?: string; // Some APIs use 'name' instead of 'title'
+    slug?: string; // SEO-friendly slug for URLs and audio folder mapping
     description: string;
     price: number; // Price in cents from Gumroad API
     formatted_price: string;
@@ -114,4 +115,3 @@ export interface Money {
     currency_code: string;
 }
 
- 

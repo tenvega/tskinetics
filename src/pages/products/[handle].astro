@@ -3,39 +3,13 @@ export const prerender = true;
 
 import Layout from '../../layouts/Layout.astro';
 import { fetchProductById, fetchProducts } from '../../lib/gumroad';
-import { getAudioPackByProductId, getAudioPackBySlug, getProductIdBySlug, getProductUrlSync, getAllAudioPacks } from '../../data/audio-packs';
 import BuyNowButton from '../../components/ui/BuyNowButton.astro';
 import type { GumroadProduct } from '../../lib/types';
-import type { AudioFile, AudioPack } from '../../data/audio-packs';
 
-// Get the product handle (could be slug or ID) from the URL
-const { handle } = Astro.params;
+import fs from 'fs';
+import path from 'path';
 
-if (!handle) {
-  throw new Error('Product handle is required');
-}
-
-// Determine if handle is a slug or product ID
-let productId = handle;
-let audioPack: AudioPack | undefined = undefined;
-
-try {
-  audioPack = getAudioPackByProductId(handle);
-  
-  // If not found by product ID, try by slug
-  if (!audioPack) {
-    const slugProductId = getProductIdBySlug(handle);
-    if (slugProductId) {
-      productId = slugProductId;
-      audioPack = getAudioPackBySlug(handle);
-    }
-  }
-} catch (e) {
-  console.warn('Audio pack not found for handle:', handle);
-  audioPack = undefined;
-}
-
-// Helper function to clean markdown and HTML from text
+// Helper to clean markdown and HTML from text
 function cleanText(text: string): string {
   if (!text) return '';
   return text
@@ -47,122 +21,54 @@ function cleanText(text: string): string {
     .replace(/`([^`]*)`/g, '$1'); // Remove markdown code backticks
 }
 
-// Helper function to format duration (will be updated with real duration via JS)
+// Helper to format duration (will be updated with real duration via JS)
 function formatDuration(filename: string): string {
-  // Return placeholder that will be updated by JavaScript
   return '--:--';
 }
 
-// Fetch the specific product
+// Helper to get audio files for a slug
+function getAudioFilesForSlug(slug: string) {
+  const folderPath = path.join(process.cwd(), 'public', 'audio', slug);
+  if (!fs.existsSync(folderPath)) return [];
+  return fs.readdirSync(folderPath)
+    .filter(f => f.match(/\.(mp3|wav|flac|aiff|m4a)$/i))
+    .map(filename => ({
+      name: filename.replace(/\.(mp3|wav|flac|aiff|m4a)$/i, '').replace(/[_-]/g, ' ').replace(/\s+/g, ' ').trim(),
+      path: `/audio/${slug}/${filename}`
+    }));
+}
+
+const { handle } = Astro.params;
+if (!handle) throw new Error('Product handle (slug) is required');
+
 let product: GumroadProduct | null = null;
 let relatedProducts: GumroadProduct[] = [];
+let audioFiles: any[] = [];
 let error: string | null = null;
 
-console.log('Product handle:', handle);
-console.log('Resolved product ID:', productId);
-console.log('Audio pack found:', audioPack ? `Yes: ${audioPack.name}` : 'No');
-
 try {
-  console.log(`Fetching product: ${productId}`);
-  
-  // First check if this is a placeholder product ID
-  if (productId === "REPLACE_WITH_ACTUAL_PRODUCT_ID" || productId.includes('REPLACE_WITH_ACTUAL')) {
-    // Create a mock product for audio packs without real Gumroad products
-    if (audioPack) {
-      // Get cover image based on audio pack type (only for placeholder products)
-      let coverImage = "/images/bg.png"; // default fallback
-      if (audioPack.name.toLowerCase().includes("drum")) {
-        coverImage = "/images/drum_kits_curated.jpg";
-      } else if (audioPack.name.toLowerCase().includes("kit")) {
-        coverImage = "/images/threehundred_free.jpg";
-      } else if (audioPack.name.toLowerCase().includes("percussion")) {
-        coverImage = "/images/fm_Percussion_Bundle.jpg";
-      } else if (audioPack.name.toLowerCase().includes("bundle")) {
-        coverImage = "/images/bundles_curated.jpg";
-      } else {
-        coverImage = "/images/one_shots.jpg"; // general sample pack image
-      }
+  // Find the product by slug
+  const allProducts = await fetchProducts(100);
+  product = allProducts.find(p => p.slug === handle) || null;
 
-             product = {
-         id: productId,
-         title: audioPack.name,
-         description: audioPack.description,
-         price: 0,
-         formatted_price: "Coming Soon",
-         currency: "USD",
-         url: "",
-         short_url: "",
-         thumbnail_url: coverImage,
-         cover_url: coverImage,
-         preview_url: coverImage,
-         tags: "sample pack, demo",
-         sales_count: 0,
-         is_published: true,
-         created_at: new Date().toISOString(),
-         updated_at: new Date().toISOString(),
-         published: true
-       };
-      console.log(`Created mock product for audio pack: ${audioPack.name}`);
-    } else {
-      return Astro.redirect('/404');
-    }
-  } else {
-    // Try to fetch real Gumroad product
-    product = await fetchProductById(productId);
-    
-    if (!product) {
-      // If no Gumroad product but we have an audio pack, create a mock product
-      if (audioPack) {
-        // Get cover image based on audio pack type (only for mock products without real Gumroad data)
-        let coverImage = "/images/bg.png"; // default fallback
-        if (audioPack.name.toLowerCase().includes("drum")) {
-          coverImage = "/images/drum_kits_curated.jpg";
-        } else if (audioPack.name.toLowerCase().includes("kit")) {
-          coverImage = "/images/threehundred_free.jpg";
-        } else if (audioPack.name.toLowerCase().includes("percussion")) {
-          coverImage = "/images/fm_Percussion_Bundle.jpg";
-        } else if (audioPack.name.toLowerCase().includes("bundle")) {
-          coverImage = "/images/bundles_curated.jpg";
-        } else {
-          coverImage = "/images/one_shots.jpg"; // general sample pack image
-        }
-
-                 product = {
-           id: productId,
-           title: audioPack.name,
-           description: audioPack.description,
-           price: 0,
-           formatted_price: "Coming Soon",
-           currency: "USD",
-           url: "",
-           short_url: "",
-           thumbnail_url: coverImage,
-           cover_url: coverImage,
-           preview_url: coverImage,
-           tags: "sample pack, demo",
-           sales_count: 0,
-           is_published: true,
-           created_at: new Date().toISOString(),
-           updated_at: new Date().toISOString(),
-           published: true
-         };
-        console.log(`Created mock product for audio pack: ${audioPack.name}`);
-      } else {
-        return Astro.redirect('/404');
-      }
-    }
+  if (!product) {
+    // Try fallback: maybe handle is a product ID
+    product = allProducts.find(p => p.id === handle) || null;
   }
 
+  if (!product) {
+    return Astro.redirect('/404');
+  }
+
+  // Load audio files if a folder exists for this slug
+  audioFiles = getAudioFilesForSlug(product.slug!);
+
   // Fetch related products (other products from the same seller) - randomized selection
-  const allProducts = await fetchProducts(12);
-  const availableProducts = (allProducts || []).filter(p => p.id !== product!.id);
-  
-  // Shuffle the available products randomly for each page load
+  const availableProducts = allProducts.filter(p => p.id !== product!.id);
   for (let i = availableProducts.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [availableProducts[i], availableProducts[j]] = [availableProducts[j], availableProducts[i]];
   }
-  
   relatedProducts = availableProducts.slice(0, 4);
 
   console.log(`Successfully fetched/created product: ${product!.title}`);
@@ -175,57 +81,15 @@ try {
 export async function getStaticPaths() {
   try {
     const paths = [];
-    
-    // Add paths for Gumroad products
-    try {
-      const products = await fetchProducts(100);
-      for (const product of products) {
-        const url = getProductUrlSync(product.id, product.title);
-        const slug = url.replace('/products/', '');
-        
-        paths.push({
-          params: { handle: slug }
-        });
-        
-        // Also add the product ID as a fallback path for backwards compatibility
-        paths.push({
-          params: { handle: product.id }
-        });
+    const products = await fetchProducts(100);
+    for (const product of products) {
+      if (product.slug) {
+        paths.push({ params: { handle: product.slug } });
       }
-    } catch (error) {
-      console.warn('Error fetching Gumroad products for static paths:', error);
+      // Also add the product ID as a fallback path for backwards compatibility
+      paths.push({ params: { handle: product.id } });
     }
-    
-    // Add paths for all audio packs (including those without real Gumroad products)
-    const audioPacks = getAllAudioPacks();
-    for (const audioPack of audioPacks) {
-      // Add slug path
-      paths.push({
-        params: { handle: audioPack.slug }
-      });
-      
-      // Add product ID path if it's not a placeholder
-      if (audioPack.productId && !audioPack.productId.includes('REPLACE_WITH_ACTUAL')) {
-        paths.push({
-          params: { handle: audioPack.productId }
-        });
-      }
-    }
-    
-    // Add paths for static main products
-    const staticMainProducts = [
-      'sonic-entropy',
-      'fm-percussion', 
-      'tsk-0a0a-intro-kit'
-    ];
-    
-    for (const slug of staticMainProducts) {
-      paths.push({
-        params: { handle: slug }
-      });
-    }
-    
-    console.log(`Generated ${paths.length} static paths for products (including audio packs)`);
+    console.log(`Generated ${paths.length} static paths for products`);
     return paths;
   } catch (error) {
     console.error('Error generating static paths:', error);
@@ -293,18 +157,16 @@ export async function getStaticPaths() {
                 <!-- Description -->
                 {product.description && (
                   <div class="text-gray-300 text-sm max-w-2xl leading-relaxed">
-                    <div id="description-text">
-                      {cleanText(product.description).length > 150 ? 
-                        <>
-                          <span id="description-short">{cleanText(product.description).substring(0, 150)}...</span>
-                          <span id="description-full" class="hidden">{cleanText(product.description)}</span>
-                          <button id="description-toggle" class="text-white hover:text-gray-300 ml-2 underline">
-                            View More
-                          </button>
-                        </> : 
-                        cleanText(product.description)
-                      }
+                    <div id="description-outer" style="overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1); max-height: 120px;">
+                      <div id="description-text">
+                        {cleanText(product.description)}
+                      </div>
                     </div>
+                    {cleanText(product.description).length > 150 && (
+                      <button id="description-toggle" class="text-white hover:text-gray-300 ml-2 underline mt-2 block">
+                        View More
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -338,7 +200,7 @@ export async function getStaticPaths() {
         <!-- Sample List Section -->
         <div class="px-6 pb-12">
           <div class="max-w-6xl mx-auto">
-            {audioPack ? (
+            {audioFiles.length > 0 ? (
               <div class="bg-black/20 rounded-lg overflow-hidden">
                 <!-- Table Header -->
                 <div class="grid grid-cols-12 gap-4 px-6 py-3 text-xs font-medium text-gray-400 uppercase tracking-wide border-b border-gray-700/50">
@@ -350,7 +212,7 @@ export async function getStaticPaths() {
 
                 <!-- Sample Rows -->
                 <div class="sample-list">
-                  {(audioPack?.audioFiles || []).slice(0, 8).map((audioFile: AudioFile, index: number) => (
+                  {audioFiles.map((audioFile, index) => (
                     <div class="sample-row grid grid-cols-12 gap-4 px-6 py-3 hover:bg-white/5 transition-colors cursor-pointer group" data-audio-src={audioFile.path}>
                       <!-- Track Number / Play Button -->
                       <div class="col-span-1 flex items-center justify-center">
@@ -386,7 +248,7 @@ export async function getStaticPaths() {
 
                       <!-- Pack Name -->
                       <div class="col-span-3 flex items-center">
-                        <span class="text-gray-400 text-sm">{audioPack.name}</span>
+                        <span class="text-gray-400 text-sm">{product.title}</span>
                       </div>
 
                       <!-- Duration -->
@@ -412,7 +274,7 @@ export async function getStaticPaths() {
               <h2 class="text-2xl font-bold text-white mb-8">You might also like</h2>
               <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {(relatedProducts || []).map((relatedProduct) => (
-                  <a href={getProductUrlSync(relatedProduct.id, relatedProduct.title)} class="group">
+                  <a href={`/products/${relatedProduct.slug}`} class="group">
                     <div class="bg-gray-800/50 p-4 rounded-lg hover:bg-gray-700/50 transition-colors">
                       <div class="aspect-square mb-4 overflow-hidden rounded">
                         <img
@@ -810,32 +672,31 @@ export async function getStaticPaths() {
       });
 
       // Description toggle functionality
-      const descriptionToggle = document.getElementById('description-toggle');
-      const descriptionShort = document.getElementById('description-short');
-      const descriptionFull = document.getElementById('description-full');
-      
-      if (descriptionToggle && descriptionShort && descriptionFull) {
-        let isExpanded = false;
-        
-        descriptionToggle.addEventListener('click', () => {
-          isExpanded = !isExpanded;
-          
-          if (isExpanded) {
-            descriptionShort.classList.add('hidden');
-            descriptionFull.classList.remove('hidden');
-            descriptionToggle.textContent = 'View Less';
+      const descOuter = document.getElementById('description-outer');
+      const descText = document.getElementById('description-text');
+      const toggleBtn = document.getElementById('description-toggle');
+      if (descOuter && descText && toggleBtn) {
+        let expanded = false;
+        let collapsedHeight = 120;
+        let fullHeight = descText.scrollHeight;
+        descOuter.style.maxHeight = collapsedHeight + 'px';
+        toggleBtn.addEventListener('click', function() {
+          expanded = !expanded;
+          if (expanded) {
+            fullHeight = descText.scrollHeight;
+            descOuter.style.maxHeight = fullHeight + 'px';
+            toggleBtn.textContent = 'View Less';
           } else {
-            descriptionShort.classList.remove('hidden');
-            descriptionFull.classList.add('hidden');
-            descriptionToggle.textContent = 'View More';
+            descOuter.style.maxHeight = collapsedHeight + 'px';
+            toggleBtn.textContent = 'View More';
+            descOuter.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
           }
+          // Re-apply gradient in case image loads late or layout shifts
+          setTimeout(updateGradientFromCover, 400);
         });
       }
-
-      // Initialize features immediately
-      console.log('Initializing features...');
+      // Always call gradient update on page load
       updateGradientFromCover();
-      loadAudioDurations();
     });
   </script>
 

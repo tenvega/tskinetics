@@ -4,8 +4,6 @@ import type {
     GumroadProduct,
     GumroadUser,
     GumroadSale,
-    Cart,
-    CartItem,
     Money
 } from './types';
 
@@ -43,6 +41,16 @@ async function gumroadFetch(endpoint: string, options: RequestInit = {}) {
     return result;
 }
 
+// Helper to generate slug from product name
+function generateSlug(name: string): string {
+    return name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric with hyphens
+        .replace(/^-+|-+$/g, '')     // Trim leading/trailing hyphens
+        .replace(/-{2,}/g, '-')      // Replace multiple hyphens with one
+        .trim();
+}
+
 // Fetch products from Gumroad
 export async function fetchProducts(limit = 10): Promise<GumroadProduct[]> {
     try {
@@ -53,37 +61,39 @@ export async function fetchProducts(limit = 10): Promise<GumroadProduct[]> {
             .filter((product: any) => product.published === true) // Only include published products
             .slice(0, limit)
             .map((product: any): GumroadProduct => {
-            const bestPrice = getBestPrice(product);
-            return {
-            id: product.id,
-            title: product.name || product.title,
-            name: product.name,
-            description: product.description || "",
-            price: bestPrice.price,
-            formatted_price: bestPrice.formatted_price,
-            currency: product.currency || "USD",
-            url: product.short_url || product.url || `https://gumroad.com/p/${product.id}`,
-            preview_url: product.preview_url,
-            thumbnail_url: product.thumbnail_url || product.cover_url,
-            cover_url: product.cover_url,
-            tags: product.tags,
-            created_at: product.created_at,
-            updated_at: product.updated_at,
-            published: product.published === true,
-            sales_count: product.sales_count || 0,
-            is_published: product.published === true,
-            short_url: product.short_url,
-            preview: product.preview,
-            file_info: product.file_info,
-            content_rating: product.content_rating,
-            require_shipping: product.require_shipping || false,
-            customizable_price: product.customizable_price || false,
-            suggested_price: product.suggested_price,
-            minimum_price: product.minimum_price,
-            purchase_email: product.purchase_email,
-            variants: product.variants || []
-        };
-        });
+                const bestPrice = getBestPrice(product);
+                const slug = generateSlug(product.name || product.title);
+                return {
+                    id: product.id,
+                    title: product.name || product.title,
+                    name: product.name,
+                    slug,
+                    description: product.description || "",
+                    price: bestPrice.price,
+                    formatted_price: bestPrice.formatted_price,
+                    currency: product.currency || "USD",
+                    url: product.short_url || product.url || `https://gumroad.com/p/${product.id}`,
+                    preview_url: product.preview_url,
+                    thumbnail_url: product.thumbnail_url || product.cover_url,
+                    cover_url: product.cover_url,
+                    tags: product.tags,
+                    created_at: product.created_at,
+                    updated_at: product.updated_at,
+                    published: product.published === true,
+                    sales_count: product.sales_count || 0,
+                    is_published: product.published === true,
+                    short_url: product.short_url,
+                    preview: product.preview,
+                    file_info: product.file_info,
+                    content_rating: product.content_rating,
+                    require_shipping: product.require_shipping || false,
+                    customizable_price: product.customizable_price || false,
+                    suggested_price: product.suggested_price,
+                    minimum_price: product.minimum_price,
+                    purchase_email: product.purchase_email,
+                    variants: product.variants || []
+                };
+            });
         return products;
     } catch (error) {
         console.error('Error fetching products from Gumroad:', error);
@@ -103,10 +113,12 @@ export async function fetchProductById(productId: string): Promise<GumroadProduc
 
         const product = data.product;
         const bestPrice = getBestPrice(product);
+        const slug = generateSlug(product.name || product.title);
         return {
             id: product.id,
             title: product.name || product.title,
             name: product.name,
+            slug,
             description: product.description || "",
             price: bestPrice.price,
             formatted_price: bestPrice.formatted_price,
@@ -231,10 +243,10 @@ export function getBestPrice(product: any): { price: number; formatted_price: st
     if (product.variants && Array.isArray(product.variants)) {
         for (const variant of product.variants) {
             if (variant.options && Array.isArray(variant.options)) {
-                const optionWithPriceDiff = variant.options.find((option: any) => 
+                const optionWithPriceDiff = variant.options.find((option: any) =>
                     option.price_difference && option.price_difference > 0
                 );
-                
+
                 if (optionWithPriceDiff) {
                     // Use the base price + price_difference (both should be in cents)
                     const totalPrice = (product.price || 0) + optionWithPriceDiff.price_difference;
@@ -246,7 +258,7 @@ export function getBestPrice(product: any): { price: number; formatted_price: st
             }
         }
     }
-    
+
     // Fallback to base product price
     return {
         price: product.price || 0,
