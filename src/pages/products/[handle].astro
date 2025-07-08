@@ -697,6 +697,8 @@ export async function getStaticPaths() {
       }
       // Always call gradient update on page load
       updateGradientFromCover();
+      // Load audio durations for all samples
+      loadAudioDurations();
     });
   </script>
 
