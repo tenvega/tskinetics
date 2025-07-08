@@ -1,9 +1,25 @@
 ---
-export const prerender = false;
+export const prerender = true;
 
 import Layout from '../../layouts/Layout.astro';
 import { fetchCollectionByHandle } from '../../lib/gumroad';
 import ProductGrid from '../../components/product/ProductGrid.astro';
+
+// Generate static paths for collections
+export async function getStaticPaths() {
+  // Define available collection handles
+  const collectionHandles = [
+    'bundles',
+    'drum-kits',
+    'one-shots',
+    'presets',
+    'midi'
+  ];
+  
+  return collectionHandles.map(handle => ({
+    params: { handle }
+  }));
+}
 
 // Get the collection handle from the URL
 const { handle } = Astro.params;

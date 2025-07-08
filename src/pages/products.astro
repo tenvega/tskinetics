@@ -1,8 +1,13 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import BuyNowButton from "../components/ui/BuyNowButton.astro";
-import { fetchProducts, getProductUrl, formatPrice } from "../lib/gumroad";
+import {
+    fetchProducts,
+    getProductUrl as gumroadGetProductUrl,
+    formatPrice,
+} from "../lib/gumroad";
 import type { GumroadProduct } from "../lib/types";
+import { getProductUrlSync } from "../data/audio-packs";
 
 let products: GumroadProduct[] = [];
 let error: string | null = null;
@@ -50,8 +55,10 @@ try {
                             const formattedPrice =
                                 product.formatted_price ||
                                 `$${price.toFixed(2)}`;
-                            const productUrl =
-                                `/products/${product.id}`;
+                            const productUrl = getProductUrlSync(
+                                product.id,
+                                product.title,
+                            );
 
                             return (
                                 <div class="group">

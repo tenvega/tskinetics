@@ -3,6 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import ProductGrid from "../components/product/ProductGrid.astro";
 import { fetchProducts } from "../lib/gumroad";
 import type { GumroadProduct } from "../lib/types";
+import { getProductUrlSync } from "../data/audio-packs";
 
 let products: GumroadProduct[] = [];
 let error: string | null = null;
@@ -10,7 +11,7 @@ let error: string | null = null;
 try {
     console.log("Fetching popular products...");
     const allProducts = await fetchProducts(50); // Fetch more products to sort by sales
-    
+
     // Sort by sales count (highest first) and limit to 8
     products = allProducts
         .sort((a, b) => (b.sales_count || 0) - (a.sales_count || 0))
@@ -58,8 +59,10 @@ try {
                             const formattedPrice =
                                 product.formatted_price ||
                                 `$${price.toFixed(2)}`;
-                            const productUrl =
-                                `/products/${product.id}`;
+                            const productUrl = getProductUrlSync(
+                                product.id,
+                                product.title,
+                            );
 
                             return (
                                 <div class="group">

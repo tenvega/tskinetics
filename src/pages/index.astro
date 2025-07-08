@@ -2,6 +2,7 @@
 import Layout from "../layouts/Layout.astro";
 import { fetchProducts, siteAssets } from "../lib/gumroad";
 import type { GumroadProduct } from "../lib/types";
+import { getProductUrlSync } from "../data/audio-packs";
 
 let products: GumroadProduct[] = [];
 let error: string | null = null;
@@ -316,7 +317,7 @@ const latestProduct = products.length > 0 ? products[0] : null;
 					<div class="w-full max-w-lg">
 						{latestProduct ? (
 							<a
-								href={`/products/${latestProduct.id}`}
+								href={getProductUrlSync(latestProduct.id, latestProduct.title)}
 								class="block rounded-lg overflow-hidden"
 							>
 								<img
@@ -374,7 +375,7 @@ const latestProduct = products.length > 0 ? products[0] : null;
 							const imageUrl =
 								product.thumbnail_url || product.cover_url;
 							const formattedPrice = product.formatted_price;
-							const productUrl = `/products/${product.id}`;
+							const productUrl = getProductUrlSync(product.id, product.title);
 
 							return (
 								<div class="group">

@@ -1,5 +1,6 @@
 ---
 import type { GumroadProduct } from "../../lib/types";
+import { getProductUrlSync } from "../../data/audio-packs";
 
 export interface Props {
     product: GumroadProduct;
@@ -15,11 +16,13 @@ const imageAlt = product.title;
 const price = product.price / 100; // Convert cents to dollars
 const formattedPrice = product.formatted_price || `$${price.toFixed(2)}`;
 
-// Product URL - always use local product page
-const productUrl = `/products/${product.id}`;
+// Product URL - use slug if available, fallback to generated slug from title
+const productUrl = getProductUrlSync(product.id, product.title);
 
 // Check if it's a new product
-const isNew = product.tags ? String(product.tags).toLowerCase().includes("new") : false;
+const isNew = product.tags
+    ? String(product.tags).toLowerCase().includes("new")
+    : false;
 ---
 
 <div class="group">

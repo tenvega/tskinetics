@@ -1,17 +1,38 @@
 ---
-export const prerender = false;
+export const prerender = true;
 
 import Layout from '../../layouts/Layout.astro';
 import { fetchProductById, fetchProducts } from '../../lib/gumroad';
+import { getAudioPackByProductId, getAudioPackBySlug, getProductIdBySlug, getProductUrlSync, getAllAudioPacks } from '../../data/audio-packs';
 import BuyNowButton from '../../components/ui/BuyNowButton.astro';
 import type { GumroadProduct } from '../../lib/types';
-import { getAudioPackByProductId, getAllAudioPacks } from '../../data/audio-packs';
+import type { AudioFile, AudioPack } from '../../data/audio-packs';
 
-// Get the product handle (ID) from the URL
+// Get the product handle (could be slug or ID) from the URL
 const { handle } = Astro.params;
 
 if (!handle) {
-  throw new Error('Product ID is required');
+  throw new Error('Product handle is required');
+}
+
+// Determine if handle is a slug or product ID
+let productId = handle;
+let audioPack: AudioPack | undefined = undefined;
+
+try {
+  audioPack = getAudioPackByProductId(handle);
+  
+  // If not found by product ID, try by slug
+  if (!audioPack) {
+    const slugProductId = getProductIdBySlug(handle);
+    if (slugProductId) {
+      productId = slugProductId;
+      audioPack = getAudioPackBySlug(handle);
+    }
+  }
+} catch (e) {
+  console.warn('Audio pack not found for handle:', handle);
+  audioPack = undefined;
 }
 
 // Helper function to clean markdown and HTML from text
@@ -37,29 +58,179 @@ let product: GumroadProduct | null = null;
 let relatedProducts: GumroadProduct[] = [];
 let error: string | null = null;
 
-// Get audio pack for this product
-const audioPack = getAudioPackByProductId(String(handle));
 console.log('Product handle:', handle);
+console.log('Resolved product ID:', productId);
 console.log('Audio pack found:', audioPack ? `Yes: ${audioPack.name}` : 'No');
 
 try {
-  console.log(`Fetching product: ${handle}`);
-  product = await fetchProductById(handle);
+  console.log(`Fetching product: ${productId}`);
   
-  if (!product) {
-    return Astro.redirect('/404');
+  // First check if this is a placeholder product ID
+  if (productId === "REPLACE_WITH_ACTUAL_PRODUCT_ID" || productId.includes('REPLACE_WITH_ACTUAL')) {
+    // Create a mock product for audio packs without real Gumroad products
+    if (audioPack) {
+      // Get cover image based on audio pack type (only for placeholder products)
+      let coverImage = "/images/bg.png"; // default fallback
+      if (audioPack.name.toLowerCase().includes("drum")) {
+        coverImage = "/images/drum_kits_curated.jpg";
+      } else if (audioPack.name.toLowerCase().includes("kit")) {
+        coverImage = "/images/threehundred_free.jpg";
+      } else if (audioPack.name.toLowerCase().includes("percussion")) {
+        coverImage = "/images/fm_Percussion_Bundle.jpg";
+      } else if (audioPack.name.toLowerCase().includes("bundle")) {
+        coverImage = "/images/bundles_curated.jpg";
+      } else {
+        coverImage = "/images/one_shots.jpg"; // general sample pack image
+      }
+
+             product = {
+         id: productId,
+         title: audioPack.name,
+         description: audioPack.description,
+         price: 0,
+         formatted_price: "Coming Soon",
+         currency: "USD",
+         url: "",
+         short_url: "",
+         thumbnail_url: coverImage,
+         cover_url: coverImage,
+         preview_url: coverImage,
+         tags: "sample pack, demo",
+         sales_count: 0,
+         is_published: true,
+         created_at: new Date().toISOString(),
+         updated_at: new Date().toISOString(),
+         published: true
+       };
+      console.log(`Created mock product for audio pack: ${audioPack.name}`);
+    } else {
+      return Astro.redirect('/404');
+    }
+  } else {
+    // Try to fetch real Gumroad product
+    product = await fetchProductById(productId);
+    
+    if (!product) {
+      // If no Gumroad product but we have an audio pack, create a mock product
+      if (audioPack) {
+        // Get cover image based on audio pack type (only for mock products without real Gumroad data)
+        let coverImage = "/images/bg.png"; // default fallback
+        if (audioPack.name.toLowerCase().includes("drum")) {
+          coverImage = "/images/drum_kits_curated.jpg";
+        } else if (audioPack.name.toLowerCase().includes("kit")) {
+          coverImage = "/images/threehundred_free.jpg";
+        } else if (audioPack.name.toLowerCase().includes("percussion")) {
+          coverImage = "/images/fm_Percussion_Bundle.jpg";
+        } else if (audioPack.name.toLowerCase().includes("bundle")) {
+          coverImage = "/images/bundles_curated.jpg";
+        } else {
+          coverImage = "/images/one_shots.jpg"; // general sample pack image
+        }
+
+                 product = {
+           id: productId,
+           title: audioPack.name,
+           description: audioPack.description,
+           price: 0,
+           formatted_price: "Coming Soon",
+           currency: "USD",
+           url: "",
+           short_url: "",
+           thumbnail_url: coverImage,
+           cover_url: coverImage,
+           preview_url: coverImage,
+           tags: "sample pack, demo",
+           sales_count: 0,
+           is_published: true,
+           created_at: new Date().toISOString(),
+           updated_at: new Date().toISOString(),
+           published: true
+         };
+        console.log(`Created mock product for audio pack: ${audioPack.name}`);
+      } else {
+        return Astro.redirect('/404');
+      }
+    }
   }
 
-  // Fetch related products (other products from the same seller)
+  // Fetch related products (other products from the same seller) - randomized selection
   const allProducts = await fetchProducts(12);
-  relatedProducts = allProducts
-    .filter(p => p.id !== product!.id)
-    .slice(0, 4);
+  const availableProducts = (allProducts || []).filter(p => p.id !== product!.id);
+  
+  // Shuffle the available products randomly for each page load
+  for (let i = availableProducts.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [availableProducts[i], availableProducts[j]] = [availableProducts[j], availableProducts[i]];
+  }
+  
+  relatedProducts = availableProducts.slice(0, 4);
 
-  console.log(`Successfully fetched product: ${product.title}`);
+  console.log(`Successfully fetched/created product: ${product!.title}`);
 } catch (e) {
   error = e instanceof Error ? e.message : 'Failed to fetch product';
   console.error('Error fetching product:', e);
+}
+
+// Generate static paths for all products with proper slugs
+export async function getStaticPaths() {
+  try {
+    const paths = [];
+    
+    // Add paths for Gumroad products
+    try {
+      const products = await fetchProducts(100);
+      for (const product of products) {
+        const url = getProductUrlSync(product.id, product.title);
+        const slug = url.replace('/products/', '');
+        
+        paths.push({
+          params: { handle: slug }
+        });
+        
+        // Also add the product ID as a fallback path for backwards compatibility
+        paths.push({
+          params: { handle: product.id }
+        });
+      }
+    } catch (error) {
+      console.warn('Error fetching Gumroad products for static paths:', error);
+    }
+    
+    // Add paths for all audio packs (including those without real Gumroad products)
+    const audioPacks = getAllAudioPacks();
+    for (const audioPack of audioPacks) {
+      // Add slug path
+      paths.push({
+        params: { handle: audioPack.slug }
+      });
+      
+      // Add product ID path if it's not a placeholder
+      if (audioPack.productId && !audioPack.productId.includes('REPLACE_WITH_ACTUAL')) {
+        paths.push({
+          params: { handle: audioPack.productId }
+        });
+      }
+    }
+    
+    // Add paths for static main products
+    const staticMainProducts = [
+      'sonic-entropy',
+      'fm-percussion', 
+      'tsk-0a0a-intro-kit'
+    ];
+    
+    for (const slug of staticMainProducts) {
+      paths.push({
+        params: { handle: slug }
+      });
+    }
+    
+    console.log(`Generated ${paths.length} static paths for products (including audio packs)`);
+    return paths;
+  } catch (error) {
+    console.error('Error generating static paths:', error);
+    return [];
+  }
 }
 ---
 
@@ -114,13 +285,7 @@ try {
 
                 <!-- Product Info -->
                 <div class="flex items-center gap-1 text-sm text-gray-300">
-                  <span class="font-medium text-white">Tehn Vega</span>
-                  {audioPack && (
-                    <>
-                      <span>•</span>
-                      <span>{audioPack.audioFiles.length} samples</span>
-                    </>
-                  )}
+                  <span class="font-medium text-white">TSK</span>
                   <span>•</span>
                   <span>{product.formatted_price}</span>
                 </div>
@@ -185,7 +350,7 @@ try {
 
                 <!-- Sample Rows -->
                 <div class="sample-list">
-                  {audioPack.audioFiles.map((audioFile, index) => (
+                  {(audioPack?.audioFiles || []).slice(0, 8).map((audioFile: AudioFile, index: number) => (
                     <div class="sample-row grid grid-cols-12 gap-4 px-6 py-3 hover:bg-white/5 transition-colors cursor-pointer group" data-audio-src={audioFile.path}>
                       <!-- Track Number / Play Button -->
                       <div class="col-span-1 flex items-center justify-center">
@@ -241,13 +406,13 @@ try {
         </div>
 
         <!-- Related Products -->
-        {relatedProducts.length > 0 && (
+        {(relatedProducts || []).length > 0 && (
           <div class="px-6 pb-12">
             <div class="max-w-6xl mx-auto">
-              <h2 class="text-2xl font-bold text-white mb-8">More from Tehn Vega</h2>
+              <h2 class="text-2xl font-bold text-white mb-8">You might also like</h2>
               <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                {relatedProducts.map((relatedProduct) => (
-                  <a href={`/products/${relatedProduct.id}`} class="group">
+                {(relatedProducts || []).map((relatedProduct) => (
+                  <a href={getProductUrlSync(relatedProduct.id, relatedProduct.title)} class="group">
                     <div class="bg-gray-800/50 p-4 rounded-lg hover:bg-gray-700/50 transition-colors">
                       <div class="aspect-square mb-4 overflow-hidden rounded">
                         <img
@@ -406,7 +571,9 @@ try {
 
         function setDefaultGradient() {
           // Start with a neutral gradient
-          mainContent.style.background = 'linear-gradient(to bottom, #404040, #2a2a2a, #1a1a1a, #000000)';
+          if (mainContent) {
+            mainContent.style.background = 'linear-gradient(to bottom, #404040, #2a2a2a, #1a1a1a, #000000)';
+          }
         }
 
         function setTitleBasedGradient() {
@@ -425,7 +592,9 @@ try {
           const color3 = `hsl(${hue}, ${saturation}%, 15%)`;
           
           console.log('Applying title-based gradient with hue:', hue);
-          mainContent.style.background = `linear-gradient(to bottom, ${color1}, ${color2}, ${color3}, #000000)`;
+          if (mainContent) {
+            mainContent.style.background = `linear-gradient(to bottom, ${color1}, ${color2}, ${color3}, #000000)`;
+          }
         }
 
         // Try immediate extraction if image is ready

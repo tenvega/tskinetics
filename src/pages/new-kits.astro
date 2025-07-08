@@ -2,6 +2,7 @@
 import Layout from "../layouts/Layout.astro";
 import ProductGrid from "../components/product/ProductGrid.astro";
 import { fetchCollectionByHandle } from "../lib/gumroad";
+import { getProductUrlSync } from "../data/audio-packs";
 import type { GumroadProduct } from "../lib/types";
 
 let products: GumroadProduct[] = [];
@@ -51,7 +52,7 @@ try {
               const price = product.price / 100; // Convert cents to dollars
               const formattedPrice =
                 product.formatted_price || `$${price.toFixed(2)}`;
-              const productUrl = `/products/${product.id}`;
+              const productUrl = getProductUrlSync(product.id, product.title);
 
               return (
                 <div class="group">

@@ -1,32 +1,16 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import {
-    fetchShopMetafields,
-    fetchProductMetafields,
-    getMetafieldValue,
-    siteAssets,
-    shopifyAssets,
-} from "../lib/shopify.ts";
+import { siteAssets, fetchProducts } from "../lib/gumroad";
 
 // Test different asset approaches
-let shopMetafields: any[] = [];
-let productMetafields: any[] = [];
+let products: any[] = [];
 let errors: string[] = [];
 
 try {
-    // Fetch shop metafields (if you store asset URLs there)
-    shopMetafields = await fetchShopMetafields();
+    // Fetch some products to test the API
+    products = await fetchProducts(5);
 } catch (error) {
-    errors.push(`Shop metafields: ${error}`);
-}
-
-try {
-    // Example: fetch metafields for a specific product
-    // You would replace this with an actual product ID from your store
-    const exampleProductId = "gid://shopify/Product/8521676505280"; // Replace with real ID
-    productMetafields = await fetchProductMetafields(exampleProductId);
-} catch (error) {
-    errors.push(`Product metafields: ${error}`);
+    errors.push(`Gumroad API: ${error}`);
 }
 ---
 
@@ -84,81 +68,47 @@ try {
                             <code
                                 class="bg-[#2A2A2A] px-3 py-2 rounded block text-sm text-green-400"
                             >
-                                {siteAssets.logos.tskDiamond}
+                                {siteAssets.logos.tskMain}
                             </code>
                             <p class="text-xs text-[#B0B0B0] mt-1">
-                                Place tsk-diamond.svg in public/images/
+                                Place tsk-main.png in public/images/
                             </p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Alternative: Shopify CDN -->
+            <!-- Gumroad API Test -->
             <section class="mb-12">
                 <h2 class="text-2xl font-bold mb-4 text-[#FF6B35]">
-                    ⚡ Alternative: Shopify CDN
-                </h2>
-                <div
-                    class="bg-[#1A1A1A] rounded-lg p-6 border border-[#2A2A2A]"
-                >
-                    <p class="mb-4 text-[#B0B0B0]">
-                        If you have the direct CDN URLs from Shopify, you can
-                        use them directly. Upload images to Shopify Admin →
-                        Settings → Files, then get the clean URL.
-                    </p>
-
-                    <div class="mb-4">
-                        <h4 class="font-semibold mb-2">Example CDN URL:</h4>
-                        <code
-                            class="bg-[#2A2A2A] px-3 py-2 rounded block text-sm text-blue-400 break-all"
-                        >
-                            {shopifyAssets.artists.tehnVega}
-                        </code>
-                    </div>
-
-                    <div
-                        class="bg-yellow-500/20 border border-yellow-500 rounded p-3"
-                    >
-                        <p class="text-yellow-300 text-sm">
-                            <strong>Note:</strong> The @ symbol URLs you're seeing
-                            are redirect URLs. You need the direct CDN URLs instead.
-                        </p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Shop Metafields -->
-            <section class="mb-12">
-                <h2 class="text-2xl font-bold mb-4 text-[#FF6B35]">
-                    🔧 Shop Metafields
+                    🔧 Gumroad API Test
                 </h2>
                 <div
                     class="bg-[#1A1A1A] rounded-lg p-6 border border-[#2A2A2A]"
                 >
                     {
-                        shopMetafields.length > 0 ? (
+                        products.length > 0 ? (
                             <div>
                                 <p class="mb-4 text-[#B0B0B0]">
-                                    Found {shopMetafields.length} shop
-                                    metafields:
+                                    Successfully fetched {products.length}{" "}
+                                    products from Gumroad:
                                 </p>
                                 <div class="space-y-2 max-h-64 overflow-y-auto">
-                                    {shopMetafields.map((metafield, index) => (
+                                    {products.map((product, index) => (
                                         <div class="bg-[#2A2A2A] rounded p-3">
                                             <div class="text-sm">
                                                 <span class="text-blue-400">
-                                                    {metafield.namespace}
+                                                    {product.title}
                                                 </span>
-                                                <span class="text-gray-400">
-                                                    .
-                                                </span>
-                                                <span class="text-green-400">
-                                                    {metafield.key}
+                                                <span class="text-gray-400 ml-2">
+                                                    $
+                                                    {(
+                                                        product.price / 100
+                                                    ).toFixed(2)}
                                                 </span>
                                             </div>
                                             <div class="text-xs text-[#B0B0B0] mt-1 break-all">
-                                                {metafield.value}
+                                                {product.url}
                                             </div>
                                         </div>
                                     ))}
@@ -166,19 +116,69 @@ try {
                             </div>
                         ) : (
                             <p class="text-[#B0B0B0]">
-                                No shop metafields found. You can create custom
-                                metafields in Shopify Admin → Settings →
-                                Metafields to store asset URLs.
+                                No products found or API connection failed.
                             </p>
                         )
                     }
                 </div>
             </section>
 
+            <!-- Available Assets -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-bold mb-4 text-[#FF6B35]">
+                    📁 Available Static Assets
+                </h2>
+                <div
+                    class="bg-[#1A1A1A] rounded-lg p-6 border border-[#2A2A2A]"
+                >
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold mb-3 text-white">
+                                Logos:
+                            </h4>
+                            <ul class="space-y-1 text-sm">
+                                <li>
+                                    <code class="text-green-400"
+                                        >{siteAssets.logos.tskMain}</code>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold mb-3 text-white">
+                                Products:
+                            </h4>
+                            <ul class="space-y-1 text-sm">
+                                <li>
+                                    <code class="text-green-400"
+                                        >{
+                                            siteAssets.products.sonicEntropy
+                                        }</code>
+                                </li>
+                                <li>
+                                    <code class="text-green-400"
+                                        >{
+                                            siteAssets.products.fmPercussion
+                                        }</code>
+                                </li>
+                                <li>
+                                    <code class="text-green-400"
+                                        >{siteAssets.products.bundles}</code>
+                                </li>
+                                <li>
+                                    <code class="text-green-400"
+                                        >{siteAssets.products.drumKits}</code>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Usage Instructions -->
             <section class="mb-12">
                 <h2 class="text-2xl font-bold mb-4 text-[#FF6B35]">
-                    📋 How to Fix Your Asset URLs
+                    📋 How to Use Assets
                 </h2>
                 <div
                     class="bg-[#1A1A1A] rounded-lg p-6 border border-[#2A2A2A]"
@@ -186,66 +186,40 @@ try {
                     <div class="space-y-4">
                         <div>
                             <h4 class="font-semibold mb-2">
-                                Option 1: Download and Host Locally
-                                (Recommended)
+                                Option 1: Static Assets (Current Implementation)
                             </h4>
                             <ol
                                 class="list-decimal list-inside space-y-1 text-[#B0B0B0] text-sm ml-4"
                             >
                                 <li>
-                                    Download your artist images from the current
-                                    site
-                                </li>
-                                <li>
-                                    Create a <code
+                                    Images are stored in <code
                                         class="bg-[#2A2A2A] px-1 rounded"
                                         >public/images/</code
-                                    > directory
-                                </li>
-                                <li>
-                                    Place images there (e.g., <code
-                                        class="bg-[#2A2A2A] px-1 rounded"
-                                        >public/images/tehn-vega.jpg</code
-                                    >)
-                                </li>
-                                <li>
-                                    Reference them as <code
-                                        class="bg-[#2A2A2A] px-1 rounded"
-                                        >/images/tehn-vega.jpg</code
                                     >
                                 </li>
+                                <li>
+                                    Import from <code
+                                        class="bg-[#2A2A2A] px-1 rounded"
+                                        >../lib/gumroad</code
+                                    >
+                                </li>
+                                <li>
+                                    Use <code class="bg-[#2A2A2A] px-1 rounded"
+                                        >siteAssets.category.assetName</code
+                                    >
+                                </li>
+                                <li>Fast loading and reliable</li>
                             </ol>
                         </div>
 
                         <div>
                             <h4 class="font-semibold mb-2">
-                                Option 2: Get Clean Shopify CDN URLs
-                            </h4>
-                            <ol
-                                class="list-decimal list-inside space-y-1 text-[#B0B0B0] text-sm ml-4"
-                            >
-                                <li>Go to Shopify Admin → Settings → Files</li>
-                                <li>Upload your images there</li>
-                                <li>
-                                    Right-click on the image and "Copy image
-                                    address"
-                                </li>
-                                <li>
-                                    Use the clean URL (should look like: <code
-                                        class="bg-[#2A2A2A] px-1 rounded text-xs"
-                                        >https://cdn.shopify.com/s/files/1/...</code
-                                    >)
-                                </li>
-                            </ol>
-                        </div>
-
-                        <div>
-                            <h4 class="font-semibold mb-2">
-                                Option 3: Use External CDN
+                                Option 2: External CDN
                             </h4>
                             <p class="text-[#B0B0B0] text-sm">
                                 Upload to Cloudinary, AWS S3, or similar service
-                                for full control over assets.
+                                for full control over assets and dynamic
+                                optimization.
                             </p>
                         </div>
                     </div>
@@ -265,7 +239,7 @@ try {
                     </h4>
                     <pre
                         class="bg-[#0A0A0A] rounded p-4 overflow-x-auto text-sm"><code class="text-green-400">{`---
-import { siteAssets } from '../lib/shopify.ts';
+import { siteAssets } from '../lib/gumroad';
 ---
 
 <!-- Use static assets -->
@@ -275,11 +249,11 @@ import { siteAssets } from '../lib/shopify.ts';
   class="w-48 h-48 object-cover rounded-lg"
 />
 
-<!-- Or use direct CDN URL -->
+<!-- Product cover -->
 <img 
-  src="https://cdn.shopify.com/s/files/1/0744/3660/8256/files/tehn-vega.jpg" 
-  alt="TEHN VEGA" 
-  class="w-48 h-48 object-cover rounded-lg"
+  src={siteAssets.products.sonicEntropy} 
+  alt="Sonic Entropy" 
+  class="w-full h-64 object-cover"
 />`}</code></pre>
                 </div>
             </section>

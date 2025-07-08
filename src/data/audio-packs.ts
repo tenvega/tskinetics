@@ -1,3 +1,4 @@
+// Audio packs configuration with populated audio files
 export interface AudioFile {
   name: string;
   path: string;
@@ -7,368 +8,206 @@ export interface AudioFile {
 export interface AudioPack {
   id: string;
   name: string;
+  slug: string;
   description: string;
   folderPath: string;
   productId: string;
   audioFiles: AudioFile[];
 }
 
+// Function to create audio file object
+function createAudioFile(folderPath: string, filename: string): AudioFile {
+  const name = filename
+    .replace(/\.(mp3|wav|flac|aiff|m4a)$/i, '') // Remove extension
+    .replace(/[_-]/g, ' ') // Replace underscores and hyphens with spaces
+    .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+    .trim();
+
+  return {
+    name,
+    path: `${folderPath}/${filename}`,
+    filename
+  };
+}
+
+// Audio packs with populated audio files
 export const audioPacks: AudioPack[] = [
   {
     id: "kits",
     name: "Kits",
+    slug: "intro-kit",
     description: "Drum kits and sample collections",
     folderPath: "/audio/Kits",
-    productId: "eDNSV8PJGMdPtWFitxPrkQ==", // Kits product
+    productId: "eDNSV8PJGMdPtWFitxPrkQ==",
     audioFiles: [
-      {
-        name: "PO 14 Bleep",
-        path: "/audio/Kits/PO_14_Bleep.mp3",
-        filename: "PO_14_Bleep.mp3"
-      },
-      {
-        name: "770 Dist Clap 1",
-        path: "/audio/Kits/770_Dist_Clap_1.mp3",
-        filename: "770_Dist_Clap_1.mp3"
-      },
-      {
-        name: "770 Dist SD 1",
-        path: "/audio/Kits/770_Dist_SD_1.mp3",
-        filename: "770_Dist_SD_1.mp3"
-      },
-      {
-        name: "770 Dist SD 2",
-        path: "/audio/Kits/770_Dist_SD_2.mp3",
-        filename: "770_Dist_SD_2.mp3"
-      },
-      {
-        name: "PO 14 BD 1",
-        path: "/audio/Kits/PO_14_BD_1.mp3",
-        filename: "PO_14_BD_1.mp3"
-      },
-      {
-        name: "PO 14 Sub 2",
-        path: "/audio/Kits/PO_14_Sub_2.mp3",
-        filename: "PO_14_Sub_2.mp3"
-      },
-      {
-        name: "PO 14 Bass A",
-        path: "/audio/Kits/PO_14_Bass_A.mp3",
-        filename: "PO_14_Bass_A.mp3"
-      },
-      {
-        name: "PO 14 TOM 2",
-        path: "/audio/Kits/PO_14_TOM_2.mp3",
-        filename: "PO_14_TOM_2.mp3"
-      }
-    ]
+      'PO_14_Bleep.mp3',
+      '770_Dist_Clap_1.mp3',
+      '770_Dist_SD_1.mp3',
+      '770_Dist_SD_2.mp3',
+      'PO_14_BD_1.mp3',
+      'PO_14_Sub_2.mp3',
+      'PO_14_Bass_A.mp3',
+      'PO_14_TOM_2.mp3'
+    ].map(filename => createAudioFile("/audio/Kits", filename))
   },
   {
     id: "gaussian-tremors",
     name: "Gaussian Tremors",
+    slug: "gaussian-tremors",
     description: "Ambient and atmospheric sound demos",
     folderPath: "/audio/Gaussian_Tremors",
-    productId: "sm089yf8HB22wTUdYe6buw==", // PRESETS FOR THE ARGON 8: Gaussian Tremors
+    productId: "sm089yf8HB22wTUdYe6buw==",
     audioFiles: [
-      {
-        name: "Gaussian Tremors Demo 1",
-        path: "/audio/Gaussian_Tremors/Gaussian_Tremors_Demo_1.mp3",
-        filename: "Gaussian_Tremors_Demo_1.mp3"
-      },
-      {
-        name: "Gaussian Tremors Demo 2",
-        path: "/audio/Gaussian_Tremors/Gaussian_Tremors_Demo_2.mp3",
-        filename: "Gaussian_Tremors_Demo_2.mp3"
-      },
-      {
-        name: "Gaussian Tremors Demo 3",
-        path: "/audio/Gaussian_Tremors/Gaussian_Tremors_Demo_3.mp3",
-        filename: "Gaussian_Tremors_Demo_3.mp3"
-      },
-      {
-        name: "Gaussian Tremors Demo 4",
-        path: "/audio/Gaussian_Tremors/Gaussian_Tremors_Demo_4.mp3",
-        filename: "Gaussian_Tremors_Demo_4.mp3"
-      },
-      {
-        name: "Gaussian Tremors Demo 5",
-        path: "/audio/Gaussian_Tremors/Gaussian_Tremors_Demo_5.mp3",
-        filename: "Gaussian_Tremors_Demo_5.mp3"
-      },
-      {
-        name: "Gaussian Tremors Demo 6",
-        path: "/audio/Gaussian_Tremors/Gaussian_Tremors_Demo_6.mp3",
-        filename: "Gaussian_Tremors_Demo_6.mp3"
-      },
-      {
-        name: "Gaussian Tremors Demo 7",
-        path: "/audio/Gaussian_Tremors/Gaussian_Tremors_Demo_7.mp3",
-        filename: "Gaussian_Tremors_Demo_7.mp3"
-      },
-      {
-        name: "Gaussian Tremors Demo 8",
-        path: "/audio/Gaussian_Tremors/Gaussian_Tremors_Demo_8.mp3",
-        filename: "Gaussian_Tremors_Demo_8.mp3"
-      }
-    ]
+      'Gaussian_Tremors_Demo_1.mp3',
+      'Gaussian_Tremors_Demo_2.mp3',
+      'Gaussian_Tremors_Demo_3.mp3',
+      'Gaussian_Tremors_Demo_4.mp3',
+      'Gaussian_Tremors_Demo_5.mp3',
+      'Gaussian_Tremors_Demo_6.mp3',
+      'Gaussian_Tremors_Demo_7.mp3',
+      'Gaussian_Tremors_Demo_8.mp3'
+    ].map(filename => createAudioFile("/audio/Gaussian_Tremors", filename))
   },
   {
     id: "foundsound-sound-perc",
     name: "Found Sound Percussion",
+    slug: "found-sound-percussion",
     description: "Unique percussion sounds from found objects",
     folderPath: "/audio/Foundsound_Sound_Perc",
-    productId: "wCpv2T2-YkEVN5S4-VKiBA==", // Found Sound Perc
+    productId: "wCpv2T2-YkEVN5S4-VKiBA==",
     audioFiles: [
-      {
-        name: "AKt Verb Door 5",
-        path: "/audio/Foundsound_Sound_Perc/AKt_Verb_Door_5.mp3",
-        filename: "AKt_Verb_Door_5.mp3"
-      },
-      {
-        name: "Found Sound Perc 10",
-        path: "/audio/Foundsound_Sound_Perc/Found_Sound_Perc_10.mp3",
-        filename: "Found_Sound_Perc_10.mp3"
-      },
-      {
-        name: "Marímbula 6",
-        path: "/audio/Foundsound_Sound_Perc/Marímbula_6.mp3",
-        filename: "Marímbula_6.mp3"
-      },
-      {
-        name: "Samarkand Claps 2",
-        path: "/audio/Foundsound_Sound_Perc/Samarkand_Claps_2.mp3",
-        filename: "Samarkand_Claps_2.mp3"
-      },
-      {
-        name: "Samarkand Whistle 3",
-        path: "/audio/Foundsound_Sound_Perc/Samarkand_Whistle_3.mp3",
-        filename: "Samarkand_Whistle_3.mp3"
-      },
-      {
-        name: "Tambor 1",
-        path: "/audio/Foundsound_Sound_Perc/Tambor_1.mp3",
-        filename: "Tambor_1.mp3"
-      },
-      {
-        name: "WM Perc Tonal 3",
-        path: "/audio/Foundsound_Sound_Perc/WM_Perc_tonal_3.mp3",
-        filename: "WM_Perc_tonal_3.mp3"
-      },
-      {
-        name: "Pipe C",
-        path: "/audio/Foundsound_Sound_Perc/pipe_C.mp3",
-        filename: "pipe_C.mp3"
-      }
-    ]
+      'AKt_Verb_Door_5.mp3',
+      'Found_Sound_Perc_10.mp3',
+      'Marímbula_6.mp3',
+      'pipe_C.mp3',
+      'Samarkand_Claps_2.mp3',
+      'Samarkand_Whistle_3.mp3',
+      'Tambor_1.mp3',
+      'WM_Perc_tonal_3.mp3'
+    ].map(filename => createAudioFile("/audio/Foundsound_Sound_Perc", filename))
   },
   {
     id: "genarch-cycle-demos",
     name: "Genarch Cycle Demos",
+    slug: "genarch-cycle",
     description: "Generative architecture cycle demonstrations",
     folderPath: "/audio/Genarch_Cycle_Demos",
-    productId: "YBZbq9G9akXVe9P9g5NLfA==", // GenArch Cycle
+    productId: "YBZbq9G9akXVe9P9g5NLfA==",
     audioFiles: [
-      {
-        name: "GA Cycle MISC 32",
-        path: "/audio/Genarch_Cycle_Demos/ GA_Cycle_MISC_32.mp3",
-        filename: " GA_Cycle_MISC_32.mp3"
-      },
-      {
-        name: "GA Cycle Chord 7",
-        path: "/audio/Genarch_Cycle_Demos/ GA_Cycle_Chord_7.mp3",
-        filename: " GA_Cycle_Chord_7.mp3"
-      },
-      {
-        name: "GA Cycle MISC 37",
-        path: "/audio/Genarch_Cycle_Demos/ GA_Cycle_MISC_37.mp3",
-        filename: " GA_Cycle_MISC_37.mp3"
-      },
-      {
-        name: "GA Cycle MISC 5",
-        path: "/audio/Genarch_Cycle_Demos/ GA_Cycle_MISC_5.mp3",
-        filename: " GA_Cycle_MISC_5.mp3"
-      },
-      {
-        name: "GA Cycle MISC 4",
-        path: "/audio/Genarch_Cycle_Demos/ GA_Cycle_MISC_4.mp3",
-        filename: " GA_Cycle_MISC_4.mp3"
-      },
-      {
-        name: "GA Cycle SD 26",
-        path: "/audio/Genarch_Cycle_Demos/GA_Cycle_SD_26.mp3",
-        filename: "GA_Cycle_SD_26.mp3"
-      },
-      {
-        name: "GA Cycle Kick 50",
-        path: "/audio/Genarch_Cycle_Demos/GA_Cycle_Kick_50.mp3",
-        filename: "GA_Cycle_Kick_50.mp3"
-      },
-      {
-        name: "GA Cycle SD 49",
-        path: "/audio/Genarch_Cycle_Demos/GA_Cycle_SD_49.mp3",
-        filename: "GA_Cycle_SD_49.mp3"
-      }
-    ]
+      ' GA_Cycle_Chord_7.mp3',
+      ' GA_Cycle_MISC_32.mp3',
+      ' GA_Cycle_MISC_37.mp3',
+      ' GA_Cycle_MISC_4.mp3',
+      ' GA_Cycle_MISC_5.mp3',
+      'GA_Cycle_Kick_50.mp3',
+      'GA_Cycle_SD_26.mp3',
+      'GA_Cycle_SD_49.mp3'
+    ].map(filename => createAudioFile("/audio/Genarch_Cycle_Demos", filename))
   },
   {
     id: "interference-pack-demos",
     name: "Interference Pack Demos",
+    slug: "interference-pack",
     description: "Interference and distortion effects demonstrations",
     folderPath: "/audio/InterferencePack_Demos",
-    productId: "8lD0nEOwzH9G3mP1GLODrQ==", // Interference Sound Pack Vol. 1
+    productId: "8lD0nEOwzH9G3mP1GLODrQ==",
     audioFiles: [
-      {
-        name: "Interference Vol1 Bent Bass 1",
-        path: "/audio/InterferencePack_Demos/Interference_Vol1 Bent Bass 1.mp3",
-        filename: "Interference_Vol1 Bent Bass 1.mp3"
-      },
-      {
-        name: "Interference Vol1 Hybrid Snare",
-        path: "/audio/InterferencePack_Demos/Interference_Vol1 Hybrid Snare.mp3",
-        filename: "Interference_Vol1 Hybrid Snare.mp3"
-      },
-      {
-        name: "Interference Vol1 Hybrid Stick",
-        path: "/audio/InterferencePack_Demos/Interference_Vol1 Hybrid Stick.mp3",
-        filename: "Interference_Vol1 Hybrid Stick.mp3"
-      },
-      {
-        name: "Interference Vol1 Detuned Am Chord",
-        path: "/audio/InterferencePack_Demos/Interference_Vol1 Detuned Am Chord.mp3",
-        filename: "Interference_Vol1 Detuned Am Chord.mp3"
-      },
-      {
-        name: "Interference Vol1 MKF Kick 3",
-        path: "/audio/InterferencePack_Demos/Interference_Vol1 MKF kick 3.mp3",
-        filename: "Interference_Vol1 MKF kick 3.mp3"
-      },
-      {
-        name: "Interference Vol1 MKF Kick 5",
-        path: "/audio/InterferencePack_Demos/Interference_Vol1 MKF kick 5.mp3",
-        filename: "Interference_Vol1 MKF kick 5.mp3"
-      },
-      {
-        name: "Interference Vol1 RVRB Stick",
-        path: "/audio/InterferencePack_Demos/Interference_Vol1 RVRB Stick.mp3",
-        filename: "Interference_Vol1 RVRB Stick.mp3"
-      },
-      {
-        name: "Interference Vol1 MKF Kick 7",
-        path: "/audio/InterferencePack_Demos/Interference_Vol1 MKF kick 7.mp3",
-        filename: "Interference_Vol1 MKF kick 7.mp3"
-      }
-    ]
+      'Interference_Vol1 Bent Bass 1.mp3',
+      'Interference_Vol1 Detuned Am Chord.mp3',
+      'Interference_Vol1 Hybrid Snare.mp3',
+      'Interference_Vol1 Hybrid Stick.mp3',
+      'Interference_Vol1 MKF kick 3.mp3',
+      'Interference_Vol1 MKF kick 5.mp3',
+      'Interference_Vol1 MKF kick 7.mp3',
+      'Interference_Vol1 RVRB Stick.mp3'
+    ].map(filename => createAudioFile("/audio/InterferencePack_Demos", filename))
   },
   {
     id: "temporal-fauna-demos",
     name: "Temporal Fauna Demos",
+    slug: "temporal-fauna",
     description: "Temporal and organic sound explorations",
     folderPath: "/audio/Temporal_Fauna_DEMOS",
-    productId: "h3iis8gqsb5Pmj8P_vxcfw==", // Temporal Fauna
+    productId: "h3iis8gqsb5Pmj8P_vxcfw==",
     audioFiles: [
-      {
-        name: "KD Subs 3",
-        path: "/audio/Temporal_Fauna_DEMOS/KD_Subs_3.mp3",
-        filename: "KD_Subs_3.mp3"
-      },
-      {
-        name: "KD Subs 6",
-        path: "/audio/Temporal_Fauna_DEMOS/KD_Subs_6.mp3",
-        filename: "KD_Subs_6.mp3"
-      },
-      {
-        name: "Lo-Perc 8",
-        path: "/audio/Temporal_Fauna_DEMOS/Lo-Perc_8.mp3",
-        filename: "Lo-Perc_8.mp3"
-      },
-      {
-        name: "Neblina 8",
-        path: "/audio/Temporal_Fauna_DEMOS/Neblina_8.mp3",
-        filename: "Neblina_8.mp3"
-      },
-      {
-        name: "Rbr DistBass 1",
-        path: "/audio/Temporal_Fauna_DEMOS/Rbr_DistBass_1.mp3",
-        filename: "Rbr_DistBass_1.mp3"
-      },
-      {
-        name: "Sub MiKro 1",
-        path: "/audio/Temporal_Fauna_DEMOS/Sub_MiKro_1.mp3",
-        filename: "Sub_MiKro_1.mp3"
-      },
-      {
-        name: "Symmetry 4",
-        path: "/audio/Temporal_Fauna_DEMOS/Symmetry_4.mp3",
-        filename: "Symmetry_4.mp3"
-      },
-      {
-        name: "Temporal Resolution 1",
-        path: "/audio/Temporal_Fauna_DEMOS/Temporal_Resolution_1.mp3",
-        filename: "Temporal_Resolution_1.mp3"
-      },
-      {
-        name: "Temporal Fauna Demo V2",
-        path: "/audio/Temporal_Fauna_DEMOS/Tempora_Fauna_DemoV2.mp3",
-        filename: "Tempora_Fauna_DemoV2.mp3"
-      },
-      {
-        name: "Temporal Fauna Demo",
-        path: "/audio/Temporal_Fauna_DEMOS/Temporal_Fauna_Demo.mp3",
-        filename: "Temporal_Fauna_Demo.mp3"
-      }
-    ]
+      'KD_Subs_3.mp3',
+      'KD_Subs_6.mp3',
+      'Lo-Perc_8.mp3',
+      'Neblina_8.mp3',
+      'Rbr_DistBass_1.mp3',
+      'Sub_MiKro_1.mp3',
+      'Symmetry_4.mp3',
+      'Tempora_Fauna_Demo.mp3',
+      'Tempora_Fauna_DemoV2.mp3',
+      'Temporal_Fauna_Demo.mp3',
+      'Temporal_Resolution_1.mp3'
+    ].map(filename => createAudioFile("/audio/Temporal_Fauna_DEMOS", filename))
   },
   {
-    id: "vapor-drums-demos",
-    name: "Vapor Drums Demos",
-    description: "Vapor wave and atmospheric drum sounds",
-    folderPath: "/audio/Vapor_Drums_Demos",
-    productId: "AJNqZ3oMXl9G6xAkNg9wNA==", // FM Vapor Drums-Green
+    id: "vapor-drums-green-demos",
+    name: "Vapor Drums Green Demos",
+    slug: "vapor-drums-green",
+    description: "Vapor wave and atmospheric drum sounds - Green variant",
+    folderPath: "/audio/Vapor_Drums_Green_Demos",
+    productId: "AJNqZ3oMXl9G6xAkNg9wNA==",
     audioFiles: [
-      {
-        name: "BDVIN FM Vapor Drums TEHN V",
-        path: "/audio/Vapor_Drums_Demos/BDVIN_FM_Vapor_Drums_TEHN_V.mp3",
-        filename: "BDVIN_FM_Vapor_Drums_TEHN_V.mp3"
-      },
-      {
-        name: "CLAPEDGE FM Vapor Drums TEHN V",
-        path: "/audio/Vapor_Drums_Demos/CLAPEDGE_FM_Vapor_Drums_TEHN_V.mp3",
-        filename: "CLAPEDGE_FM_Vapor_Drums_TEHN_V.mp3"
-      },
-      {
-        name: "CONGXY FM Vapor Drums TEHN V",
-        path: "/audio/Vapor_Drums_Demos/CONGXY_FM_Vapor_Drums_TEHN_V.mp3",
-        filename: "CONGXY_FM_Vapor_Drums_TEHN_V.mp3"
-      },
-      {
-        name: "HHO5 FM Vapor Drums TEHN V",
-        path: "/audio/Vapor_Drums_Demos/HHO5_FM_Vapor_Drums_TEHN_V.mp3",
-        filename: "HHO5_FM_Vapor_Drums_TEHN_V.mp3"
-      },
-      {
-        name: "ISAO FM Vapor Drums TEHN V",
-        path: "/audio/Vapor_Drums_Demos/ISAO_FM_Vapor_Drums_TEHN_V.mp3",
-        filename: "ISAO_FM_Vapor_Drums_TEHN_V.mp3"
-      },
-      {
-        name: "METALVIN FM Vapor Drums TEHN V",
-        path: "/audio/Vapor_Drums_Demos/METALVIN_FM_Vapor_Drums_TEHN_V.mp3",
-        filename: "METALVIN_FM_Vapor_Drums_TEHN_V.mp3"
-      },
-      {
-        name: "PRCTONE2 FM Vapor Drums TEHN V",
-        path: "/audio/Vapor_Drums_Demos/PRCTONE2_FM_Vapor_Drums_TEHN_V.mp3",
-        filename: "PRCTONE2_FM_Vapor_Drums_TEHN_V.mp3"
-      },
-      {
-        name: "TRIACON FM Vapor Drums TEHN V",
-        path: "/audio/Vapor_Drums_Demos/TRIACON_FM_Vapor_Drums_TEHN_V.mp3",
-        filename: "TRIACON_FM_Vapor_Drums_TEHN_V.mp3"
-      }
-    ]
+      'BDVIN_FM_Vapor_Drums_TEHN_V.mp3',
+      'CLAPEDGE_FM_Vapor_Drums_TEHN_V.mp3',
+      'CONGXY_FM_Vapor_Drums_TEHN_V.mp3',
+      'HHO5_FM_Vapor_Drums_TEHN_V.mp3',
+      'ISAO_FM_Vapor_Drums_TEHN_V.mp3',
+      'METALVIN_FM_Vapor_Drums_TEHN_V.mp3',
+      'PRCTONE2_FM_Vapor_Drums_TEHN_V.mp3',
+      'TRIACON_FM_Vapor_Drums_TEHN_V.mp3'
+    ].map(filename => createAudioFile("/audio/Vapor_Drums_Green_Demos", filename))
+  },
+  {
+    id: "vapor-drums-red-demos",
+    name: "Vapor Drums Red Demos",
+    slug: "vapor-drums-red",
+    description: "Vapor wave and atmospheric drum sounds - Red variant",
+    folderPath: "/audio/Vapor_Drums_Red_Demos",
+    productId: "tG6ebGD796t30HLKfa5i2Q==",
+    audioFiles: [
+      'BDVIN_FM_Vapor_Drums_TEHN_V.mp3',
+      'CLAPEDGE_FM_Vapor_Drums_TEHN_V.mp3',
+      'CONGXY_FM_Vapor_Drums_TEHN_V.mp3',
+      'HHO5_FM_Vapor_Drums_TEHN_V.mp3',
+      'ISAO_FM_Vapor_Drums_TEHN_V.mp3',
+      'METALVIN_FM_Vapor_Drums_TEHN_V.mp3',
+      'PRCTONE2_FM_Vapor_Drums_TEHN_V.mp3',
+      'TRIACON_FM_Vapor_Drums_TEHN_V.mp3'
+    ].map(filename => createAudioFile("/audio/Vapor_Drums_Red_Demos", filename))
+  },
+  {
+    id: "replikas-modular-drums-and-sound-scapes",
+    name: "Replikas Modular Drums and Sound Scapes",
+    slug: "replikas-modular-drums-and-sound-scapes",
+    description: "Modular drum samples and synthetic percussion sounds from Replikas",
+    folderPath: "/audio/Replikas_Modular_Drums_Demo",
+    productId: "6ohI7gZEqraWbi4kdhOeVQ==", // Real Gumroad product ID from API
+    audioFiles: [
+      'Replikas_Pads_and Synths.mp3',
+      'Replikas_Synth_Bass.mp3',
+      'Replikas_Subs.mp3',
+      'Replikas_Snares.mp3',
+      'Replikas_Demo_1.mp3',
+      'Replikas_Misc_Percussion.mp3',
+      'Replikas_MCO_Kicks.mp3',
+      'Replikas_Doepfr_Kicks.mp3',
+      'RPLKS_Sttgtr_CMAJ_Inv_Tehn_Vega.mp3',
+      'Replikas_Inverted_1_Tehn_Vega.mp3',
+      'RPLKS_Raves_Gb2_Tehn_Vega.mp3',
+      'RPLKS_CLM_Down_CMaj9_Tehn_Vega.mp3',
+      'RPLKS_DistL_C2_Tehn_Vega.mp3',
+      'MDDEMO_3_Remastered.mp3',
+      'RPLKS_BceX_Cmaj9_Tehn_Vega.mp3',
+      'RPLKS_Bass_Bait_C2_Tehn_Vega.mp3'
+    ].map(filename => createAudioFile("/audio/Replikas_Modular_Drums_Demo", filename))
   }
 ];
 
+// Lookup functions
 export function getAudioPackById(id: string): AudioPack | undefined {
   return audioPacks.find(pack => pack.id === id);
 }
@@ -377,10 +216,108 @@ export function getAudioPackByName(name: string): AudioPack | undefined {
   return audioPacks.find(pack => pack.name.toLowerCase() === name.toLowerCase());
 }
 
+export function getAudioPackByProductId(productId: string): AudioPack | undefined {
+  return audioPacks.find(pack => pack.productId === productId);
+}
+
+export function getAudioPackBySlug(slug: string): AudioPack | undefined {
+  return audioPacks.find(pack => pack.slug === slug);
+}
+
 export function getAllAudioPacks(): AudioPack[] {
   return audioPacks;
 }
 
-export function getAudioPackByProductId(productId: string): AudioPack | undefined {
-  return audioPacks.find(pack => pack.productId === productId);
+// Static mapping for main products that don't have audio packs
+const staticProductMapping: { [slug: string]: string } = {
+  'sonic-entropy': '99xqpkLEY4yTbHgcsVjwcA==',
+  'fm-percussion': 'zxUyXIn1veXajo6K81SdWA==',
+  'tsk-0a0a-intro-kit': 'jYlJV3xNBShdlCPYFYh4Jg==', // Real TSK + /0A0A/ INTRO KIT product ID
+};
+
+// URL and slug functions
+export function getProductIdBySlug(slug: string): string | undefined {
+  // First check audio packs
+  const pack = audioPacks.find(pack => pack.slug === slug);
+  if (pack?.productId) {
+    return pack.productId;
+  }
+
+  // Then check static mapping for main products
+  return staticProductMapping[slug];
+}
+
+export function getSlugByProductId(productId: string): string | undefined {
+  // First check audio packs
+  const pack = audioPacks.find(pack => pack.productId === productId);
+  if (pack?.slug) {
+    return pack.slug;
+  }
+
+  // Then check static mapping for main products
+  const slugEntry = Object.entries(staticProductMapping).find(([slug, id]) => id === productId);
+  return slugEntry?.[0];
+}
+
+export function generateSlugFromTitle(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters except spaces and hyphens
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+    .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+}
+
+export function getSlugFromTitle(title: string): string {
+  return generateSlugFromTitle(title);
+}
+
+// URL generation function
+export function getProductUrlSync(productId: string, productTitle?: string): string {
+  // First try to get slug from audio packs mapping
+  const pack = getAudioPackByProductId(productId);
+
+  if (pack?.slug) {
+    return `/products/${pack.slug}`;
+  }
+
+  // If no mapping exists, generate slug from product title
+  if (productTitle) {
+    const generatedSlug = generateSlugFromTitle(productTitle);
+    return `/products/${generatedSlug}`;
+  }
+
+  // Fallback to product ID if no title available
+  return `/products/${productId}`;
+}
+
+// Legacy alias
+export const getProductUrl = getProductUrlSync;
+
+// Function to add new audio packs for future use
+export function addNewAudioPack(audioPack: AudioPack): void {
+  // Add to the audioPacks array
+  audioPacks.push(audioPack);
+  console.log(`Added new audio pack: ${audioPack.name} with ${audioPack.audioFiles.length} files`);
+}
+
+// Helper function to create a new audio pack
+export function createNewAudioPack(
+  id: string,
+  name: string,
+  slug: string,
+  description: string,
+  folderPath: string,
+  productId: string,
+  audioFilenames: string[]
+): AudioPack {
+  return {
+    id,
+    name,
+    slug,
+    description,
+    folderPath,
+    productId,
+    audioFiles: audioFilenames.map(filename => createAudioFile(folderPath, filename))
+  };
 }
