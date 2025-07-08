@@ -161,7 +161,7 @@ export async function getStaticPaths() {
                   <div class="text-gray-300 text-sm max-w-2xl leading-relaxed text-left">
                     <div id="description-outer" style="overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1); max-height: 120px;">
                       <div id="description-text">
-                        {cleanText(product.description)}
+                        {cleanText(product.description).length > 160 ? `${cleanText(product.description).slice(0, 160)}...` : cleanText(product.description)}
                       </div>
                     </div>
                     {cleanText(product.description).length > 160 && (
