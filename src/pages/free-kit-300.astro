@@ -4,6 +4,7 @@ import { fetchProducts } from "../lib/gumroad";
 import type { GumroadProduct } from "../lib/types";
 import fs from "fs";
 import path from "path";
+import BuyNowButton from "../components/ui/BuyNowButton.astro";
 
 let products: GumroadProduct[] = [];
 let freeProduct: GumroadProduct | null = null;
@@ -166,18 +167,17 @@ function formatDuration(filename: string): string {
 								</div>
 							</div>
 						</div>
-						<a
-							href="https://tehnvega.gumroad.com/l/hvhjo"
-							target="_blank"
-							rel="noopener noreferrer"
-							class="btn-smooth w-full bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-4 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg text-center block"
-						>
-							{
-								freeProduct
-									? "TSK INTRO KIT DOWNLOAD"
-									: "TSK INTRO KIT DOWNLOAD"
-							}
-						</a>
+						{
+							freeProduct && (
+								<BuyNowButton
+									productId={freeProduct.id}
+									productTitle={freeProduct.title}
+									price={freeProduct.price}
+									productUrl={freeProduct.url}
+									formattedPrice={freeProduct.formatted_price}
+								/>
+							)
+						}
 						<div class="mt-6 text-center">
 							<div
 								class="flex justify-center items-center space-x-6 text-gray-500 text-xs"
