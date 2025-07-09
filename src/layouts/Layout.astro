@@ -1,6 +1,7 @@
 ---
 import "../styles/globals.css";
 import { siteAssets, fetchProducts } from "../lib/gumroad";
+import CookieNotice from "../components/ui/CookieNotice.astro";
 
 export interface Props {
     title?: string;
@@ -596,4 +597,6 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
             }
         </script>
     </body>
+
+    <CookieNotice />
 </html>
