@@ -1,5 +1,9 @@
 ---
 import Layout from "../layouts/Layout.astro";
+
+// Get success parameter from URL
+const { searchParams } = Astro.url;
+const isSuccess = searchParams.get("success") === "true";
 ---
 
 <Layout title="Contact - TSK Sound Kits">
@@ -20,92 +24,109 @@ import Layout from "../layouts/Layout.astro";
                 Have a question, feedback, or want to collaborate? Fill out the
                 form below and we’ll get back to you soon.
             </p>
-            <form
-                name="contact"
-                method="POST"
-                data-netlify="true"
-                netlify-honeypot="bot-field"
-                class="space-y-6"
-            >
-                <input type="hidden" name="form-name" value="contact" />
-                <input type="hidden" name="bot-field" />
-
-                <div>
-                    <label
-                        for="name"
-                        class="block text-sm font-medium text-gray-300 mb-1"
-                        >Name</label
+            {
+                !isSuccess && (
+                    <form
+                        name="contact"
+                        method="POST"
+                        data-netlify="true"
+                        data-netlify-recaptcha="true"
+                        action="/contact?success=true"
+                        class="space-y-6"
                     >
-                    <input
-                        type="text"
-                        name="name"
-                        id="name"
-                        required
-                        class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
-                    />
-                </div>
+                        <input type="hidden" name="form-name" value="contact" />
 
-                <div>
-                    <label
-                        for="email"
-                        class="block text-sm font-medium text-gray-300 mb-1"
-                        >Email</label
-                    >
-                    <input
-                        type="email"
-                        name="email"
-                        id="email"
-                        required
-                        class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
-                    />
-                </div>
+                        <div>
+                            <label
+                                for="name"
+                                class="block text-sm font-medium text-gray-300 mb-1"
+                            >
+                                Name
+                            </label>
+                            <input
+                                type="text"
+                                name="name"
+                                id="name"
+                                required
+                                class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+                            />
+                        </div>
 
-                <div>
-                    <label
-                        for="subject"
-                        class="block text-sm font-medium text-gray-300 mb-1"
-                        >Subject</label
-                    >
-                    <select
-                        name="subject"
-                        id="subject"
-                        required
-                        class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
-                    >
-                        <option value="">Select a topic</option>
-                        <option value="general">General Inquiry</option>
-                        <option value="licensing">Licensing Question</option>
-                        <option value="collaboration">Collaboration</option>
-                        <option value="technical">Technical Support</option>
-                    </select>
-                </div>
+                        <div>
+                            <label
+                                for="email"
+                                class="block text-sm font-medium text-gray-300 mb-1"
+                            >
+                                Email
+                            </label>
+                            <input
+                                type="email"
+                                name="email"
+                                id="email"
+                                required
+                                class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+                            />
+                        </div>
 
-                <div>
-                    <label
-                        for="message"
-                        class="block text-sm font-medium text-gray-300 mb-1"
-                        >Message</label
-                    >
-                    <textarea
-                        name="message"
-                        id="message"
-                        rows="5"
-                        required
-                        class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition resize-none"
-                    ></textarea>
-                </div>
+                        <div>
+                            <label
+                                for="subject"
+                                class="block text-sm font-medium text-gray-300 mb-1"
+                            >
+                                Subject
+                            </label>
+                            <select
+                                name="subject"
+                                id="subject"
+                                required
+                                class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+                            >
+                                <option value="">Select a topic</option>
+                                <option value="general">General Inquiry</option>
+                                <option value="licensing">
+                                    Licensing Question
+                                </option>
+                                <option value="collaboration">
+                                    Collaboration
+                                </option>
+                                <option value="technical">
+                                    Technical Support
+                                </option>
+                            </select>
+                        </div>
 
-                <button
-                    type="submit"
-                    class="w-full py-3 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-bold text-lg shadow-lg transition"
-                    >Send Message</button
-                >
-            </form>
-            <div class="hidden" id="form-success">
-                <div class="mt-8 text-center text-green-400 font-semibold">
-                    Thank you! Your message has been sent.
-                </div>
-            </div>
+                        <div>
+                            <label
+                                for="message"
+                                class="block text-sm font-medium text-gray-300 mb-1"
+                            >
+                                Message
+                            </label>
+                            <textarea
+                                name="message"
+                                id="message"
+                                rows="5"
+                                required
+                                class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition resize-none"
+                            />
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="w-full py-3 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-bold text-lg shadow-lg transition"
+                        >
+                            Send Message
+                        </button>
+                    </form>
+                )
+            }
+            {
+                isSuccess && (
+                    <div class="mt-8 text-center text-green-400 font-semibold">
+                        Thank you! Your message has been sent successfully.
+                    </div>
+                )
+            }
         </div>
     </main>
 </Layout>
