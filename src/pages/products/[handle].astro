@@ -77,6 +77,9 @@ try {
   console.error('Error fetching product:', e);
 }
 
+let cleanDescription = product && product.description ? cleanText(product.description) : '';
+let truncatedDescription = cleanDescription.length > 160 ? cleanDescription.slice(0, 160) + '...' : cleanDescription;
+
 // Generate static paths for all products with proper slugs
 export async function getStaticPaths() {
   try {
@@ -159,17 +162,10 @@ export async function getStaticPaths() {
                 <!-- Description -->
                 {product.description && (
                   <div class="text-gray-300 text-sm max-w-2xl leading-relaxed text-left">
-                    <div id="description-outer" style="overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1); max-height: 120px;">
-                      <div id="description-text" style="position: relative;">
-                        <span id="desc-truncated" style="position: absolute; left: 0; right: 0; top: 0; opacity: 1; transition: opacity 0.3s;">
-                          {cleanText(product.description).length > 160 ? `${cleanText(product.description).slice(0, 160)}...` : cleanText(product.description)}
-                        </span>
-                        <span id="desc-full" style="opacity: 0; transition: opacity 0.3s;">
-                          {cleanText(product.description)}
-                        </span>
-                      </div>
+                    <div id="description-outer" style="overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1); will-change: max-height;">
+                      <div id="description-text" data-full-text={cleanDescription} data-truncated-text={truncatedDescription}>{truncatedDescription}</div>
                     </div>
-                    {cleanText(product.description).length > 160 && (
+                    {cleanDescription.length > 160 && (
                       <button id="description-toggle" class="text-white hover:text-gray-300 ml-2 underline mt-2 block">
                         View More
                       </button>
@@ -342,22 +338,21 @@ export async function getStaticPaths() {
       // Function to extract colors from cover art and update gradient
       function updateGradientFromCover() {
         const coverImage = document.getElementById('cover-img') as HTMLImageElement;
-        const mainContent = document.getElementById('main-content');
-        
         if (!coverImage || !mainContent) {
-          console.warn('Cover image or main content not found');
-          setTitleBasedGradient();
+          console.log('Cover image or main content not found');
+          setDefaultGradient();
           return;
         }
 
-        // Set crossOrigin to try to avoid CORS issues
-        coverImage.crossOrigin = 'anonymous';
+        console.log('Extracting colors from:', coverImage.src);
 
-        function extractColors() {
+        // Set initial gradient immediately to avoid delay
+        setDefaultGradient();
+
+        const extractColors = () => {
           try {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            
             if (!ctx) {
               setTitleBasedGradient();
               return;
@@ -429,8 +424,7 @@ export async function getStaticPaths() {
               mainContent.style.background = gradient;
               
             } catch (canvasError) {
-              console.warn('Canvas extraction failed (likely CORS issue):', canvasError);
-              // Fall back to title-based gradient
+              console.warn('Canvas extraction failed:', canvasError);
               setTitleBasedGradient();
             }
             
@@ -438,7 +432,7 @@ export async function getStaticPaths() {
             console.error('Color extraction error:', error);
             setTitleBasedGradient();
           }
-        }
+        };
 
         function setDefaultGradient() {
           // Start with a neutral gradient
@@ -680,53 +674,57 @@ export async function getStaticPaths() {
         }
       });
 
-      // Improved smooth description toggle logic
+      // IMPROVED Description toggle logic - smooth both ways
       const descToggle = document.getElementById('description-toggle');
-      const descTruncated = document.getElementById('desc-truncated');
-      const descFull = document.getElementById('desc-full');
       const descOuter = document.getElementById('description-outer');
       const descText = document.getElementById('description-text');
+      const fullText = descText?.getAttribute('data-full-text') || '';
+      const truncatedText = descText?.getAttribute('data-truncated-text') || '';
       let descExpanded = false;
-      if (descToggle && descTruncated && descFull && descOuter && descText) {
+
+      if (descToggle && descOuter && descText) {
+        // Set initial state properly
+        descText.textContent = truncatedText;
+        descOuter.style.maxHeight = descText.scrollHeight + 'px';
+        
         descToggle.addEventListener('click', function() {
           if (!descExpanded) {
-            // Expanding: show both, animate max-height, then fade in full text
-            descTruncated.style.opacity = '1';
-            descTruncated.style.position = 'absolute';
-            descFull.style.opacity = '0';
-            descFull.style.position = 'static';
-            descFull.style.display = '';
-            // Animate max-height to fit full content
-            const fullHeight = descText.scrollHeight;
-            descOuter.style.maxHeight = fullHeight + 'px';
-            descToggle.textContent = 'View Less';
-            setTimeout(() => {
-              descTruncated.style.opacity = '0';
-              descFull.style.opacity = '1';
-              descTruncated.style.position = 'absolute';
-              descFull.style.position = 'static';
-            }, 350); // match transition duration
-            descExpanded = true;
-          } else {
-            // Collapsing: fade out full text first, then animate max-height
-            descFull.style.opacity = '0';
-            descTruncated.style.opacity = '1';
-            descTruncated.style.position = 'static';
-            descFull.style.position = 'absolute';
-            descToggle.textContent = 'View More';
+            // EXPANDING: Calculate target height first
+            const currentHeight = descOuter.scrollHeight;
+            descText.textContent = fullText;
+            const targetHeight = descText.scrollHeight;
             
-            // Wait for opacity transition, then animate height
-            setTimeout(() => {
-              descOuter.style.maxHeight = '120px';
-              // Smooth scroll after height animation starts
-              setTimeout(() => {
-                descOuter.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-              }, 100);
-            }, 200); // let opacity transition finish first
+            // Start from current height
+            descOuter.style.maxHeight = currentHeight + 'px';
+            
+            // Trigger reflow, then animate to target
+            requestAnimationFrame(() => {
+              descOuter.style.maxHeight = targetHeight + 'px';
+            });
+            
+            descToggle.textContent = 'View Less';
+            descExpanded = true;
+            
+          } else {
+            // COLLAPSING: Calculate target height first  
+            const currentHeight = descOuter.scrollHeight;
+            descText.textContent = truncatedText;
+            const targetHeight = descText.scrollHeight;
+            
+            // Start from current height
+            descOuter.style.maxHeight = currentHeight + 'px';
+            
+            // Trigger reflow, then animate to target
+            requestAnimationFrame(() => {
+              descOuter.style.maxHeight = targetHeight + 'px';
+            });
+            
+            descToggle.textContent = 'View More';
             descExpanded = false;
           }
         });
       }
+
       // Always call gradient update on page load
       updateGradientFromCover();
       // Load audio durations for all samples
@@ -768,6 +766,17 @@ export async function getStaticPaths() {
 
     .sample-row.bg-purple-900\/30 .track-number {
       display: none;
+    }
+
+    /* Enhanced description animation */
+    #description-outer {
+      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: max-height;
+    }
+
+    /* Prevent text jumping during transition */
+    #description-text {
+      transition: none;
     }
   </style>
 </Layout>
