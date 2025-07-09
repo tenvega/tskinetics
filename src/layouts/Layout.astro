@@ -8,10 +8,10 @@ export interface Props {
     image?: string;
 }
 
-const { 
+const {
     title = "TSK Sound Kits",
     description = "Premium sound kits and samples for music producers",
-    image = "/images/og-default.jpg"
+    image = "/images/og-default.jpg",
 } = Astro.props;
 
 // Get latest release for dynamic marquee
@@ -23,15 +23,15 @@ const currentPath = Astro.url.pathname;
 
 // Function to check if current page matches the link
 const isActivePage = (page: string) => {
-  if (currentPath === "/" && page === "home") return true;
-  if (currentPath === "/popular" && page === "popular") return true;
-  if (currentPath === "/new-releases" && page === "new-releases") return true;
-  if (currentPath === "/products" && page === "products") return true;
-  if (currentPath === "/blog" && page === "blog") return true;
-  if (currentPath?.startsWith("/blog/") && page === "blog") return true;
-  if (currentPath === "/free-kit-300" && page === "free-kit") return true;
-  if (currentPath === "/contact" && page === "contact") return true;
-  return false;
+    if (currentPath === "/" && page === "home") return true;
+    if (currentPath === "/popular" && page === "popular") return true;
+    if (currentPath === "/new-releases" && page === "new-releases") return true;
+    if (currentPath === "/products" && page === "products") return true;
+    if (currentPath === "/blog" && page === "blog") return true;
+    if (currentPath?.startsWith("/blog/") && page === "blog") return true;
+    if (currentPath === "/free-kit-300" && page === "free-kit") return true;
+    if (currentPath === "/contact" && page === "contact") return true;
+    return false;
 };
 
 // Active link classes
@@ -45,31 +45,38 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
         <meta charset="UTF-8" />
         <meta name="description" content={description} />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="icon" type="image/png" href="/images/tenvga_isometric_logo_2.png" />
+        <link
+            rel="icon"
+            type="image/png"
+            href="/images/tenvga_isometric_logo_2.png"
+        />
         <link
             href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700;800;900&display=swap"
             rel="stylesheet"
         />
         <title>{title}</title>
-        
+
         <!-- Open Graph / Facebook -->
         <meta property="og:type" content="website" />
         <meta property="og:url" content={Astro.url.href} />
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
         <meta property="og:image" content={new URL(image, Astro.url).href} />
-        
+
         <!-- Twitter -->
         <meta property="twitter:card" content="summary_large_image" />
         <meta property="twitter:url" content={Astro.url.href} />
         <meta property="twitter:title" content={title} />
         <meta property="twitter:description" content={description} />
-        <meta property="twitter:image" content={new URL(image, Astro.url).href} />
-        
+        <meta
+            property="twitter:image"
+            content={new URL(image, Astro.url).href}
+        />
+
         <!-- Canonical URL -->
         <link rel="canonical" href={Astro.url.href} />
     </head>
-    <body class="bg-[#151515] text-white">
+    <body class="bg-[#151515] text-white min-h-screen flex flex-col">
         <!-- Navigation Header -->
         <header
             class="fixed top-0 left-0 right-0 z-50 bg-[#151515]/90 backdrop-blur-sm border-b border-gray-800"
@@ -89,32 +96,33 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
                 </div>
 
                 <!-- Navigation Menu (Desktop) -->
-                <nav class="hidden lg:flex items-center space-x-6 xl:space-x-8 absolute left-1/2 transform -translate-x-1/2">
+                <nav
+                    class="hidden lg:flex items-center space-x-6 xl:space-x-8 absolute left-1/2 transform -translate-x-1/2"
+                >
                     <a
                         href="/"
-                        class="px-3 py-2 {isActivePage("home") ? activeLinkClass : inactiveLinkClass}"
+                        class={`px-3 py-2 ${isActivePage("home") ? activeLinkClass : inactiveLinkClass}`}
                         >HOME</a
                     >
                     <a
                         href="/products"
-                        class="px-3 py-2 {isActivePage("products") ? activeLinkClass : inactiveLinkClass}"
+                        class={`px-3 py-2 ${isActivePage("products") ? activeLinkClass : inactiveLinkClass}`}
                         >PRODUCTS</a
                     >
                     <a
                         href="/popular"
-                        class="px-3 py-2 {isActivePage("popular") ? activeLinkClass : inactiveLinkClass}"
+                        class={`px-3 py-2 ${isActivePage("popular") ? activeLinkClass : inactiveLinkClass}`}
                         >POPULAR</a
                     >
                     <a
                         href="/new-releases"
-                        class="px-3 py-2 whitespace-nowrap {isActivePage("new-releases") ? activeLinkClass : inactiveLinkClass}"
+                        class={`px-3 py-2 whitespace-nowrap ${isActivePage("new-releases") ? activeLinkClass : inactiveLinkClass}`}
                         >NEW RELEASES</a
                     >
-                    <a
+                    <!-- <a
                         href="/blog"
-                        class="px-3 py-2 {isActivePage("blog") ? activeLinkClass : inactiveLinkClass}"
-                        >BLOG</a
-                    >
+                        class={`px-3 py-2 ${isActivePage('blog') ? activeLinkClass : inactiveLinkClass}`}
+                    >BLOG</a> -->
                     <div class="relative group">
                         <button
                             class="px-3 py-2 text-white hover:text-gray-300 flex items-center"
@@ -131,23 +139,40 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
                                     clip-rule="evenodd"></path>
                             </svg>
                         </button>
-                        
+
                         <!-- Dropdown Menu -->
-                        <div class="absolute left-0 mt-2 w-48 bg-[#1a1a1a] border border-gray-700 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                        <div
+                            class="absolute left-0 mt-2 w-48 bg-[#1a1a1a] border border-gray-700 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50"
+                        >
                             <div class="py-2">
-                                <a href="/products" class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-md mx-2">
+                                <a
+                                    href="/products"
+                                    class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-md mx-2"
+                                >
                                     ALL PRODUCTS
                                 </a>
-                                <a href="/categories/one-shots" class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-md mx-2">
+                                <a
+                                    href="/categories/one-shots"
+                                    class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-md mx-2"
+                                >
                                     ONE SHOTS
                                 </a>
-                                <a href="/categories/drum-kits" class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-md mx-2">
+                                <a
+                                    href="/categories/drum-kits"
+                                    class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-md mx-2"
+                                >
                                     DRUM KITS
                                 </a>
-                                <a href="/categories/presets" class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-md mx-2">
+                                <a
+                                    href="/categories/presets"
+                                    class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-md mx-2"
+                                >
                                     PRESETS
                                 </a>
-                                <a href="/categories/midi" class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-md mx-2">
+                                <a
+                                    href="/categories/midi"
+                                    class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-md mx-2"
+                                >
                                     MIDI
                                 </a>
                             </div>
@@ -182,15 +207,17 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
                                 stroke-width="2"
-                                d="M4 6h16M4 12h16M4 18h16"
-                            ></path>
+                                d="M4 6h16M4 12h16M4 18h16"></path>
                         </svg>
                     </button>
                 </div>
             </div>
 
             <!-- Mobile Menu -->
-            <div id="mobile-menu" class="lg:hidden hidden bg-[#151515] border-t border-gray-800">
+            <div
+                id="mobile-menu"
+                class="lg:hidden hidden bg-[#151515] border-t border-gray-800"
+            >
                 <div class="px-4 pt-2 pb-3 space-y-1">
                     <a
                         href="/"
@@ -217,10 +244,12 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
                         class="block px-3 py-2 text-gray-300 hover:text-white rounded-md"
                         >BLOG</a
                     >
-                    
+
                     <!-- Mobile Categories -->
                     <div class="border-t border-gray-700 pt-2 mt-2">
-                        <div class="px-3 py-2 text-gray-400 text-sm font-semibold">
+                        <div
+                            class="px-3 py-2 text-gray-400 text-sm font-semibold"
+                        >
                             CATEGORIES
                         </div>
                         <a
@@ -270,36 +299,108 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
         </header>
 
         <!-- Scrolling Banner -->
-        {latestProduct && (
-            <a href={`/products/${latestProduct.id}`} class="block">
+        {
+            latestProduct && (
+                <a href={`/products/${latestProduct.id}`} class="block">
+                    <div class="marquee-bar mt-20">
+                        <div class="marquee-content">
+                            <span class="marquee-text">
+                                NEW RELEASE:{" "}
+                                {latestProduct?.name?.toUpperCase()} • NEW
+                                RELEASE: {latestProduct?.name?.toUpperCase()} •
+                                NEW RELEASE:{" "}
+                                {latestProduct?.name?.toUpperCase()} • NEW
+                                RELEASE: {latestProduct?.name?.toUpperCase()} •
+                                NEW RELEASE:{" "}
+                                {latestProduct?.name?.toUpperCase()} • NEW
+                                RELEASE: {latestProduct?.name?.toUpperCase()} •
+                                NEW RELEASE:{" "}
+                                {latestProduct?.name?.toUpperCase()} • NEW
+                                RELEASE: {latestProduct?.name?.toUpperCase()} •
+                                NEW RELEASE:{" "}
+                                {latestProduct?.name?.toUpperCase()} • NEW
+                                RELEASE: {latestProduct?.name?.toUpperCase()} •
+                                NEW RELEASE:{" "}
+                                {latestProduct?.name?.toUpperCase()} • NEW
+                                RELEASE: {latestProduct?.name?.toUpperCase()} •
+                                NEW RELEASE:{" "}
+                                {latestProduct?.name?.toUpperCase()} • NEW
+                                RELEASE: {latestProduct?.name?.toUpperCase()} •
+                                NEW RELEASE:{" "}
+                                {latestProduct?.name?.toUpperCase()} • NEW
+                                RELEASE: {latestProduct?.name?.toUpperCase()} •
+                                NEW RELEASE:{" "}
+                                {latestProduct?.name?.toUpperCase()} • NEW
+                                RELEASE: {latestProduct?.name?.toUpperCase()} •
+                                NEW RELEASE:{" "}
+                                {latestProduct?.name?.toUpperCase()} • NEW
+                                RELEASE: {latestProduct?.name?.toUpperCase()} •
+                            </span>
+                            <span class="marquee-text">
+                                NEW RELEASE:{" "}
+                                {latestProduct?.name?.toUpperCase()} • NEW
+                                RELEASE: {latestProduct?.name?.toUpperCase()} •
+                                NEW RELEASE:{" "}
+                                {latestProduct?.name?.toUpperCase()} • NEW
+                                RELEASE: {latestProduct?.name?.toUpperCase()} •
+                                NEW RELEASE:{" "}
+                                {latestProduct?.name?.toUpperCase()} • NEW
+                                RELEASE: {latestProduct?.name?.toUpperCase()} •
+                                NEW RELEASE:{" "}
+                                {latestProduct?.name?.toUpperCase()} • NEW
+                                RELEASE: {latestProduct?.name?.toUpperCase()} •
+                                NEW RELEASE:{" "}
+                                {latestProduct?.name?.toUpperCase()} • NEW
+                                RELEASE: {latestProduct?.name?.toUpperCase()} •
+                                NEW RELEASE:{" "}
+                                {latestProduct?.name?.toUpperCase()} • NEW
+                                RELEASE: {latestProduct?.name?.toUpperCase()} •
+                                NEW RELEASE:{" "}
+                                {latestProduct?.name?.toUpperCase()} • NEW
+                                RELEASE: {latestProduct?.name?.toUpperCase()} •
+                                NEW RELEASE:{" "}
+                                {latestProduct?.name?.toUpperCase()} • NEW
+                                RELEASE: {latestProduct?.name?.toUpperCase()} •
+                                NEW RELEASE:{" "}
+                                {latestProduct?.name?.toUpperCase()} • NEW
+                                RELEASE: {latestProduct?.name?.toUpperCase()} •
+                                NEW RELEASE:{" "}
+                                {latestProduct?.name?.toUpperCase()} • NEW
+                                RELEASE: {latestProduct?.name?.toUpperCase()} •
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            )
+        }
+
+        {
+            !latestProduct && (
                 <div class="marquee-bar mt-20">
                     <div class="marquee-content">
                         <span class="marquee-text">
-                            NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • 
+                            NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW
+                            RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE •
+                            NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW
+                            RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE •
+                            NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW
+                            RELEASE • NEW RELEASE • NEW RELEASE •
                         </span>
                         <span class="marquee-text">
-                            NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • NEW RELEASE: {latestProduct.name.toUpperCase()} • 
+                            NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW
+                            RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE •
+                            NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW
+                            RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE •
+                            NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW
+                            RELEASE • NEW RELEASE • NEW RELEASE •
                         </span>
                     </div>
                 </div>
-            </a>
-        )}
-        
-        {!latestProduct && (
-            <div class="marquee-bar mt-20">
-                <div class="marquee-content">
-                    <span class="marquee-text">
-                        NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • 
-                    </span>
-                    <span class="marquee-text">
-                        NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • NEW RELEASE • 
-                    </span>
-                </div>
-            </div>
-        )}
+            )
+        }
 
         <!-- Main Content -->
-        <main>
+        <main class="flex-1">
             <slot />
         </main>
 
@@ -428,9 +529,7 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
                 </div>
 
                 <!-- Copyright -->
-                <div
-                    class="border-t border-gray-800 mt-8 pt-8 text-center"
-                >
+                <div class="border-t border-gray-800 mt-8 pt-8 text-center">
                     <p class="text-gray-400 text-sm">
                         © 2025, TSK Powered by Gumroad
                     </p>
@@ -454,7 +553,7 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
                     black 90%,
                     black
                 );
-                font-family: 'Alexandria', sans-serif;
+                font-family: "Alexandria", sans-serif;
             }
 
             .marquee-content {
@@ -486,12 +585,13 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
 
         <script>
             // Mobile menu toggle functionality
-            const mobileMenuButton = document.getElementById('mobile-menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuButton =
+                document.getElementById("mobile-menu-button");
+            const mobileMenu = document.getElementById("mobile-menu");
 
             if (mobileMenuButton && mobileMenu) {
-                mobileMenuButton.addEventListener('click', () => {
-                    mobileMenu.classList.toggle('hidden');
+                mobileMenuButton.addEventListener("click", () => {
+                    mobileMenu.classList.toggle("hidden");
                 });
             }
         </script>

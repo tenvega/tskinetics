@@ -65,18 +65,11 @@ function formatDuration(filename: string): string {
 ---
 
 <Layout title="TSK Intro Kit 300+ - Free Sound Pack">
-	<!-- Gradient Background (matches cover art) -->
-	<div
-		id="cover-gradient"
-		class="fixed inset-0 z-0 pointer-events-none transition-all duration-700"
-		style="background: linear-gradient(120deg, #2d1a4a 0%, #1a1a1a 100%);"
-	>
-	</div>
-
 	<!-- TSK Intro Kit Section -->
 	<section
 		id="main-content"
-		class="py-20 min-h-screen text-white relative z-10"
+		class="py-20 text-white relative z-10 min-h-screen"
+		style="background: linear-gradient(120deg, #2d1a4a 0%, #1a1a1a 100%);"
 	>
 		<div class="max-w-6xl mx-auto px-4">
 			<!-- Header Section -->
@@ -321,41 +314,211 @@ function formatDuration(filename: string): string {
 		</div>
 	</section>
 
+	<audio id="audio-player" preload="none"></audio>
+
 	<script>
-		// Gradient extraction from cover art (like product page)
 		document.addEventListener("DOMContentLoaded", function () {
-			const cover = document.getElementById("cover-art");
-			const grad = document.getElementById("cover-gradient");
-			if (!cover || !grad) return;
-			function updateGradientFromCover() {
-				try {
-					const img = cover as HTMLImageElement;
-					if (!img || !(img instanceof HTMLImageElement)) return;
-					if (!img.complete) {
-						img.onload = updateGradientFromCover;
+			const audioPlayer = document.getElementById(
+				"audio-player",
+			) as HTMLAudioElement | null;
+			const playAllBtn = document.getElementById("play-all-btn");
+			const sampleRows = document.querySelectorAll(".sample-row");
+			const playButtons = document.querySelectorAll(".play-btn");
+			const durationDisplays =
+				document.querySelectorAll(".duration-display");
+			let currentPlayingRow: HTMLElement | null = null;
+			let currentTrackIndex = -1;
+			let isPlaying = false;
+			let audioFiles: { src: string; index: number; row: HTMLElement }[] =
+				[];
+			let durationsLoaded = false;
+
+			// Extract audio files data from the page
+			sampleRows.forEach((row, index) => {
+				const audioSrc = (row as HTMLElement).getAttribute(
+					"data-audio-src",
+				);
+				if (audioSrc) {
+					audioFiles.push({
+						src: audioSrc,
+						index: index,
+						row: row as HTMLElement,
+					});
+				}
+			});
+
+			// Function to load real audio durations
+			function loadAudioDurations() {
+				if (durationsLoaded) return;
+				let loadedCount = 0;
+				const totalCount = durationDisplays.length;
+				durationDisplays.forEach((display, index) => {
+					const audioSrc = (display as HTMLElement).getAttribute(
+						"data-audio-src",
+					);
+					if (!audioSrc) {
+						loadedCount++;
 						return;
 					}
-					const canvas = document.createElement("canvas");
-					canvas.width = 1;
-					canvas.height = 32;
-					const ctx = canvas.getContext("2d");
-					if (!ctx) throw new Error("No 2D context");
-					ctx.drawImage(img, 0, 0, 1, 32);
-					const data = ctx.getImageData(0, 0, 1, 32).data;
-					const stops = [0, 8, 16, 24, 31];
-					const colors = stops.map(
-						(i) =>
-							`rgba(${data[i * 4]},${data[i * 4 + 1]},${data[i * 4 + 2]},1)`,
+					const tempAudio = new Audio();
+					tempAudio.preload = "metadata";
+					tempAudio.crossOrigin = "anonymous";
+					const handleMetadata = () => {
+						const duration = tempAudio.duration;
+						if (isNaN(duration) || !isFinite(duration)) {
+							(display as HTMLElement).textContent = "--:--";
+						} else {
+							const minutes = Math.floor(duration / 60);
+							const seconds = Math.floor(duration % 60);
+							const formattedDuration = `${minutes}:${seconds.toString().padStart(2, "0")}`;
+							(display as HTMLElement).textContent =
+								formattedDuration;
+						}
+						loadedCount++;
+						if (loadedCount === totalCount) {
+							durationsLoaded = true;
+						}
+					};
+					const handleError = () => {
+						(display as HTMLElement).textContent = "--:--";
+						loadedCount++;
+						if (loadedCount === totalCount) {
+							durationsLoaded = true;
+						}
+					};
+					tempAudio.addEventListener(
+						"loadedmetadata",
+						handleMetadata,
 					);
-					(grad as HTMLElement).style.background =
-						`linear-gradient(120deg, ${colors[0]} 0%, ${colors[colors.length - 1]} 100%)`;
-				} catch (e) {
-					if (grad)
-						(grad as HTMLElement).style.background =
-							"linear-gradient(120deg, #2d1a4a 0%, #1a1a1a 100%)";
+					tempAudio.addEventListener("error", handleError);
+					tempAudio.addEventListener("abort", handleError);
+					tempAudio.src = audioSrc;
+				});
+			}
+
+			function updatePlayButton(button: Element, isPlaying: boolean) {
+				const svg = button.querySelector("svg");
+				if (svg) {
+					if (isPlaying) {
+						svg.innerHTML =
+							'<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+					} else {
+						svg.innerHTML = '<path d="M8 5v14l11-7z"/>';
+					}
 				}
 			}
-			updateGradientFromCover();
+
+			function updatePlayAllButton(isPlaying: boolean) {
+				const svg = playAllBtn?.querySelector("svg");
+				if (svg) {
+					if (isPlaying) {
+						svg.innerHTML =
+							'<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+					} else {
+						svg.innerHTML = '<path d="M8 5v14l11-7z"/>';
+					}
+				}
+			}
+
+			function resetAllPlayButtons() {
+				playButtons.forEach((btn) => updatePlayButton(btn, false));
+				updatePlayAllButton(false);
+			}
+
+			function playTrack(index: number) {
+				if (index < 0 || index >= audioFiles.length) return;
+				if (!audioPlayer) return;
+				const audioFile = audioFiles[index];
+				currentTrackIndex = index;
+				currentPlayingRow = audioFile.row;
+				sampleRows.forEach((row) =>
+					(row as HTMLElement).classList.remove("bg-purple-900/30"),
+				);
+				resetAllPlayButtons();
+				audioFile.row.classList.add("bg-purple-900/30");
+				const playBtn = audioFile.row.querySelector(".play-btn");
+				if (playBtn) updatePlayButton(playBtn, true);
+				updatePlayAllButton(true);
+				audioPlayer.src = audioFile.src;
+				audioPlayer
+					.play()
+					.then(() => {
+						isPlaying = true;
+					})
+					.catch((error) => {
+						resetAllPlayButtons();
+						currentPlayingRow?.classList.remove("bg-purple-900/30");
+					});
+			}
+
+			function togglePlayPause() {
+				if (!audioPlayer) return;
+				if (currentTrackIndex === -1) {
+					playTrack(0);
+				} else {
+					if (isPlaying) {
+						audioPlayer.pause();
+					} else {
+						audioPlayer.play();
+					}
+				}
+			}
+
+			function nextTrack() {
+				if (currentTrackIndex < audioFiles.length - 1) {
+					playTrack(currentTrackIndex + 1);
+				}
+			}
+
+			playAllBtn?.addEventListener("click", togglePlayPause);
+			sampleRows.forEach((row, index) => {
+				const playBtn = row.querySelector(".play-btn");
+				playBtn?.addEventListener("click", (e) => {
+					e.stopPropagation();
+					if (!audioPlayer) return;
+					if (currentTrackIndex === index && isPlaying) {
+						audioPlayer.pause();
+					} else {
+						playTrack(index);
+					}
+				});
+				row.addEventListener("click", () => {
+					if (!audioPlayer) return;
+					if (currentTrackIndex === index && isPlaying) {
+						audioPlayer.pause();
+					} else {
+						playTrack(index);
+					}
+				});
+			});
+			audioPlayer?.addEventListener("play", () => {
+				isPlaying = true;
+				if (currentPlayingRow) {
+					const playBtn =
+						currentPlayingRow.querySelector(".play-btn");
+					if (playBtn) updatePlayButton(playBtn, true);
+				}
+				updatePlayAllButton(true);
+			});
+			audioPlayer?.addEventListener("pause", () => {
+				isPlaying = false;
+				if (currentPlayingRow) {
+					const playBtn =
+						currentPlayingRow.querySelector(".play-btn");
+					if (playBtn) updatePlayButton(playBtn, false);
+				}
+				updatePlayAllButton(false);
+			});
+			audioPlayer?.addEventListener("ended", () => {
+				nextTrack();
+			});
+			document.addEventListener("keydown", (e) => {
+				if (e.code === "Space" && e.target === document.body) {
+					e.preventDefault();
+					togglePlayPause();
+				}
+			});
+			loadAudioDurations();
 		});
 	</script>
 
