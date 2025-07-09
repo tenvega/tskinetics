@@ -107,8 +107,6 @@ export interface GumroadSale {
     affiliate_credit_amount_cents?: number;
 }
 
-// All legacy Shopify interfaces have been migrated to Gumroad
-
 // Money/Price formatting interface
 export interface Money {
     amount: string;

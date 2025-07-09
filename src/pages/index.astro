@@ -297,14 +297,14 @@ const latestProduct = products.length > 0 ? products[0] : null;
 						{latestProduct ? (
 							<a
 								href={`/products/${latestProduct.id}`}
-								class="inline-flex items-center justify-center px-6 py-2 bg-[#151515] border border-[#f3f3f3] text-[#f3f3f3] text-base md:text-lg font-bold leading-relaxed rounded-lg hover:bg-[#2266ff] hover:text-[#f3f3f3]"
+								class="inline-flex items-center justify-center px-6 py-2 bg-[#151515] border border-[#f3f3f3] text-[#f3f3f3] text-base md:text-lg font-bold leading-relaxed rounded-lg hover:bg-white hover:text-black transition-colors duration-300"
 							>
 								LEARN MORE
 							</a>
 						) : (
 							<a
 								href="/products"
-								class="inline-flex items-center justify-center px-6 py-2 bg-[#151515] border border-[#f3f3f3] text-[#f3f3f3] text-base md:text-lg font-bold leading-relaxed rounded-lg hover:bg-[#2266ff] hover:text-[#f3f3f3]"
+								class="inline-flex items-center justify-center px-6 py-2 bg-[#151515] border border-[#f3f3f3] text-[#f3f3f3] text-base md:text-lg font-bold leading-relaxed rounded-lg hover:bg-white hover:text-black transition-colors duration-300"
 							>
 								VIEW PRODUCTS
 							</a>
@@ -407,8 +407,6 @@ const latestProduct = products.length > 0 ? products[0] : null;
 									</p>
 									<a
 										href={productUrl}
-										target="_blank"
-										rel="noopener noreferrer"
 										class="inline-block border border-white text-white px-6 py-2 hover:bg-white hover:text-black transition-colors duration-300 text-sm font-semibold"
 									>
 										VIEW PRODUCT
@@ -490,9 +488,7 @@ const latestProduct = products.length > 0 ? products[0] : null;
 											)}
 										</div>
 										<a
-											href={bundle.url || bundle.short_url}
-											target="_blank"
-											rel="noopener noreferrer"
+											href={getProductUrlSync(bundle.id, bundle.title)}
 											class="border border-white text-white px-6 py-3 hover:bg-white hover:text-black transition-colors duration-300 font-semibold"
 										>
 											BUY BUNDLE
@@ -922,17 +918,11 @@ const latestProduct = products.length > 0 ? products[0] : null;
 				<div class="space-y-6">
 					<h2 class="text-5xl font-bold text-white">TSK</h2>
 					<p class="text-gray-200 text-lg leading-relaxed">
-						TSK is a premier sound design collective specializing in 
-						cutting-edge electronic music production. We craft intricate 
-						sonic worlds that merge precise rhythms with organic textures, 
-						spanning experimental sound packs, modular synthesis, and 
-						forward-thinking music production. Our work pushes the 
-						boundaries of sound design, delivering premium audio content 
-						for producers and composers worldwide.
+						Textured Sound Kinetics specializes in cutting-edge electronic music production, crafting intricate sonic worlds that merge precise rhythms with organic textures. Spanning experimental sound packs, modular synthesis, and forward-thinking music production, TSK delivers premium audio content for producers and composers worldwide.
 					</p>
 					<div class="flex space-x-4">
 						<a
-							href="https://www.instagram.com/tehnsoundkits/"
+							href="https://www.instagram.com/tskinetics.audio/"
 							target="_blank"
 							rel="noopener noreferrer"
 							class="text-white hover:text-gray-300 transition-colors"
