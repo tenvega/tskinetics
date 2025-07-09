@@ -4,7 +4,7 @@ import tailwind from '@astrojs/tailwind';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://tehnvega.gumroad.com',
+  site: 'https://texturedsoundkinetics.com',
   output: 'static',
   integrations: [tailwind()]
 });
