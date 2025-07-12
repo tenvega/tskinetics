@@ -9,26 +9,41 @@ let error: string | null = null;
 try {
     console.log("Fetching MIDI products for collection...");
     const allProducts = await fetchProducts(50);
-    
+
     // Filter products by tags - look for MIDI specific content
-    products = allProducts.filter(product => {
+    products = allProducts.filter((product) => {
         if (!product.tags) return false;
-        
+
         // Handle tags as array (from API) or convert to array
-        const tagsArray = Array.isArray(product.tags) ? product.tags : String(product.tags).split(',').map(t => t.trim());
+        const tagsArray = Array.isArray(product.tags)
+            ? product.tags
+            : String(product.tags)
+                  .split(",")
+                  .map((t) => t.trim());
         const title = product.title.toLowerCase();
-        
+
         // Look for MIDI specific tags
-        const midiTags = ['midi', 'mid', 'musical instrument digital interface'];
-        const hasMidiTag = tagsArray.some(tag => midiTags.includes(tag.toLowerCase()));
-        
+        const midiTags = [
+            "midi",
+            "mid",
+            "musical instrument digital interface",
+        ];
+        const hasMidiTag = tagsArray.some((tag) =>
+            midiTags.includes(tag.toLowerCase()),
+        );
+
         // Title-based MIDI detection
-        const titleHasMidi = title.includes('midi') || title.includes('sequence') || title.includes('pattern');
-        
+        const titleHasMidi =
+            title.includes("midi") ||
+            title.includes("sequence") ||
+            title.includes("pattern");
+
         return hasMidiTag || titleHasMidi;
     });
-    
-    console.log(`Successfully fetched ${products.length} MIDI products for collection`);
+
+    console.log(
+        `Successfully fetched ${products.length} MIDI products for collection`,
+    );
 } catch (e) {
     error = e instanceof Error ? e.message : "Failed to fetch MIDI products";
     console.error("Error fetching MIDI products for collection:", e);
@@ -44,17 +59,23 @@ try {
                     MIDI
                 </h1>
                 <p class="text-gray-400 text-lg max-w-2xl mx-auto">
-                    MIDI files and musical sequences for your DAW. 
-                    Ready-to-use patterns and melodies for your productions.
+                    MIDI files and musical sequences for your DAW. Ready-to-use
+                    patterns and melodies for your productions.
                 </p>
             </div>
 
             <!-- Breadcrumb -->
             <div class="mb-8">
                 <nav class="flex items-center space-x-2 text-sm text-gray-400">
-                    <a href="/" class="hover:text-white transition-colors">Home</a>
+                    <a href="/" class="hover:text-white transition-colors"
+                        >Home</a
+                    >
                     <span>/</span>
-                    <a href="/collections" class="hover:text-white transition-colors">Collections</a>
+                    <a
+                        href="/collections"
+                        class="hover:text-white transition-colors"
+                        >Collections</a
+                    >
                     <span>/</span>
                     <span class="text-white">MIDI</span>
                 </nav>
@@ -70,7 +91,8 @@ try {
                             </h3>
                             <p class="text-red-300 text-sm mb-4">{error}</p>
                             <p class="text-gray-400 text-xs">
-                                Please check your Gumroad configuration in the .env file.
+                                Please check your Gumroad configuration in the
+                                .env file.
                             </p>
                         </div>
                     </div>
@@ -83,11 +105,12 @@ try {
                                 No MIDI Files Available
                             </h3>
                             <p class="text-gray-400 mb-4">
-                                We're currently working on adding MIDI files to this collection. Please check back soon!
+                                We're currently working on adding MIDI files to
+                                this collection. Please check back soon!
                             </p>
                             <a
                                 href="/collections"
-                                class="btn-smooth inline-block mt-4 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                                class="btn-smooth inline-block mt-4 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-colors"
                             >
                                 Explore Other Collections
                             </a>
