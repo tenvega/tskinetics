@@ -214,12 +214,12 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
                     </div>
                     <a
                         href="/free-kit-300"
-                        class="px-3 py-2 text-white hover:text-gray-300 whitespace-nowrap"
+                        class={`px-3 py-2 whitespace-nowrap ${isActivePage("free-kit") ? activeLinkClass : inactiveLinkClass}`}
                         >FREE KIT 300+</a
                     >
                     <a
                         href="/contact"
-                        class="px-3 py-2 text-white hover:text-gray-300"
+                        class={`px-3 py-2 ${isActivePage("contact") ? activeLinkClass : inactiveLinkClass}`}
                         >CONTACT</a
                     >
                 </nav>
@@ -255,27 +255,27 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
                 <div class="px-4 pt-2 pb-3 space-y-1">
                     <a
                         href="/"
-                        class="block px-3 py-2 text-gray-300 hover:text-white rounded-md"
+                        class={`block px-3 py-2 rounded-md ${isActivePage("home") ? "text-white bg-gray-800" : "text-gray-300 hover:text-white"}`}
                         >HOME</a
                     >
                     <a
                         href="/products"
-                        class="block px-3 py-2 text-gray-300 hover:text-white rounded-md"
+                        class={`block px-3 py-2 rounded-md ${isActivePage("products") ? "text-white bg-gray-800" : "text-gray-300 hover:text-white"}`}
                         >PRODUCTS</a
                     >
                     <a
                         href="/popular"
-                        class="block px-3 py-2 text-gray-300 hover:text-white rounded-md"
+                        class={`block px-3 py-2 rounded-md ${isActivePage("popular") ? "text-white bg-gray-800" : "text-gray-300 hover:text-white"}`}
                         >POPULAR</a
                     >
                     <a
                         href="/new-releases"
-                        class="block px-3 py-2 text-gray-300 hover:text-white rounded-md whitespace-nowrap"
+                        class={`block px-3 py-2 rounded-md whitespace-nowrap ${isActivePage("new-releases") ? "text-white bg-gray-800" : "text-gray-300 hover:text-white"}`}
                         >NEW RELEASES</a
                     >
                     <a
                         href="/blog"
-                        class="block px-3 py-2 text-gray-300 hover:text-white rounded-md"
+                        class={`block px-3 py-2 rounded-md ${isActivePage("blog") ? "text-white bg-gray-800" : "text-gray-300 hover:text-white"}`}
                         >BLOG</a
                     >
 
@@ -320,12 +320,12 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
 
                     <a
                         href="/free-kit-300"
-                        class="block px-3 py-2 text-gray-300 hover:text-white rounded-md"
+                        class={`block px-3 py-2 rounded-md ${isActivePage("free-kit") ? "text-white bg-gray-800" : "text-gray-300 hover:text-white"}`}
                         >FREE KIT 300+</a
                     >
                     <a
                         href="/contact"
-                        class="block px-3 py-2 text-gray-300 hover:text-white rounded-md"
+                        class={`block px-3 py-2 rounded-md ${isActivePage("contact") ? "text-white bg-gray-800" : "text-gray-300 hover:text-white"}`}
                         >CONTACT</a
                     >
                 </div>

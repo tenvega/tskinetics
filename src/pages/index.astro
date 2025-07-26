@@ -605,132 +605,131 @@ const latestProduct = products.length > 0 ? products[0] : null;
 			</div>
 
 			<!-- Main Content Grid -->
-			<div
-				class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16"
-			>
-				<!-- Kit Image -->
-				<div class="order-2 lg:order-1">
-					<div class="relative">
-						<img
-							src={freeProduct?.thumbnail_url ||
-								freeProduct?.cover_url ||
-								"/images/threehundred_free.jpg"}
-							alt="TSK Intro Kit 300+ - Free Sound Pack"
-							class="w-full max-w-lg mx-auto rounded-2xl shadow-2xl border border-purple-500/20"
-						/>
-						<!-- Floating Stats -->
-						<div
-							class="absolute -top-4 -right-4 bg-purple-600 text-white px-4 py-2 rounded-full font-bold shadow-lg"
-						>
-							FREE
-						</div>
-						<div
-							class="absolute -bottom-4 -left-4 bg-gray-800/90 backdrop-blur-sm text-purple-400 px-4 py-2 rounded-full font-bold shadow-lg border border-purple-500/30"
-						>
-							300+ Sounds
-						</div>
-					</div>
-				</div>
-
-				<!-- Download Section -->
-				<div class="order-1 lg:order-2">
-					<div
-						class="bg-gray-800/50 backdrop-blur-md rounded-2xl p-8 border border-gray-700/50 shadow-xl"
-					>
-						<h2
-							class="text-3xl font-bold text-white mb-6 text-center"
-						>
-							Download Your Free Kit
-						</h2>
-
-						<!-- Stats Grid -->
-						<div
-							class="flex justify-center items-center gap-8 mb-8"
-						>
-							<div class="text-center">
-								<div
-									class="text-2xl font-bold text-purple-400 mb-1"
-								>
-									300+
-								</div>
-								<div class="text-sm text-gray-400">Sounds</div>
-							</div>
-							<div class="w-px h-12 bg-gray-600"></div>
-							<div class="text-center">
-								<div
-									class="text-2xl font-bold text-purple-400 mb-1"
-								>
-									FREE
-								</div>
-								<div class="text-sm text-gray-400">
-									Download
-								</div>
-							</div>
-						</div>
-
-						<!-- Download Button -->
-						<a
-							href="https://tehnvega.gumroad.com/l/hvhjo"
-							target="_blank"
-							rel="noopener noreferrer"
-							class="btn-smooth w-full bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-4 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg text-center block"
-						>
-							{
-								freeProduct
-									? "TSK INTRO KIT DOWNLOAD"
-									: "TSK INTRO KIT DOWNLOAD"
-							}
-						</a>
-
-						<!-- Trust Indicators -->
-						<div class="mt-6 text-center">
+			<a href="/free-kit-300" class="block group">
+				<div
+					class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16 group-hover:scale-[1.02] transition-transform duration-300"
+				>
+					<!-- Kit Image -->
+					<div class="order-2 lg:order-1">
+						<div class="relative">
+							<img
+								src={freeProduct?.thumbnail_url ||
+									freeProduct?.cover_url ||
+									"/images/threehundred_free.jpg"}
+								alt="TSK Intro Kit 300+ - Free Sound Pack"
+								class="w-full max-w-lg mx-auto rounded-2xl shadow-2xl border border-purple-500/20"
+							/>
+							<!-- Floating Stats -->
 							<div
-								class="flex justify-center items-center space-x-6 text-gray-500 text-xs"
+								class="absolute -top-4 -right-4 bg-purple-600 text-white px-4 py-2 rounded-full font-bold shadow-lg"
 							>
-								<span class="flex items-center">
-									<svg
-										class="w-3 h-3 mr-1 text-green-500"
-										fill="currentColor"
-										viewBox="0 0 20 20"
+								FREE
+							</div>
+							<div
+								class="absolute -bottom-4 -left-4 bg-gray-800/90 backdrop-blur-sm text-purple-400 px-4 py-2 rounded-full font-bold shadow-lg border border-purple-500/30"
+							>
+								300+ Sounds
+							</div>
+						</div>
+					</div>
+
+					<!-- Download Section -->
+					<div class="order-1 lg:order-2">
+						<div
+							class="bg-gray-800/50 backdrop-blur-md rounded-2xl p-8 border border-gray-700/50 shadow-xl"
+						>
+							<h2
+								class="text-3xl font-bold text-white mb-6 text-center"
+							>
+								Download Your Free Kit
+							</h2>
+
+							<!-- Stats Grid -->
+							<div
+								class="flex justify-center items-center gap-8 mb-8"
+							>
+								<div class="text-center">
+									<div
+										class="text-2xl font-bold text-purple-400 mb-1"
 									>
-										<path
-											fill-rule="evenodd"
-											d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-											clip-rule="evenodd"></path>
-									</svg>
-									Instant Download
-								</span>
-								<span class="flex items-center">
-									<svg
-										class="w-3 h-3 mr-1 text-green-500"
-										fill="currentColor"
-										viewBox="0 0 20 20"
+										300+
+									</div>
+									<div class="text-sm text-gray-400">Sounds</div>
+								</div>
+								<div class="w-px h-12 bg-gray-600"></div>
+								<div class="text-center">
+									<div
+										class="text-2xl font-bold text-purple-400 mb-1"
 									>
-										<path
-											fill-rule="evenodd"
-											d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-											clip-rule="evenodd"></path>
-									</svg>
-									Commercial License
-								</span>
-								<span class="flex items-center">
-									<svg
-										class="w-3 h-3 mr-1 text-green-500"
-										fill="currentColor"
-										viewBox="0 0 20 20"
-									>
-										<path
-											fill-rule="evenodd"
-											d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-											clip-rule="evenodd"></path>
-									</svg>
-									100% Royalty Free
-								</span>
+										FREE
+									</div>
+									<div class="text-sm text-gray-400">
+										Download
+									</div>
+								</div>
+							</div>
+
+							<!-- Download Button -->
+							<div
+								class="btn-smooth w-full bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-4 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg text-center block cursor-pointer"
+							>
+								{
+									freeProduct
+										? "TSK INTRO KIT DOWNLOAD"
+										: "TSK INTRO KIT DOWNLOAD"
+								}
+							</div>
+
+							<!-- Trust Indicators -->
+							<div class="mt-6 text-center">
+								<div
+									class="flex justify-center items-center space-x-6 text-gray-500 text-xs"
+								>
+									<span class="flex items-center">
+										<svg
+											class="w-3 h-3 mr-1 text-green-500"
+											fill="currentColor"
+											viewBox="0 0 20 20"
+										>
+											<path
+												fill-rule="evenodd"
+												d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+												clip-rule="evenodd"></path>
+										</svg>
+										Instant Download
+									</span>
+									<span class="flex items-center">
+										<svg
+											class="w-3 h-3 mr-1 text-green-500"
+											fill="currentColor"
+											viewBox="0 0 20 20"
+										>
+											<path
+												fill-rule="evenodd"
+												d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+												clip-rule="evenodd"></path>
+										</svg>
+										Commercial License
+									</span>
+									<span class="flex items-center">
+										<svg
+											class="w-3 h-3 mr-1 text-green-500"
+											fill="currentColor"
+											viewBox="0 0 20 20"
+										>
+											<path
+												fill-rule="evenodd"
+												d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+												clip-rule="evenodd"></path>
+										</svg>
+										100% Royalty Free
+									</span>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-			</div>
+			</a>
 
 			<!-- Kit Features Section -->
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
