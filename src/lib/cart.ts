@@ -38,7 +38,7 @@ function getStoredCart(): Cart {
         if (!stored) {
             return createEmptyCart();
         }
-        
+
         const cart: Cart = JSON.parse(stored);
         return cart;
     } catch (error) {
@@ -52,15 +52,15 @@ function getStoredCart(): Cart {
  */
 function saveCart(cart: Cart): void {
     if (typeof window === 'undefined') return;
-    
+
     try {
         sessionStorage.setItem(CART_KEY, JSON.stringify(cart));
-        
+
         // Dispatch custom event for UI updates
-        window.dispatchEvent(new CustomEvent('cart-updated', { 
-            detail: cart 
+        window.dispatchEvent(new CustomEvent('cart-updated', {
+            detail: cart
         }));
-        
+
         // Analytics hook - ready for future implementation
         window.dispatchEvent(new CustomEvent('analytics-cart-update', {
             detail: {
@@ -92,10 +92,15 @@ function createEmptyCart(): Cart {
  * Calculate cart totals
  */
 function calculateTotals(items: CartItem[]): { totalItems: number; totalPrice: number; formattedTotal: string } {
+    console.log('💰 Calculating totals for items:', items);
     const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-    const totalPrice = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const totalPrice = items.reduce((sum, item) => {
+        console.log(`💰 Item: ${item.title}, Price: ${item.price}, Quantity: ${item.quantity}, Subtotal: ${item.price * item.quantity}`);
+        return sum + (item.price * item.quantity);
+    }, 0);
     const formattedTotal = `$${(totalPrice / 100).toFixed(2)}`;
     
+    console.log('💰 Final totals:', { totalItems, totalPrice, formattedTotal });
     return { totalItems, totalPrice, formattedTotal };
 }
 
@@ -106,12 +111,12 @@ export function addToCart(item: Omit<CartItem, 'quantity' | 'addedAt'>): Cart {
     console.log('🛒 addToCart called with:', item);
     const cart = getStoredCart();
     console.log('🛒 Current cart before adding:', cart);
-    
+
     // Check if item already exists in cart
     const existingItemIndex = cart.items.findIndex(
         cartItem => cartItem.shortCode === item.shortCode
     );
-    
+
     if (existingItemIndex > -1) {
         // Increment quantity if item already exists
         cart.items[existingItemIndex].quantity += 1;
@@ -123,16 +128,16 @@ export function addToCart(item: Omit<CartItem, 'quantity' | 'addedAt'>): Cart {
             addedAt: new Date().toISOString()
         });
     }
-    
+
     // Recalculate totals
     const totals = calculateTotals(cart.items);
     cart.totalItems = totals.totalItems;
     cart.totalPrice = totals.totalPrice;
     cart.formattedTotal = totals.formattedTotal;
     cart.lastUpdated = new Date().toISOString();
-    
+
     saveCart(cart);
-    
+
     // Analytics hook - item added
     if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('analytics-add-to-cart', {
@@ -145,7 +150,7 @@ export function addToCart(item: Omit<CartItem, 'quantity' | 'addedAt'>): Cart {
             }
         }));
     }
-    
+
     return cart;
 }
 
@@ -154,22 +159,22 @@ export function addToCart(item: Omit<CartItem, 'quantity' | 'addedAt'>): Cart {
  */
 export function removeFromCart(shortCode: string): Cart {
     const cart = getStoredCart();
-    
+
     // Find the item being removed for analytics
     const removedItem = cart.items.find(item => item.shortCode === shortCode);
-    
+
     // Remove item
     cart.items = cart.items.filter(item => item.shortCode !== shortCode);
-    
+
     // Recalculate totals
     const totals = calculateTotals(cart.items);
     cart.totalItems = totals.totalItems;
     cart.totalPrice = totals.totalPrice;
     cart.formattedTotal = totals.formattedTotal;
     cart.lastUpdated = new Date().toISOString();
-    
+
     saveCart(cart);
-    
+
     // Analytics hook - item removed
     if (typeof window !== 'undefined' && removedItem) {
         window.dispatchEvent(new CustomEvent('analytics-remove-from-cart', {
@@ -182,7 +187,7 @@ export function removeFromCart(shortCode: string): Cart {
             }
         }));
     }
-    
+
     return cart;
 }
 
@@ -191,26 +196,26 @@ export function removeFromCart(shortCode: string): Cart {
  */
 export function updateQuantity(shortCode: string, quantity: number): Cart {
     const cart = getStoredCart();
-    
+
     if (quantity <= 0) {
         return removeFromCart(shortCode);
     }
-    
+
     const itemIndex = cart.items.findIndex(item => item.shortCode === shortCode);
-    
+
     if (itemIndex > -1) {
         const oldQuantity = cart.items[itemIndex].quantity;
         cart.items[itemIndex].quantity = quantity;
-        
+
         // Recalculate totals
         const totals = calculateTotals(cart.items);
         cart.totalItems = totals.totalItems;
         cart.totalPrice = totals.totalPrice;
         cart.formattedTotal = totals.formattedTotal;
         cart.lastUpdated = new Date().toISOString();
-        
+
         saveCart(cart);
-        
+
         // Analytics hook - quantity changed
         if (typeof window !== 'undefined') {
             window.dispatchEvent(new CustomEvent('analytics-update-cart-quantity', {
@@ -224,7 +229,7 @@ export function updateQuantity(shortCode: string, quantity: number): Cart {
             }));
         }
     }
-    
+
     return cart;
 }
 
@@ -259,17 +264,17 @@ export function getCartTotal(): { price: number; formatted: string } {
  */
 export function clearCart(): void {
     if (typeof window === 'undefined') return;
-    
+
     const cart = getStoredCart();
     const itemCount = cart.totalItems;
-    
+
     sessionStorage.removeItem(CART_KEY);
-    
+
     // Dispatch event for UI updates
-    window.dispatchEvent(new CustomEvent('cart-updated', { 
-        detail: createEmptyCart() 
+    window.dispatchEvent(new CustomEvent('cart-updated', {
+        detail: createEmptyCart()
     }));
-    
+
     // Analytics hook - cart cleared
     window.dispatchEvent(new CustomEvent('analytics-cart-cleared', {
         detail: {
@@ -284,7 +289,7 @@ export function clearCart(): void {
  */
 export function buildCheckoutUrl(): string {
     const cart = getStoredCart();
-    
+
     console.log('🛒 Building checkout URL...');
     console.log('📦 Cart items:', cart.items.length);
     console.log('📝 Cart contents:', cart.items.map(item => ({
@@ -292,12 +297,12 @@ export function buildCheckoutUrl(): string {
         shortCode: item.shortCode,
         quantity: item.quantity
     })));
-    
+
     if (cart.items.length === 0) {
         console.error('❌ Cart is empty!');
         return '';
     }
-    
+
     // Build URL with multiple products
     // Format: https://gumroad.com/checkout?product=id1&product=id2&product=id3
     const productParams = cart.items
@@ -308,10 +313,10 @@ export function buildCheckoutUrl(): string {
                 .join('&');
         })
         .join('&');
-    
+
     const checkoutUrl = `https://gumroad.com/checkout?${productParams}`;
     console.log('✅ Checkout URL built:', checkoutUrl);
-    
+
     // Analytics hook - checkout initiated
     if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('analytics-begin-checkout', {
@@ -328,7 +333,7 @@ export function buildCheckoutUrl(): string {
             }
         }));
     }
-    
+
     return checkoutUrl;
 }
 
