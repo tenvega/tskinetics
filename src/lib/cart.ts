@@ -283,7 +283,16 @@ export function clearCart(): void {
 export function buildCheckoutUrl(): string {
     const cart = getStoredCart();
     
+    console.log('🛒 Building checkout URL...');
+    console.log('📦 Cart items:', cart.items.length);
+    console.log('📝 Cart contents:', cart.items.map(item => ({
+        title: item.title,
+        shortCode: item.shortCode,
+        quantity: item.quantity
+    })));
+    
     if (cart.items.length === 0) {
+        console.error('❌ Cart is empty!');
         return '';
     }
     
@@ -299,6 +308,7 @@ export function buildCheckoutUrl(): string {
         .join('&');
     
     const checkoutUrl = `https://gumroad.com/checkout?${productParams}`;
+    console.log('✅ Checkout URL built:', checkoutUrl);
     
     // Analytics hook - checkout initiated
     if (typeof window !== 'undefined') {

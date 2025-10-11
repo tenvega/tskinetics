@@ -286,6 +286,9 @@ import CartSummary from './CartSummary.astro';
             if (checkoutButton) {
                 checkoutButton.addEventListener('click', () => {
                     const checkoutUrl = buildCheckoutUrl();
+                    console.log('🛒 Checkout clicked!');
+                    console.log('📦 Checkout URL:', checkoutUrl);
+                    
                     if (checkoutUrl) {
                         checkoutButton.innerHTML = '<span>Redirecting to Gumroad...</span>';
                         checkoutButton.classList.add('opacity-70');
@@ -301,6 +304,8 @@ import CartSummary from './CartSummary.astro';
                                 checkoutButton.classList.remove('opacity-70');
                             }, 1000);
                         }, 300);
+                    } else {
+                        console.error('❌ No checkout URL generated - cart might be empty');
                     }
                 });
             }
