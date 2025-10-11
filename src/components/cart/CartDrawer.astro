@@ -5,8 +5,8 @@
  * Session-based, responsive, with animations
  */
 
-import CartItem from './CartItem.astro';
-import CartSummary from './CartSummary.astro';
+import CartItem from "./CartItem.astro";
+import CartSummary from "./CartSummary.astro";
 ---
 
 <!-- Cart Drawer Overlay -->
@@ -36,8 +36,17 @@ import CartSummary from './CartSummary.astro';
             aria-label="Close cart"
             data-analytics-event="close_cart_clicked"
         >
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            <svg
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"></path>
             </svg>
         </button>
     </div>
@@ -50,12 +59,28 @@ import CartSummary from './CartSummary.astro';
         </div>
 
         <!-- Empty Cart State -->
-        <div id="empty-cart-state" class="hidden flex flex-col items-center justify-center h-full p-8 text-center">
-            <svg class="w-24 h-24 text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+        <div
+            id="empty-cart-state"
+            class="hidden flex flex-col items-center justify-center h-full p-8 text-center"
+        >
+            <svg
+                class="w-24 h-24 text-gray-600 mb-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
             </svg>
-            <h3 class="text-white text-xl font-semibold mb-2">Your cart is empty</h3>
-            <p class="text-gray-400 text-sm mb-6">Add some amazing sound packs to get started!</p>
+            <h3 class="text-white text-xl font-semibold mb-2">
+                Your cart is empty
+            </h3>
+            <p class="text-gray-400 text-sm mb-6">
+                Add some amazing sound packs to get started!
+            </p>
             <button
                 id="empty-cart-continue-button"
                 class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
@@ -72,82 +97,87 @@ import CartSummary from './CartSummary.astro';
 </div>
 
 <script>
-    import { getCart } from '../../lib/cart';
-    import type { Cart } from '../../lib/cart';
+    import { getCart } from "../../lib/cart";
+    import type { Cart } from "../../lib/cart";
 
     let isCartOpen = false;
 
     function openCart() {
-        const overlay = document.getElementById('cart-overlay');
-        const drawer = document.getElementById('cart-drawer');
-        
+        const overlay = document.getElementById("cart-overlay");
+        const drawer = document.getElementById("cart-drawer");
+
         if (!overlay || !drawer) return;
 
         isCartOpen = true;
-        document.body.style.overflow = 'hidden'; // Prevent body scroll
+        document.body.style.overflow = "hidden"; // Prevent body scroll
 
         // Show overlay
-        overlay.classList.remove('hidden');
+        overlay.classList.remove("hidden");
         setTimeout(() => {
-            overlay.classList.remove('opacity-0');
-            overlay.classList.add('opacity-100');
+            overlay.classList.remove("opacity-0");
+            overlay.classList.add("opacity-100");
         }, 10);
 
         // Slide in drawer
         setTimeout(() => {
-            drawer.classList.remove('translate-x-full');
-            drawer.classList.add('translate-x-0');
+            drawer.classList.remove("translate-x-full");
+            drawer.classList.add("translate-x-0");
         }, 10);
 
         renderCart();
     }
 
     function closeCart() {
-        const overlay = document.getElementById('cart-overlay');
-        const drawer = document.getElementById('cart-drawer');
-        
+        const overlay = document.getElementById("cart-overlay");
+        const drawer = document.getElementById("cart-drawer");
+
         if (!overlay || !drawer) return;
 
         isCartOpen = false;
-        document.body.style.overflow = ''; // Restore body scroll
+        document.body.style.overflow = ""; // Restore body scroll
 
         // Hide overlay
-        overlay.classList.remove('opacity-100');
-        overlay.classList.add('opacity-0');
+        overlay.classList.remove("opacity-100");
+        overlay.classList.add("opacity-0");
 
         // Slide out drawer
-        drawer.classList.remove('translate-x-0');
-        drawer.classList.add('translate-x-full');
+        drawer.classList.remove("translate-x-0");
+        drawer.classList.add("translate-x-full");
 
         setTimeout(() => {
-            overlay.classList.add('hidden');
+            overlay.classList.add("hidden");
         }, 300);
     }
 
     function renderCart() {
         const cart = getCart();
-        const itemsList = document.getElementById('cart-items-list');
-        const emptyState = document.getElementById('empty-cart-state');
-        const summaryContainer = document.getElementById('cart-summary-container');
-        const itemCountText = document.getElementById('cart-item-count');
+        const itemsList = document.getElementById("cart-items-list");
+        const emptyState = document.getElementById("empty-cart-state");
+        const summaryContainer = document.getElementById(
+            "cart-summary-container",
+        );
+        const itemCountText = document.getElementById("cart-item-count");
 
-        if (!itemsList || !emptyState || !summaryContainer || !itemCountText) return;
+        if (!itemsList || !emptyState || !summaryContainer || !itemCountText)
+            return;
 
         // Update item count
-        itemCountText.textContent = `${cart.totalItems} ${cart.totalItems === 1 ? 'item' : 'items'}`;
+        itemCountText.textContent = `${cart.totalItems} ${cart.totalItems === 1 ? "item" : "items"}`;
 
         if (cart.items.length === 0) {
             // Show empty state
-            itemsList.innerHTML = '';
-            emptyState.classList.remove('hidden');
-            summaryContainer.classList.add('hidden');
+            itemsList.innerHTML = "";
+            emptyState.classList.remove("hidden");
+            summaryContainer.classList.add("hidden");
         } else {
             // Show cart items
-            emptyState.classList.add('hidden');
-            summaryContainer.classList.remove('hidden');
+            emptyState.classList.add("hidden");
+            summaryContainer.classList.remove("hidden");
 
             // Render cart items
-            itemsList.innerHTML = cart.items.map(item => `
+            itemsList.innerHTML = cart.items
+                .map(
+                    (item) => `
                 <div
                     class="cart-item flex items-center gap-4 p-4 border-b border-gray-700 hover:bg-gray-800/30 transition-colors"
                     data-product-id="${item.productId}"
@@ -155,20 +185,24 @@ import CartSummary from './CartSummary.astro';
                 >
                     <!-- Product Thumbnail -->
                     <div class="flex-shrink-0 w-16 h-16 bg-gray-800 rounded-lg overflow-hidden">
-                        ${item.thumbnailUrl ? `
+                        ${
+                            item.thumbnailUrl
+                                ? `
                             <img
                                 src="${item.thumbnailUrl}"
                                 alt="${item.title}"
                                 class="w-full h-full object-cover"
                                 loading="lazy"
                             />
-                        ` : `
+                        `
+                                : `
                             <div class="w-full h-full flex items-center justify-center text-gray-600">
                                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
                                 </svg>
                             </div>
-                        `}
+                        `
+                        }
                     </div>
 
                     <!-- Product Info -->
@@ -199,7 +233,9 @@ import CartSummary from './CartSummary.astro';
                         </svg>
                     </button>
                 </div>
-            `).join('');
+            `,
+                )
+                .join("");
 
             // Render cart summary
             summaryContainer.innerHTML = `
@@ -209,7 +245,7 @@ import CartSummary from './CartSummary.astro';
                         <div>
                             <p class="text-gray-400 text-sm">Subtotal</p>
                             <p class="text-gray-500 text-xs">
-                                ${cart.totalItems} ${cart.totalItems === 1 ? 'item' : 'items'}
+                                ${cart.totalItems} ${cart.totalItems === 1 ? "item" : "items"}
                             </p>
                         </div>
                         <p class="text-white text-2xl font-bold">
@@ -264,121 +300,165 @@ import CartSummary from './CartSummary.astro';
     }
 
     function attachCartEventListeners() {
-        import('../../lib/cart').then(({ removeFromCart, buildCheckoutUrl, getAllCheckoutUrls, getCart }) => {
-            // Remove from cart buttons
-            document.querySelectorAll('.remove-from-cart').forEach(button => {
-                button.addEventListener('click', () => {
-                    const shortCode = button.getAttribute('data-short-code');
-                    if (shortCode) {
-                        const cartItem = button.closest('.cart-item');
-                        if (cartItem) {
-                            cartItem.classList.add('opacity-50', 'scale-95', 'transition-all', 'duration-300');
+        import("../../lib/cart").then(
+            ({
+                removeFromCart,
+                buildCheckoutUrl,
+                getAllCheckoutUrls,
+                getCart,
+            }) => {
+                // Remove from cart buttons
+                document
+                    .querySelectorAll(".remove-from-cart")
+                    .forEach((button) => {
+                        button.addEventListener("click", () => {
+                            const shortCode =
+                                button.getAttribute("data-short-code");
+                            if (shortCode) {
+                                const cartItem = button.closest(".cart-item");
+                                if (cartItem) {
+                                    cartItem.classList.add(
+                                        "opacity-50",
+                                        "scale-95",
+                                        "transition-all",
+                                        "duration-300",
+                                    );
+                                    setTimeout(() => {
+                                        removeFromCart(shortCode);
+                                    }, 300);
+                                }
+                            }
+                        });
+                    });
+
+                // Checkout button
+                const checkoutButton =
+                    document.getElementById("checkout-button");
+                if (checkoutButton) {
+                    checkoutButton.addEventListener("click", () => {
+                        console.log("🛒 Checkout clicked!");
+                        const cart = getCart();
+
+                        if (cart.items.length === 0) {
+                            console.error("❌ Cart is empty");
+                            return;
+                        }
+
+                        checkoutButton.innerHTML =
+                            "<span>Opening Gumroad...</span>";
+                        checkoutButton.classList.add("opacity-70");
+
+                         setTimeout(() => {
+                            if (cart.items.length === 1) {
+                                // Single item - direct checkout
+                                const checkoutUrl = buildCheckoutUrl();
+                                console.log(
+                                    "📦 Single item checkout:",
+                                    checkoutUrl,
+                                );
+                                window.open(checkoutUrl, "_blank");
+                            } else {
+                                // Multiple items - explain limitation and offer to checkout first item
+                                const itemNames = cart.items.map(item => `• ${item.title}`).join('\n');
+                                const confirmed = confirm(
+                                    `⚠️ GUMROAD LIMITATION\n\n` +
+                                    `Gumroad doesn't support multi-product checkout.\n\n` +
+                                    `Your cart has ${cart.items.length} items:\n${itemNames}\n\n` +
+                                    `Would you like to checkout these items one at a time?\n\n` +
+                                    `Click OK to start with the first item, or Cancel to go back.`
+                                );
+
+                                if (confirmed) {
+                                    const checkoutUrls = getAllCheckoutUrls();
+                                    console.log(
+                                        `📦 Opening ${checkoutUrls.length} Gumroad checkout tabs sequentially...`,
+                                    );
+
+                                    // Open tabs with longer delays for better UX
+                                    checkoutUrls.forEach((url, index) => {
+                                        setTimeout(() => {
+                                            console.log(
+                                                `📦 Opening checkout ${index + 1}/${checkoutUrls.length}:`,
+                                                url,
+                                            );
+                                            window.open(url, '_blank');
+                                            
+                                            // Show progress for multiple items
+                                            if (index < checkoutUrls.length - 1) {
+                                                setTimeout(() => {
+                                                    alert(`Opened checkout ${index + 1} of ${checkoutUrls.length}.\n\nOpening next item...`);
+                                                }, 300);
+                                            }
+                                        }, index * 2000); // 2 second delay between each
+                                    });
+                                }
+                            }
+
                             setTimeout(() => {
-                                removeFromCart(shortCode);
-                            }, 300);
-                        }
-                    }
-                });
-            });
-
-            // Checkout button
-            const checkoutButton = document.getElementById('checkout-button');
-            if (checkoutButton) {
-                checkoutButton.addEventListener('click', () => {
-                    console.log('🛒 Checkout clicked!');
-                    const cart = getCart();
-                    
-                    if (cart.items.length === 0) {
-                        console.error('❌ Cart is empty');
-                        return;
-                    }
-
-                    checkoutButton.innerHTML = '<span>Opening Gumroad...</span>';
-                    checkoutButton.classList.add('opacity-70');
-                    
-                    setTimeout(() => {
-                        if (cart.items.length === 1) {
-                            // Single item - direct checkout
-                            const checkoutUrl = buildCheckoutUrl();
-                            console.log('📦 Single item checkout:', checkoutUrl);
-                            window.open(checkoutUrl, '_blank');
-                        } else {
-                            // Multiple items - open each in sequence
-                            const checkoutUrls = getAllCheckoutUrls();
-                            console.log(`📦 Opening ${checkoutUrls.length} Gumroad checkout tabs...`);
-                            
-                            // Open all tabs with small delay to prevent popup blocker
-                            checkoutUrls.forEach((url, index) => {
-                                setTimeout(() => {
-                                    console.log(`📦 Opening tab ${index + 1}/${checkoutUrls.length}:`, url);
-                                    window.open(url, '_blank');
-                                }, index * 500); // 500ms delay between each tab
-                            });
-                            
-                            // Show user message
-                            alert(`Opening ${checkoutUrls.length} Gumroad checkout tabs.\n\nIf tabs are blocked, please allow popups for this site.`);
-                        }
-                        
-                        setTimeout(() => {
-                            checkoutButton.innerHTML = `
+                                checkoutButton.innerHTML = `
                                 <span>Checkout</span>
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                                 </svg>
                             `;
-                            checkoutButton.classList.remove('opacity-70');
-                        }, 1000);
-                    }, 300);
-                });
-            }
+                                checkoutButton.classList.remove("opacity-70");
+                            }, 1000);
+                        }, 300);
+                    });
+                }
 
-            // Continue shopping button
-            const continueButton = document.getElementById('continue-shopping-button');
-            if (continueButton) {
-                continueButton.addEventListener('click', closeCart);
-            }
-        });
+                // Continue shopping button
+                const continueButton = document.getElementById(
+                    "continue-shopping-button",
+                );
+                if (continueButton) {
+                    continueButton.addEventListener("click", closeCart);
+                }
+            },
+        );
     }
 
     // Initialize on page load
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener("DOMContentLoaded", () => {
         // Close button
-        const closeButton = document.getElementById('close-cart-button');
+        const closeButton = document.getElementById("close-cart-button");
         if (closeButton) {
-            closeButton.addEventListener('click', closeCart);
+            closeButton.addEventListener("click", closeCart);
         }
 
         // Overlay click to close
-        const overlay = document.getElementById('cart-overlay');
+        const overlay = document.getElementById("cart-overlay");
         if (overlay) {
-            overlay.addEventListener('click', closeCart);
+            overlay.addEventListener("click", closeCart);
         }
 
         // Empty cart continue button
-        const emptyCartButton = document.getElementById('empty-cart-continue-button');
+        const emptyCartButton = document.getElementById(
+            "empty-cart-continue-button",
+        );
         if (emptyCartButton) {
-            emptyCartButton.addEventListener('click', closeCart);
+            emptyCartButton.addEventListener("click", closeCart);
         }
 
         // Listen for custom events
-        window.addEventListener('open-cart-drawer', openCart);
-        window.addEventListener('close-cart-drawer', closeCart);
-        window.addEventListener('cart-updated', () => {
+        window.addEventListener("open-cart-drawer", openCart);
+        window.addEventListener("close-cart-drawer", closeCart);
+        window.addEventListener("cart-updated", () => {
             if (isCartOpen) {
                 renderCart();
             }
         });
 
         // ESC key to close
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && isCartOpen) {
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && isCartOpen) {
                 closeCart();
             }
         });
     });
 
     // Re-initialize on page load
-    document.addEventListener('astro:page-load', () => {
+    document.addEventListener("astro:page-load", () => {
         if (isCartOpen) {
             renderCart();
         }
@@ -410,4 +490,3 @@ import CartSummary from './CartSummary.astro';
         border-radius: 3px;
     }
 </style>
-

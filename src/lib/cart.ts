@@ -99,7 +99,7 @@ function calculateTotals(items: CartItem[]): { totalItems: number; totalPrice: n
         return sum + (item.price * item.quantity);
     }, 0);
     const formattedTotal = `$${(totalPrice / 100).toFixed(2)}`;
-    
+
     console.log('💰 Final totals:', { totalItems, totalPrice, formattedTotal });
     return { totalItems, totalPrice, formattedTotal };
 }
@@ -291,7 +291,7 @@ export function clearCart(): void {
  */
 export function buildCheckoutUrl(): string {
     const cart = getStoredCart();
-    
+
     console.log('🛒 Building checkout URL...');
     console.log('📦 Cart items:', cart.items.length);
     console.log('📝 Cart contents:', cart.items.map(item => ({
@@ -299,12 +299,12 @@ export function buildCheckoutUrl(): string {
         shortCode: item.shortCode,
         quantity: item.quantity
     })));
-    
+
     if (cart.items.length === 0) {
         console.error('❌ Cart is empty!');
         return '';
     }
-    
+
     // For a single item, return direct checkout URL
     if (cart.items.length === 1) {
         const item = cart.items[0];
@@ -312,7 +312,7 @@ export function buildCheckoutUrl(): string {
         console.log('✅ Single item checkout URL:', checkoutUrl);
         return checkoutUrl;
     }
-    
+
     // For multiple items, we'll return a special marker that tells the UI
     // to open multiple tabs (handled in the calling code)
     console.log('⚠️ Multiple items detected - will open multiple checkout tabs');
@@ -359,7 +359,7 @@ export function getCartItem(shortCode: string): CartItem | undefined {
  */
 export function getAllCheckoutUrls(): string[] {
     const cart = getStoredCart();
-    return cart.items.map(item => 
+    return cart.items.map(item =>
         `https://gumroad.com/checkout?product=${encodeURIComponent(item.shortCode)}&quantity=${item.quantity}`
     );
 }
