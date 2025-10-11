@@ -2,6 +2,8 @@
 import "../styles/globals.css";
 import { siteAssets, fetchProducts } from "../lib/gumroad";
 import CookieNotice from "../components/ui/CookieNotice.astro";
+import CartIcon from "../components/cart/CartIcon.astro";
+import CartDrawer from "../components/cart/CartDrawer.astro";
 
 export interface Props {
     title?: string;
@@ -224,26 +226,32 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
                     >
                 </nav>
 
-                <!-- Mobile Menu Button -->
-                <div class="lg:hidden">
-                    <button
-                        id="mobile-menu-button"
-                        class="p-2 text-gray-300 hover:text-white"
-                        aria-label="Toggle mobile menu"
-                    >
-                        <svg
-                            class="w-6 h-6"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
+                <!-- Cart Icon & Mobile Menu Button -->
+                <div class="flex items-center space-x-2">
+                    <!-- Cart Icon (Always Visible) -->
+                    <CartIcon />
+
+                    <!-- Mobile Menu Button -->
+                    <div class="lg:hidden">
+                        <button
+                            id="mobile-menu-button"
+                            class="p-2 text-gray-300 hover:text-white"
+                            aria-label="Toggle mobile menu"
                         >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M4 6h16M4 12h16M4 18h16"></path>
-                        </svg>
-                    </button>
+                            <svg
+                                class="w-6 h-6"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -647,6 +655,9 @@ const inactiveLinkClass = "text-gray-300 hover:text-white transition-colors";
             }
         </script>
     </body>
+
+    <!-- Cart Drawer (Global) -->
+    <CartDrawer />
 
     <CookieNotice />
 </html>

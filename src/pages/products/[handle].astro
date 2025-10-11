@@ -4,6 +4,7 @@ export const prerender = true;
 import Layout from '../../layouts/Layout.astro';
 import { fetchProductById, fetchProducts } from '../../lib/gumroad';
 import BuyNowButton from '../../components/ui/BuyNowButton.astro';
+import AddToCartButton from '../../components/cart/AddToCartButton.astro';
 import type { GumroadProduct } from '../../lib/types';
 
 import fs from 'fs';
@@ -180,22 +181,40 @@ export async function getStaticPaths() {
         <!-- Controls Section -->
         <div class="px-6 pb-8">
           <div class="max-w-6xl mx-auto">
-            <div class="flex items-center gap-8">
+            <div class="flex flex-col md:flex-row items-stretch md:items-center gap-4">
               <!-- Play All Button -->
-              <button id="play-all-btn" class="w-14 h-14 bg-[#151515] hover:bg-gray-800 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-105 shadow-lg aspect-square">
+              <button id="play-all-btn" class="w-14 h-14 bg-[#151515] hover:bg-gray-800 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-105 shadow-lg aspect-square flex-shrink-0">
                 <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24" style="margin-left: 2px;">
                   <path d="M8 5v14l11-7z"/>
                 </svg>
               </button>
 
-              <!-- Download/Purchase Button -->
-              <BuyNowButton 
-                productId={product.id}
-                productTitle={product.title}
-                price={product.price}
-                productUrl={product.url}
-                formattedPrice={product.formatted_price}
-              />
+              <!-- Button Group -->
+              <div class="flex-1 flex flex-col md:flex-row gap-4">
+                <!-- Add to Cart Button -->
+                <div class="flex-1">
+                  <AddToCartButton 
+                    productId={product.id}
+                    productTitle={product.title}
+                    price={product.price}
+                    productUrl={product.url}
+                    formattedPrice={product.formatted_price}
+                    thumbnailUrl={product.thumbnail_url}
+                    variant="secondary"
+                  />
+                </div>
+
+                <!-- Buy Now Button (Direct Checkout) -->
+                <div class="flex-1">
+                  <BuyNowButton 
+                    productId={product.id}
+                    productTitle={product.title}
+                    price={product.price}
+                    productUrl={product.url}
+                    formattedPrice={product.formatted_price}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>

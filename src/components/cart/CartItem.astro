@@ -1,0 +1,107 @@
+---
+/**
+ * Cart Item Component
+ * Displays individual product in cart with remove option
+ */
+
+export interface Props {
+    shortCode: string;
+    productId: string;
+    title: string;
+    price: number;
+    formattedPrice: string;
+    thumbnailUrl?: string;
+    quantity: number;
+}
+
+const { shortCode, productId, title, price, formattedPrice, thumbnailUrl, quantity } = Astro.props;
+---
+
+<div
+    class="cart-item flex items-center gap-4 p-4 border-b border-gray-700 hover:bg-gray-800/30 transition-colors"
+    data-product-id={productId}
+    data-short-code={shortCode}
+>
+    <!-- Product Thumbnail -->
+    <div class="flex-shrink-0 w-16 h-16 bg-gray-800 rounded-lg overflow-hidden">
+        {thumbnailUrl ? (
+            <img
+                src={thumbnailUrl}
+                alt={title}
+                class="w-full h-full object-cover"
+                loading="lazy"
+            />
+        ) : (
+            <div class="w-full h-full flex items-center justify-center text-gray-600">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+                </svg>
+            </div>
+        )}
+    </div>
+
+    <!-- Product Info -->
+    <div class="flex-1 min-w-0">
+        <h4 class="text-white font-semibold text-sm truncate mb-1">
+            {title}
+        </h4>
+        <p class="text-gray-400 text-xs mb-2">
+            Qty: {quantity}
+        </p>
+        <p class="text-purple-400 font-bold text-sm">
+            {formattedPrice}
+        </p>
+    </div>
+
+    <!-- Remove Button -->
+    <button
+        class="remove-from-cart flex-shrink-0 p-2 text-gray-400 hover:text-red-500 transition-colors rounded-lg hover:bg-gray-700"
+        data-short-code={shortCode}
+        data-product-title={title}
+        aria-label={`Remove ${title} from cart`}
+        data-analytics-event="remove_from_cart"
+        data-analytics-product-id={productId}
+        data-analytics-product-name={title}
+    >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+        </svg>
+    </button>
+</div>
+
+<script>
+    import { removeFromCart } from '../../lib/cart';
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Handle remove button clicks
+        document.addEventListener('click', (e) => {
+            const button = (e.target as HTMLElement).closest('.remove-from-cart');
+            if (!button) return;
+
+            const shortCode = button.getAttribute('data-short-code');
+            const productTitle = button.getAttribute('data-product-title');
+
+            if (!shortCode) return;
+
+            // Add fade-out animation
+            const cartItem = button.closest('.cart-item');
+            if (cartItem) {
+                cartItem.classList.add('opacity-50', 'scale-95', 'transition-all', 'duration-300');
+                
+                setTimeout(() => {
+                    // Remove from cart
+                    removeFromCart(shortCode);
+                    
+                    // Show toast notification (optional)
+                    console.log(`Removed "${productTitle}" from cart`);
+                }, 300);
+            }
+        });
+    });
+
+    // Re-initialize on page load (for view transitions)
+    document.addEventListener('astro:page-load', () => {
+        // Event listeners are already set up globally
+    });
+</script>
+

@@ -1,0 +1,174 @@
+---
+/**
+ * Add to Cart Button Component
+ * Adds product to cart without redirecting
+ * Shows toast notification on success
+ */
+
+export interface Props {
+    productId: string;
+    productTitle: string;
+    price: number; // Price in cents from Gumroad API
+    productUrl: string;
+    formattedPrice?: string;
+    thumbnailUrl?: string;
+    variant?: 'primary' | 'secondary';
+}
+
+const { 
+    productId, 
+    productTitle, 
+    price, 
+    productUrl, 
+    formattedPrice,
+    thumbnailUrl,
+    variant = 'secondary'
+} = Astro.props;
+
+// Extract product ID from short_url for cart
+// Format: https://tehnvega.gumroad.com/l/{PRODUCT_ID}
+const extractProductId = (url: string): string => {
+  try {
+    const match = url.match(/\/l\/([^\/\?]+)/);
+    return match ? match[1] : productId;
+  } catch {
+    return productId;
+  }
+};
+
+const extractedProductId = extractProductId(productUrl);
+
+// Button styling based on variant
+const variantClasses = variant === 'primary' 
+    ? 'bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900'
+    : 'bg-gray-800 hover:bg-gray-700 border border-gray-600';
+---
+
+<button
+    class={`add-to-cart-btn ${variantClasses} text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 inline-block text-center w-full flex items-center justify-center space-x-2 transform hover:scale-105`}
+    data-product-id={productId}
+    data-product-title={productTitle}
+    data-price={price}
+    data-formatted-price={formattedPrice || `$${(price / 100).toFixed(2)}`}
+    data-extracted-id={extractedProductId}
+    data-product-url={productUrl}
+    data-thumbnail-url={thumbnailUrl || ''}
+    data-analytics-event="add_to_cart"
+    data-analytics-product-id={productId}
+    data-analytics-product-name={productTitle}
+    data-analytics-product-price={price / 100}
+>
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+    </svg>
+    <span>Add to Cart</span>
+</button>
+
+<script>
+    import { addToCart } from '../../lib/cart';
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+
+        addToCartButtons.forEach((button) => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                const btn = e.currentTarget as HTMLButtonElement;
+                const productId = btn.dataset.productId || '';
+                const shortCode = btn.dataset.extractedId || '';
+                const productTitle = btn.dataset.productTitle || '';
+                const price = parseInt(btn.dataset.price || '0');
+                const formattedPrice = btn.dataset.formattedPrice || '$0.00';
+                const productUrl = btn.dataset.productUrl || '';
+                const thumbnailUrl = btn.dataset.thumbnailUrl || '';
+
+                // Visual feedback - save original content
+                const originalContent = btn.innerHTML;
+                btn.disabled = true;
+                btn.classList.add('opacity-70');
+                btn.innerHTML = `
+                    <svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    <span>Adding...</span>
+                `;
+
+                // Add to cart
+                setTimeout(() => {
+                    addToCart({
+                        shortCode,
+                        productId,
+                        title: productTitle,
+                        price,
+                        formattedPrice,
+                        thumbnailUrl: thumbnailUrl || undefined
+                    });
+
+                    // Success feedback
+                    btn.innerHTML = `
+                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>Added!</span>
+                    `;
+
+                    // Show toast notification
+                    showToast(`"${productTitle}" added to cart!`);
+
+                    // Reset button after delay
+                    setTimeout(() => {
+                        btn.innerHTML = originalContent;
+                        btn.disabled = false;
+                        btn.classList.remove('opacity-70');
+                    }, 2000);
+                }, 500);
+            });
+        });
+    });
+
+    // Toast notification function
+    function showToast(message: string) {
+        // Check if toast container exists, create if not
+        let toastContainer = document.getElementById('toast-container');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.id = 'toast-container';
+            toastContainer.className = 'fixed top-4 right-4 z-50 flex flex-col space-y-2';
+            document.body.appendChild(toastContainer);
+        }
+
+        // Create toast element
+        const toast = document.createElement('div');
+        toast.className = 'bg-gray-800 border border-purple-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-3 transform translate-x-full transition-transform duration-300';
+        toast.innerHTML = `
+            <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span class="text-sm font-medium">${message}</span>
+        `;
+
+        toastContainer.appendChild(toast);
+
+        // Slide in
+        setTimeout(() => {
+            toast.classList.remove('translate-x-full');
+            toast.classList.add('translate-x-0');
+        }, 10);
+
+        // Remove after 3 seconds
+        setTimeout(() => {
+            toast.classList.remove('translate-x-0');
+            toast.classList.add('translate-x-full');
+            setTimeout(() => {
+                toast.remove();
+            }, 300);
+        }, 3000);
+    }
+
+    // Re-initialize on page load
+    document.addEventListener('astro:page-load', () => {
+        // Event listeners are already set up
+    });
+</script>
+
