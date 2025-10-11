@@ -264,7 +264,7 @@ import CartSummary from './CartSummary.astro';
     }
 
     function attachCartEventListeners() {
-        import('../../lib/cart').then(({ removeFromCart, buildCheckoutUrl }) => {
+        import('../../lib/cart').then(({ removeFromCart, buildCheckoutUrl, getAllCheckoutUrls, getCart }) => {
             // Remove from cart buttons
             document.querySelectorAll('.remove-from-cart').forEach(button => {
                 button.addEventListener('click', () => {
@@ -285,28 +285,50 @@ import CartSummary from './CartSummary.astro';
             const checkoutButton = document.getElementById('checkout-button');
             if (checkoutButton) {
                 checkoutButton.addEventListener('click', () => {
-                    const checkoutUrl = buildCheckoutUrl();
                     console.log('🛒 Checkout clicked!');
-                    console.log('📦 Checkout URL:', checkoutUrl);
+                    const cart = getCart();
                     
-                    if (checkoutUrl) {
-                        checkoutButton.innerHTML = '<span>Redirecting to Gumroad...</span>';
-                        checkoutButton.classList.add('opacity-70');
-                        setTimeout(() => {
-                            window.open(checkoutUrl, '_blank');
-                            setTimeout(() => {
-                                checkoutButton.innerHTML = `
-                                    <span>Checkout</span>
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                                    </svg>
-                                `;
-                                checkoutButton.classList.remove('opacity-70');
-                            }, 1000);
-                        }, 300);
-                    } else {
-                        console.error('❌ No checkout URL generated - cart might be empty');
+                    if (cart.items.length === 0) {
+                        console.error('❌ Cart is empty');
+                        return;
                     }
+
+                    checkoutButton.innerHTML = '<span>Opening Gumroad...</span>';
+                    checkoutButton.classList.add('opacity-70');
+                    
+                    setTimeout(() => {
+                        if (cart.items.length === 1) {
+                            // Single item - direct checkout
+                            const checkoutUrl = buildCheckoutUrl();
+                            console.log('📦 Single item checkout:', checkoutUrl);
+                            window.open(checkoutUrl, '_blank');
+                        } else {
+                            // Multiple items - open each in sequence
+                            const checkoutUrls = getAllCheckoutUrls();
+                            console.log(`📦 Opening ${checkoutUrls.length} Gumroad checkout tabs...`);
+                            
+                            // Open all tabs with small delay to prevent popup blocker
+                            checkoutUrls.forEach((url, index) => {
+                                setTimeout(() => {
+                                    console.log(`📦 Opening tab ${index + 1}/${checkoutUrls.length}:`, url);
+                                    window.open(url, '_blank');
+                                }, index * 500); // 500ms delay between each tab
+                            });
+                            
+                            // Show user message
+                            alert(`Opening ${checkoutUrls.length} Gumroad checkout tabs.\n\nIf tabs are blocked, please allow popups for this site.`);
+                        }
+                        
+                        setTimeout(() => {
+                            checkoutButton.innerHTML = `
+                                <span>Checkout</span>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                </svg>
+                            `;
+                            checkoutButton.classList.remove('opacity-70');
+                        }, 1000);
+                    }, 300);
                 });
             }
 

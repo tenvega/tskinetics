@@ -286,10 +286,12 @@ export function clearCart(): void {
 
 /**
  * Build Gumroad checkout URL with all cart items
+ * NOTE: Gumroad's URL format doesn't support multiple different products
+ * We'll open multiple checkout tabs as a workaround
  */
 export function buildCheckoutUrl(): string {
     const cart = getStoredCart();
-
+    
     console.log('🛒 Building checkout URL...');
     console.log('📦 Cart items:', cart.items.length);
     console.log('📝 Cart contents:', cart.items.map(item => ({
@@ -297,25 +299,24 @@ export function buildCheckoutUrl(): string {
         shortCode: item.shortCode,
         quantity: item.quantity
     })));
-
+    
     if (cart.items.length === 0) {
         console.error('❌ Cart is empty!');
         return '';
     }
-
-    // Build URL with multiple products
-    // Format: https://gumroad.com/checkout?product=id1&product=id2&product=id3
-    const productParams = cart.items
-        .map(item => {
-            // Repeat the product parameter for each quantity
-            return Array(item.quantity)
-                .fill(`product=${encodeURIComponent(item.shortCode)}`)
-                .join('&');
-        })
-        .join('&');
-
-    const checkoutUrl = `https://gumroad.com/checkout?${productParams}`;
-    console.log('✅ Checkout URL built:', checkoutUrl);
+    
+    // For a single item, return direct checkout URL
+    if (cart.items.length === 1) {
+        const item = cart.items[0];
+        const checkoutUrl = `https://gumroad.com/checkout?product=${encodeURIComponent(item.shortCode)}&quantity=${item.quantity}`;
+        console.log('✅ Single item checkout URL:', checkoutUrl);
+        return checkoutUrl;
+    }
+    
+    // For multiple items, we'll return a special marker that tells the UI
+    // to open multiple tabs (handled in the calling code)
+    console.log('⚠️ Multiple items detected - will open multiple checkout tabs');
+    return 'MULTIPLE_ITEMS';
 
     // Analytics hook - checkout initiated
     if (typeof window !== 'undefined') {
@@ -351,5 +352,15 @@ export function isInCart(shortCode: string): boolean {
 export function getCartItem(shortCode: string): CartItem | undefined {
     const cart = getStoredCart();
     return cart.items.find(item => item.shortCode === shortCode);
+}
+
+/**
+ * Get all checkout URLs for cart items (for multiple product checkout)
+ */
+export function getAllCheckoutUrls(): string[] {
+    const cart = getStoredCart();
+    return cart.items.map(item => 
+        `https://gumroad.com/checkout?product=${encodeURIComponent(item.shortCode)}&quantity=${item.quantity}`
+    );
 }
 
