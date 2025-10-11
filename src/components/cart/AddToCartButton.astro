@@ -67,12 +67,17 @@ const variantClasses = variant === 'primary'
 <script>
     import { addToCart } from '../../lib/cart';
 
+    console.log('🎯 AddToCartButton script loaded');
+
     document.addEventListener('DOMContentLoaded', () => {
+        console.log('🎯 DOMContentLoaded - Setting up Add to Cart buttons');
         const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+        console.log('🎯 Found', addToCartButtons.length, 'Add to Cart buttons');
 
         addToCartButtons.forEach((button) => {
             button.addEventListener('click', (e) => {
                 e.preventDefault();
+                console.log('🎯 Add to Cart button clicked!');
                 
                 const btn = e.currentTarget as HTMLButtonElement;
                 const productId = btn.dataset.productId || '';
@@ -82,6 +87,8 @@ const variantClasses = variant === 'primary'
                 const formattedPrice = btn.dataset.formattedPrice || '$0.00';
                 const productUrl = btn.dataset.productUrl || '';
                 const thumbnailUrl = btn.dataset.thumbnailUrl || '';
+                
+                console.log('🎯 Adding to cart:', { productTitle, shortCode, price });
 
                 // Visual feedback - save original content
                 const originalContent = btn.innerHTML;

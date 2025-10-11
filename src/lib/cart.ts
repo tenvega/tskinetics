@@ -103,7 +103,9 @@ function calculateTotals(items: CartItem[]): { totalItems: number; totalPrice: n
  * Add item to cart
  */
 export function addToCart(item: Omit<CartItem, 'quantity' | 'addedAt'>): Cart {
+    console.log('🛒 addToCart called with:', item);
     const cart = getStoredCart();
+    console.log('🛒 Current cart before adding:', cart);
     
     // Check if item already exists in cart
     const existingItemIndex = cart.items.findIndex(
