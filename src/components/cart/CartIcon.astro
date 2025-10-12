@@ -24,8 +24,7 @@
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-        ></path>
+            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
     </svg>
 
     <!-- Item Count Badge -->
@@ -39,57 +38,57 @@
 </button>
 
 <script>
-    import { getCart } from '../../lib/cart';
+    import { getCart } from "../../lib/cart";
 
     function updateCartIcon() {
-        const badge = document.getElementById('cart-count-badge');
+        const badge = document.getElementById("cart-count-badge");
         if (!badge) return;
 
         const cart = getCart();
         const count = cart.totalItems;
 
         badge.textContent = count.toString();
-        badge.setAttribute('data-count', count.toString());
+        badge.setAttribute("data-count", count.toString());
 
         if (count > 0) {
-            badge.classList.remove('opacity-0', 'scale-0');
-            badge.classList.add('opacity-100', 'scale-100');
+            badge.classList.remove("opacity-0", "scale-0");
+            badge.classList.add("opacity-100", "scale-100");
         } else {
-            badge.classList.remove('opacity-100', 'scale-100');
-            badge.classList.add('opacity-0', 'scale-0');
+            badge.classList.remove("opacity-100", "scale-100");
+            badge.classList.add("opacity-0", "scale-0");
         }
     }
 
     // Initialize on page load
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener("DOMContentLoaded", () => {
         updateCartIcon();
 
         // Update when cart changes
-        window.addEventListener('cart-updated', () => {
+        window.addEventListener("cart-updated", () => {
             updateCartIcon();
-            
+
             // Add pulse animation when item added
-            const badge = document.getElementById('cart-count-badge');
+            const badge = document.getElementById("cart-count-badge");
             if (badge) {
-                badge.classList.add('animate-pulse');
+                badge.classList.add("animate-pulse");
                 setTimeout(() => {
-                    badge.classList.remove('animate-pulse');
+                    badge.classList.remove("animate-pulse");
                 }, 1000);
             }
         });
 
         // Open cart drawer when clicked
-        const cartButton = document.getElementById('cart-icon-button');
+        const cartButton = document.getElementById("cart-icon-button");
         if (cartButton) {
-            cartButton.addEventListener('click', () => {
+            cartButton.addEventListener("click", () => {
                 // Dispatch event to open cart drawer
-                window.dispatchEvent(new CustomEvent('open-cart-drawer'));
+                window.dispatchEvent(new CustomEvent("open-cart-drawer"));
             });
         }
     });
 
     // Update on page navigation (for SPAs or view transitions)
-    document.addEventListener('astro:page-load', () => {
+    document.addEventListener("astro:page-load", () => {
         updateCartIcon();
     });
 </script>
@@ -97,11 +96,12 @@
 <style>
     /* Pulse animation for badge */
     @keyframes pulse {
-        0%, 100% {
+        0%,
+        100% {
             opacity: 1;
         }
         50% {
-            opacity: .5;
+            opacity: 0.5;
         }
     }
 
@@ -109,4 +109,3 @@
         animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) 2;
     }
 </style>
-
