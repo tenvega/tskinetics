@@ -181,7 +181,7 @@ export async function getStaticPaths() {
         <!-- Controls Section -->
         <div class="px-6 pb-8">
           <div class="max-w-6xl mx-auto">
-            <div class="flex flex-col md:flex-row items-stretch md:items-center gap-4">
+            <div class="flex items-center gap-3">
               <!-- Play All Button -->
               <button id="play-all-btn" class="w-14 h-14 bg-white hover:bg-gray-100 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-105 shadow-lg aspect-square flex-shrink-0">
                 <svg class="w-5 h-5 text-black" fill="currentColor" viewBox="0 0 24 24" style="margin-left: 2px;">
@@ -189,31 +189,28 @@ export async function getStaticPaths() {
                 </svg>
               </button>
 
-              <!-- Button Group -->
-              <div class="flex-1 flex flex-col md:flex-row gap-4">
-                <!-- Add to Cart Button -->
-                <div class="flex-1">
-                  <AddToCartButton 
-                    productId={product.id}
-                    productTitle={product.title}
-                    price={product.price}
-                    productUrl={product.url}
-                    formattedPrice={product.formatted_price}
-                    thumbnailUrl={product.thumbnail_url}
-                    variant="secondary"
-                  />
-                </div>
+              <!-- Add to Cart Button -->
+              <div class="flex-1">
+                <AddToCartButton 
+                  productId={product.id}
+                  productTitle={product.title}
+                  price={product.price}
+                  productUrl={product.url}
+                  formattedPrice={product.formatted_price}
+                  thumbnailUrl={product.thumbnail_url}
+                  variant="secondary"
+                />
+              </div>
 
-                <!-- Buy Now Button (Direct Checkout) -->
-                <div class="flex-1">
-                  <BuyNowButton 
-                    productId={product.id}
-                    productTitle={product.title}
-                    price={product.price}
-                    productUrl={product.url}
-                    formattedPrice={product.formatted_price}
-                  />
-                </div>
+              <!-- Buy Now Button (Direct Checkout) -->
+              <div class="flex-1">
+                <BuyNowButton 
+                  productId={product.id}
+                  productTitle={product.title}
+                  price={product.price}
+                  productUrl={product.url}
+                  formattedPrice={product.formatted_price}
+                />
               </div>
             </div>
           </div>
