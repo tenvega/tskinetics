@@ -306,6 +306,7 @@ import CartSummary from "./CartSummary.astro";
                 buildCheckoutUrl,
                 getAllCheckoutUrls,
                 getCart,
+                openGumroadOverlayCheckout,
             }) => {
                 // Remove from cart buttons
                 document
@@ -331,66 +332,56 @@ import CartSummary from "./CartSummary.astro";
                         });
                     });
 
-                // Checkout button
-                const checkoutButton =
-                    document.getElementById("checkout-button");
-                if (checkoutButton) {
-                    checkoutButton.addEventListener("click", () => {
-                        console.log("🛒 Checkout clicked!");
-                        const cart = getCart();
+                 // Checkout button
+                 const checkoutButton =
+                     document.getElementById("checkout-button");
+                 if (checkoutButton) {
+                     checkoutButton.addEventListener("click", () => {
+                         console.log("🛒 Checkout clicked!");
+                         const cart = getCart();
 
-                        if (cart.items.length === 0) {
-                            console.error("❌ Cart is empty");
-                            return;
-                        }
+                         if (cart.items.length === 0) {
+                             console.error("❌ Cart is empty");
+                             return;
+                         }
 
                         checkoutButton.innerHTML =
                             "<span>Opening Gumroad...</span>";
                         checkoutButton.classList.add("opacity-70");
 
                          setTimeout(() => {
-                            if (cart.items.length === 1) {
-                                // Single item - direct checkout
-                                const checkoutUrl = buildCheckoutUrl();
-                                console.log(
-                                    "📦 Single item checkout:",
-                                    checkoutUrl,
-                                );
-                                window.open(checkoutUrl, "_blank");
-                            } else {
-                                // Multiple items - explain limitation and offer to checkout first item
-                                const itemNames = cart.items.map(item => `• ${item.title}`).join('\n');
-                                const confirmed = confirm(
-                                    `⚠️ GUMROAD LIMITATION\n\n` +
-                                    `Gumroad doesn't support multi-product checkout.\n\n` +
-                                    `Your cart has ${cart.items.length} items:\n${itemNames}\n\n` +
-                                    `Would you like to checkout these items one at a time?\n\n` +
-                                    `Click OK to start with the first item, or Cancel to go back.`
-                                );
-
-                                if (confirmed) {
-                                    const checkoutUrls = getAllCheckoutUrls();
-                                    console.log(
-                                        `📦 Opening ${checkoutUrls.length} Gumroad checkout tabs sequentially...`,
+                            // Try to use Gumroad Overlay first (best UX - single modal for all items)
+                            const overlaySuccess = openGumroadOverlayCheckout();
+                            
+                            if (!overlaySuccess) {
+                                // Fallback to old method if overlay fails
+                                console.log('⚠️ Overlay failed, falling back to multi-tab method');
+                                
+                                if (cart.items.length === 1) {
+                                    // Single item - direct checkout
+                                    const checkoutUrl = buildCheckoutUrl();
+                                    console.log("📦 Single item checkout:", checkoutUrl);
+                                    window.open(checkoutUrl, "_blank");
+                                } else {
+                                    // Multiple items - explain and open tabs
+                                    const itemNames = cart.items.map(item => `• ${item.title}`).join('\n');
+                                    const confirmed = confirm(
+                                        `Your cart has ${cart.items.length} items:\n${itemNames}\n\n` +
+                                        `Would you like to checkout these items one at a time?\n\n` +
+                                        `Click OK to proceed, or Cancel to go back.`
                                     );
 
-                                    // Open tabs with longer delays for better UX
-                                    checkoutUrls.forEach((url, index) => {
-                                        setTimeout(() => {
-                                            console.log(
-                                                `📦 Opening checkout ${index + 1}/${checkoutUrls.length}:`,
-                                                url,
-                                            );
-                                            window.open(url, '_blank');
-                                            
-                                            // Show progress for multiple items
-                                            if (index < checkoutUrls.length - 1) {
-                                                setTimeout(() => {
-                                                    alert(`Opened checkout ${index + 1} of ${checkoutUrls.length}.\n\nOpening next item...`);
-                                                }, 300);
-                                            }
-                                        }, index * 2000); // 2 second delay between each
-                                    });
+                                    if (confirmed) {
+                                        const checkoutUrls = getAllCheckoutUrls();
+                                        console.log(`📦 Opening ${checkoutUrls.length} tabs...`);
+
+                                        checkoutUrls.forEach((url, index) => {
+                                            setTimeout(() => {
+                                                console.log(`📦 Opening ${index + 1}/${checkoutUrls.length}:`, url);
+                                                window.open(url, '_blank');
+                                            }, index * 2000);
+                                        });
+                                    }
                                 }
                             }
 
@@ -404,8 +395,8 @@ import CartSummary from "./CartSummary.astro";
                                 checkoutButton.classList.remove("opacity-70");
                             }, 1000);
                         }, 300);
-                    });
-                }
+                     });
+                 }
 
                 // Continue shopping button
                 const continueButton = document.getElementById(

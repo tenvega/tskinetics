@@ -359,8 +359,76 @@ export function getCartItem(shortCode: string): CartItem | undefined {
  */
 export function getAllCheckoutUrls(): string[] {
     const cart = getStoredCart();
-    return cart.items.map(item =>
+    return cart.items.map(item => 
         `https://gumroad.com/checkout?product=${encodeURIComponent(item.shortCode)}&quantity=${item.quantity}`
     );
+}
+
+/**
+ * Open Gumroad Overlay checkout with all cart items
+ * Uses Gumroad's overlay.js to add multiple products to a single checkout
+ */
+export function openGumroadOverlayCheckout(): boolean {
+    const cart = getStoredCart();
+    
+    if (cart.items.length === 0) {
+        console.error('❌ Cart is empty');
+        return false;
+    }
+
+    // Check if Gumroad overlay is available
+    if (typeof window === 'undefined' || !(window as any).GumroadOverlay) {
+        console.error('❌ Gumroad Overlay not loaded');
+        return false;
+    }
+
+    console.log('🎯 Opening Gumroad Overlay with', cart.items.length, 'items');
+
+    try {
+        // For single item, use direct overlay
+        if (cart.items.length === 1) {
+            const item = cart.items[0];
+            console.log('📦 Single item overlay:', item.shortCode);
+            (window as any).GumroadOverlay.open({
+                url: `https://gumroad.com/l/${item.shortCode}`,
+                quantity: item.quantity
+            });
+        } else {
+            // For multiple items, we need to create a comma-separated list
+            // Gumroad Overlay supports: gumroad.com/l/product1,product2,product3
+            const productCodes = cart.items.map(item => item.shortCode).join(',');
+            const overlayUrl = `https://gumroad.com/l/${productCodes}`;
+            
+            console.log('📦 Multiple items overlay URL:', overlayUrl);
+            console.log('📦 Items:', cart.items.map(i => i.title));
+            
+            (window as any).GumroadOverlay.open({
+                url: overlayUrl
+            });
+        }
+
+        // Analytics hook
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('analytics-begin-checkout', {
+                detail: {
+                    itemCount: cart.totalItems,
+                    totalValue: cart.totalPrice / 100,
+                    products: cart.items.map(item => ({
+                        id: item.productId,
+                        name: item.title,
+                        price: item.price / 100,
+                        quantity: item.quantity
+                    })),
+                    timestamp: new Date().toISOString(),
+                    method: 'gumroad_overlay'
+                }
+            }));
+        }
+
+        return true;
+    } catch (error) {
+        console.error('❌ Error opening Gumroad Overlay:', error);
+        return false;
+    }
 }
 
