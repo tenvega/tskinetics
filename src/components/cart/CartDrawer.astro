@@ -176,62 +176,78 @@ import CartSummary from "./CartSummary.astro";
             emptyState.classList.add("hidden");
             summaryContainer.classList.remove("hidden");
 
-            // Render cart items
+            // Render cart items with individual checkout buttons
             itemsList.innerHTML = cart.items
                 .map(
                     (item) => `
                 <div
-                    class="cart-item flex items-center gap-4 p-4 border-b border-gray-700 hover:bg-gray-800/30 transition-colors"
+                    class="cart-item p-4 border-b border-gray-700"
                     data-product-id="${item.productId}"
                     data-short-code="${item.shortCode}"
                 >
-                    <!-- Product Thumbnail -->
-                    <div class="flex-shrink-0 w-16 h-16 bg-gray-800 rounded-lg overflow-hidden">
-                        ${
-                            item.thumbnailUrl
-                                ? `
-                            <img
-                                src="${item.thumbnailUrl}"
-                                alt="${item.title}"
-                                class="w-full h-full object-cover"
-                                loading="lazy"
-                            />
-                        `
-                                : `
-                            <div class="w-full h-full flex items-center justify-center text-gray-600">
-                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
-                                </svg>
+                    <!-- Item Header -->
+                    <div class="flex items-start gap-3 mb-3">
+                        <!-- Product Thumbnail -->
+                        <div class="flex-shrink-0 w-12 h-12 bg-gray-800 rounded-lg overflow-hidden">
+                            ${
+                                item.thumbnailUrl
+                                    ? `
+                                <img
+                                    src="${item.thumbnailUrl}"
+                                    alt="${item.title}"
+                                    class="w-full h-full object-cover"
+                                    loading="lazy"
+                                />
+                            `
+                                    : `
+                                <div class="w-full h-full flex items-center justify-center text-gray-600">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+                                    </svg>
+                                </div>
+                            `
+                            }
+                        </div>
+
+                        <!-- Product Info -->
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-white font-semibold text-sm mb-1">
+                                ${item.title}
+                            </h4>
+                            <div class="flex items-center gap-3 text-xs">
+                                <span class="text-gray-400">Qty: ${item.quantity}</span>
+                                <span class="text-emerald-400 font-bold">${item.formattedPrice}</span>
                             </div>
-                        `
-                        }
+                        </div>
+
+                        <!-- Remove Button -->
+                        <button
+                            class="remove-from-cart flex-shrink-0 p-1.5 text-gray-400 hover:text-red-500 transition-colors rounded hover:bg-gray-700"
+                            data-short-code="${item.shortCode}"
+                            data-product-title="${item.title}"
+                            aria-label="Remove ${item.title}"
+                            data-analytics-event="remove_from_cart"
+                            data-analytics-product-id="${item.productId}"
+                            data-analytics-product-name="${item.title}"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
                     </div>
 
-                    <!-- Product Info -->
-                    <div class="flex-1 min-w-0">
-                        <h4 class="text-white font-semibold text-sm truncate mb-1">
-                            ${item.title}
-                        </h4>
-                        <p class="text-gray-400 text-xs mb-2">
-                            Qty: ${item.quantity}
-                        </p>
-                        <p class="text-emerald-400 font-bold text-sm">
-                            ${item.formattedPrice}
-                        </p>
-                    </div>
-
-                    <!-- Remove Button -->
+                    <!-- Individual Checkout Button -->
                     <button
-                        class="remove-from-cart flex-shrink-0 p-2 text-gray-400 hover:text-red-500 transition-colors rounded-lg hover:bg-gray-700"
+                        class="checkout-item-btn w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold py-2 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2"
                         data-short-code="${item.shortCode}"
+                        data-checkout-url="https://gumroad.com/checkout?product=${encodeURIComponent(item.shortCode)}&quantity=${item.quantity}"
                         data-product-title="${item.title}"
-                        aria-label="Remove ${item.title} from cart"
-                        data-analytics-event="remove_from_cart"
+                        data-analytics-event="checkout_individual_item"
                         data-analytics-product-id="${item.productId}"
-                        data-analytics-product-name="${item.title}"
                     >
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        <span>Checkout This Item</span>
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                         </svg>
                     </button>
                 </div>
@@ -242,30 +258,34 @@ import CartSummary from "./CartSummary.astro";
             // Render cart summary
             summaryContainer.innerHTML = `
                 <div class="cart-summary bg-gray-800/50 p-6 border-t border-gray-700">
-                    <!-- Subtotal -->
-                    <div class="flex justify-between items-center mb-6">
-                        <div>
-                            <p class="text-gray-400 text-sm">Subtotal</p>
-                            <p class="text-gray-500 text-xs">
-                                ${cart.totalItems} ${cart.totalItems === 1 ? "item" : "items"}
-                            </p>
+                    <!-- Collection Summary -->
+                    <div class="mb-4">
+                        <h3 class="text-white text-lg font-bold mb-2">Your Collection</h3>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-400">${cart.totalItems} ${cart.totalItems === 1 ? "item" : "items"}</span>
+                            <span class="text-white font-semibold">Total if purchased: ${cart.formattedTotal}</span>
                         </div>
-                        <p class="text-white text-2xl font-bold">
-                            ${cart.formattedTotal}
-                        </p>
                     </div>
 
-                    <!-- Checkout Button -->
-                    <button
-                        id="checkout-button"
-                        class="w-full bg-gradient-to-r from-emerald-600 to-emerald-800 hover:from-emerald-700 hover:to-emerald-900 text-white font-bold py-4 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg mb-3 flex items-center justify-center space-x-2"
-                        data-analytics-event="checkout_clicked"
-                    >
-                        <span>Checkout</span>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                        </svg>
-                    </button>
+                    <!-- Info Message -->
+                    <div class="bg-gray-700/30 border border-gray-600 rounded-lg p-4 mb-4">
+                        <div class="flex items-start space-x-2 mb-2">
+                            <svg class="w-4 h-4 text-yellow-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                            </svg>
+                            <p class="text-gray-300 text-xs leading-relaxed">
+                                <strong class="text-white">Gumroad processes items individually</strong>
+                            </p>
+                        </div>
+                        <div class="flex items-start space-x-2">
+                            <svg class="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                            </svg>
+                            <p class="text-gray-300 text-xs leading-relaxed">
+                                <strong class="text-emerald-400">Tip:</strong> Checkout items one at a time using the buttons above
+                            </p>
+                        </div>
+                    </div>
 
                     <!-- Continue Shopping Button -->
                     <button
@@ -280,13 +300,13 @@ import CartSummary from "./CartSummary.astro";
                     <div class="mt-6 pt-6 border-t border-gray-700">
                         <div class="flex justify-center items-center space-x-6 text-gray-500 text-xs">
                             <span class="flex items-center">
-                                <svg class="w-3 h-3 mr-1 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                <svg class="w-3 h-3 mr-1 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                                 </svg>
                                 Instant Download
                             </span>
                             <span class="flex items-center">
-                                <svg class="w-3 h-3 mr-1 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                <svg class="w-3 h-3 mr-1 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                                 </svg>
                                 Secure Checkout
@@ -303,10 +323,7 @@ import CartSummary from "./CartSummary.astro";
 
     function attachCartEventListeners() {
         import("../../lib/cart").then(
-            ({
-                removeFromCart,
-                handleMultiProductCheckout,
-            }) => {
+            ({ removeFromCart }) => {
                 // Remove from cart buttons
                 document
                     .querySelectorAll(".remove-from-cart")
@@ -331,31 +348,42 @@ import CartSummary from "./CartSummary.astro";
                         });
                     });
 
-                // Checkout button
-                const checkoutButton =
-                    document.getElementById("checkout-button");
-                if (checkoutButton) {
-                    checkoutButton.addEventListener("click", () => {
-                        checkoutButton.innerHTML =
-                            "<span>Opening checkout...</span>";
-                        checkoutButton.classList.add("opacity-70");
+                // Individual checkout buttons
+                document
+                    .querySelectorAll(".checkout-item-btn")
+                    .forEach((button) => {
+                        button.addEventListener("click", (e) => {
+                            const btn = e.currentTarget as HTMLButtonElement;
+                            const checkoutUrl = btn.getAttribute("data-checkout-url");
+                            const productTitle = btn.getAttribute("data-product-title");
 
-                        setTimeout(() => {
-                            handleMultiProductCheckout();
+                            if (!checkoutUrl) return;
 
-                            // Reset button
+                            // Visual feedback
+                            const originalContent = btn.innerHTML;
+                            btn.disabled = true;
+                            btn.innerHTML = "<span>Opening...</span>";
+
+                            // Open Gumroad checkout in new tab
                             setTimeout(() => {
-                                checkoutButton.innerHTML = `
-                                <span>Checkout</span>
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                                </svg>
-                            `;
-                                checkoutButton.classList.remove("opacity-70");
-                            }, 1000);
-                        }, 300);
+                                window.open(checkoutUrl, "_blank");
+
+                                // Analytics hook
+                                window.dispatchEvent(new CustomEvent('analytics-checkout-item', {
+                                    detail: {
+                                        productTitle,
+                                        timestamp: new Date().toISOString()
+                                    }
+                                }));
+
+                                // Reset button
+                                setTimeout(() => {
+                                    btn.innerHTML = originalContent;
+                                    btn.disabled = false;
+                                }, 1000);
+                            }, 300);
+                        });
                     });
-                }
 
                 // Continue shopping button
                 const continueButton = document.getElementById(
