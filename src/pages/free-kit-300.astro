@@ -69,13 +69,13 @@ function formatDuration(filename: string): string {
 	<section
 		id="main-content"
 		class="py-20 text-white relative z-10 min-h-screen"
-		style="background: linear-gradient(120deg, #2d1a4a 0%, #1a1a1a 100%);"
+		style="background: linear-gradient(120deg, #1a2332 0%, #151515 100%);"
 	>
 		<div class="max-w-6xl mx-auto px-4">
 			<!-- Header Section -->
 			<div class="text-center mb-12">
 				<p
-					class="text-purple-400 text-lg font-medium mb-4 tracking-wider"
+					class="text-blue-400 text-lg font-medium mb-4 tracking-wider"
 				>
 					EXPERIENCE OUR SIGNATURE SOUND
 				</p>
@@ -87,7 +87,7 @@ function formatDuration(filename: string): string {
 							? freeProduct.title.toUpperCase()
 							: "TSK INTRO KIT"
 					}
-					<span class="text-purple-400">300+</span>
+					<span class="text-blue-400">300+</span>
 				</h1>
 				<p
 					class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed"
@@ -111,16 +111,16 @@ function formatDuration(filename: string): string {
 								freeProduct?.cover_url ||
 								"/images/threehundred_free.jpg"}
 							alt="TSK Intro Kit 300+ - Free Sound Pack"
-							class="w-full max-w-lg mx-auto rounded-2xl shadow-2xl border border-purple-500/20"
+							class="w-full max-w-lg mx-auto rounded-2xl shadow-2xl border border-blue-500/20"
 						/>
 						<!-- Floating Stats -->
 						<div
-							class="absolute -top-4 -right-4 bg-purple-600 text-white px-4 py-2 rounded-full font-bold shadow-lg"
+							class="absolute -top-4 -right-4 bg-blue-600 text-white px-4 py-2 rounded-full font-bold shadow-lg"
 						>
 							FREE
 						</div>
 						<div
-							class="absolute -bottom-4 -left-4 bg-gray-800/90 backdrop-blur-sm text-purple-400 px-4 py-2 rounded-full font-bold shadow-lg border border-purple-500/30"
+							class="absolute -bottom-4 -left-4 bg-gray-800/90 backdrop-blur-sm text-blue-400 px-4 py-2 rounded-full font-bold shadow-lg border border-blue-500/30"
 						>
 							300+ Sounds
 						</div>
@@ -142,7 +142,7 @@ function formatDuration(filename: string): string {
 						>
 							<div class="text-center">
 								<div
-									class="text-2xl font-bold text-purple-400 mb-1"
+									class="text-2xl font-bold text-blue-400 mb-1"
 								>
 									300+
 								</div>
@@ -151,7 +151,7 @@ function formatDuration(filename: string): string {
 							<div class="w-px h-12 bg-gray-600"></div>
 							<div class="text-center">
 								<div
-									class="text-2xl font-bold text-purple-400 mb-1"
+									class="text-2xl font-bold text-blue-400 mb-1"
 								>
 									FREE
 								</div>
@@ -432,10 +432,10 @@ function formatDuration(filename: string): string {
 				currentTrackIndex = index;
 				currentPlayingRow = audioFile.row;
 				sampleRows.forEach((row) =>
-					(row as HTMLElement).classList.remove("bg-purple-900/30"),
+					(row as HTMLElement).classList.remove("bg-gray-900/30"),
 				);
 				resetAllPlayButtons();
-				audioFile.row.classList.add("bg-purple-900/30");
+				audioFile.row.classList.add("bg-gray-900/30");
 				const playBtn = audioFile.row.querySelector(".play-btn");
 				if (playBtn) updatePlayButton(playBtn, true);
 				updatePlayAllButton(true);
@@ -447,7 +447,7 @@ function formatDuration(filename: string): string {
 					})
 					.catch((error) => {
 						resetAllPlayButtons();
-						currentPlayingRow?.classList.remove("bg-purple-900/30");
+						currentPlayingRow?.classList.remove("bg-gray-900/30");
 					});
 			}
 
@@ -543,11 +543,11 @@ function formatDuration(filename: string): string {
 			display: none;
 		}
 
-		.sample-row.bg-purple-900\/30 .play-btn {
+		.sample-row.bg-gray-900\/30 .play-btn {
 			display: flex;
 		}
 
-		.sample-row.bg-purple-900\/30 .track-number {
+		.sample-row.bg-gray-900\/30 .track-number {
 			display: none;
 		}
 	</style>
