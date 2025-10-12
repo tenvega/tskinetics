@@ -41,12 +41,12 @@ const extractedProductId = extractProductId(productUrl);
 // Button styling based on variant
 const variantClasses =
     variant === "primary"
-        ? "bg-gradient-to-r from-emerald-600 to-emerald-800 hover:from-emerald-700 hover:to-emerald-900"
+        ? "bg-white hover:bg-gray-100 text-black"
         : "bg-gray-800 hover:bg-gray-700 border border-gray-600";
 ---
 
 <button
-    class={`add-to-cart-btn ${variantClasses} text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 text-center w-full flex items-center justify-center space-x-2 transform hover:scale-105`}
+    class={`add-to-cart-btn ${variantClasses} px-8 py-3 rounded-lg font-semibold transition-all duration-300 text-center w-full flex items-center justify-center space-x-2 transform hover:scale-105`}
     data-product-id={productId}
     data-product-title={productTitle}
     data-price={price}
@@ -158,9 +158,9 @@ const variantClasses =
         // Create toast element
         const toast = document.createElement("div");
         toast.className =
-            "bg-gray-800 border border-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-3 transform translate-x-full transition-transform duration-300";
+            "bg-gray-800 border border-white text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-3 transform translate-x-full transition-transform duration-300";
         toast.innerHTML = `
-            <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-white flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
             <span class="text-sm font-medium">${message}</span>
