@@ -286,56 +286,24 @@ export function clearCart(): void {
 
 /**
  * Build Gumroad checkout URL with all cart items
- * NOTE: Gumroad's URL format doesn't support multiple different products
- * We'll open multiple checkout tabs as a workaround
+ * NOTE: Gumroad's API doesn't support multiple different products in one checkout
+ * We'll open separate tabs for each product
  */
 export function buildCheckoutUrl(): string {
     const cart = getStoredCart();
 
-    console.log('🛒 Building checkout URL...');
-    console.log('📦 Cart items:', cart.items.length);
-    console.log('📝 Cart contents:', cart.items.map(item => ({
-        title: item.title,
-        shortCode: item.shortCode,
-        quantity: item.quantity
-    })));
-
     if (cart.items.length === 0) {
-        console.error('❌ Cart is empty!');
         return '';
     }
 
     // For a single item, return direct checkout URL
     if (cart.items.length === 1) {
         const item = cart.items[0];
-        const checkoutUrl = `https://gumroad.com/checkout?product=${encodeURIComponent(item.shortCode)}&quantity=${item.quantity}`;
-        console.log('✅ Single item checkout URL:', checkoutUrl);
-        return checkoutUrl;
+        return `https://gumroad.com/checkout?product=${encodeURIComponent(item.shortCode)}&quantity=${item.quantity}`;
     }
 
-    // For multiple items, we'll return a special marker that tells the UI
-    // to open multiple tabs (handled in the calling code)
-    console.log('⚠️ Multiple items detected - will open multiple checkout tabs');
+    // For multiple items, return marker for special handling
     return 'MULTIPLE_ITEMS';
-
-    // Analytics hook - checkout initiated
-    if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('analytics-begin-checkout', {
-            detail: {
-                itemCount: cart.totalItems,
-                totalValue: cart.totalPrice / 100,
-                products: cart.items.map(item => ({
-                    id: item.productId,
-                    name: item.title,
-                    price: item.price / 100,
-                    quantity: item.quantity
-                })),
-                timestamp: new Date().toISOString()
-            }
-        }));
-    }
-
-    return checkoutUrl;
 }
 
 /**
@@ -359,76 +327,75 @@ export function getCartItem(shortCode: string): CartItem | undefined {
  */
 export function getAllCheckoutUrls(): string[] {
     const cart = getStoredCart();
-    return cart.items.map(item => 
+    return cart.items.map(item =>
         `https://gumroad.com/checkout?product=${encodeURIComponent(item.shortCode)}&quantity=${item.quantity}`
     );
 }
 
 /**
- * Open Gumroad Overlay checkout with all cart items
- * Uses Gumroad's overlay.js to add multiple products to a single checkout
+ * Handle multi-product checkout with better UX
+ * Opens tabs sequentially with user confirmation
  */
-export function openGumroadOverlayCheckout(): boolean {
+export function handleMultiProductCheckout(): void {
     const cart = getStoredCart();
-    
+
     if (cart.items.length === 0) {
-        console.error('❌ Cart is empty');
-        return false;
+        return;
     }
 
-    // Check if Gumroad overlay is available
-    if (typeof window === 'undefined' || !(window as any).GumroadOverlay) {
-        console.error('❌ Gumroad Overlay not loaded');
-        return false;
+    // Single item - direct checkout in new tab
+    if (cart.items.length === 1) {
+        const url = buildCheckoutUrl();
+        window.open(url, '_blank');
+        
+        // Analytics hook
+        dispatchCheckoutAnalytics('single_item');
+        return;
     }
 
-    console.log('🎯 Opening Gumroad Overlay with', cart.items.length, 'items');
+    // Multiple items - show user-friendly message
+    const itemList = cart.items.map((item, i) => `${i + 1}. ${item.title}`).join('\n');
+    const message = 
+        `Your cart contains ${cart.items.length} items:\n\n${itemList}\n\n` +
+        `Due to Gumroad's checkout system, each item will open in a separate tab.\n\n` +
+        `TIP: After checkout, you can close all tabs except the last one.\n\n` +
+        `Click OK to proceed to checkout.`;
 
-    try {
-        // For single item, use direct overlay
-        if (cart.items.length === 1) {
-            const item = cart.items[0];
-            console.log('📦 Single item overlay:', item.shortCode);
-            (window as any).GumroadOverlay.open({
-                url: `https://gumroad.com/l/${item.shortCode}`,
-                quantity: item.quantity
-            });
-        } else {
-            // For multiple items, we need to create a comma-separated list
-            // Gumroad Overlay supports: gumroad.com/l/product1,product2,product3
-            const productCodes = cart.items.map(item => item.shortCode).join(',');
-            const overlayUrl = `https://gumroad.com/l/${productCodes}`;
-            
-            console.log('📦 Multiple items overlay URL:', overlayUrl);
-            console.log('📦 Items:', cart.items.map(i => i.title));
-            
-            (window as any).GumroadOverlay.open({
-                url: overlayUrl
-            });
-        }
+    if (confirm(message)) {
+        const checkoutUrls = getAllCheckoutUrls();
+        
+        // Open tabs with a staggered delay to avoid popup blockers
+        checkoutUrls.forEach((url, index) => {
+            setTimeout(() => {
+                window.open(url, '_blank');
+            }, index * 500); // 500ms between each tab
+        });
 
         // Analytics hook
-        if (typeof window !== 'undefined') {
-            window.dispatchEvent(new CustomEvent('analytics-begin-checkout', {
-                detail: {
-                    itemCount: cart.totalItems,
-                    totalValue: cart.totalPrice / 100,
-                    products: cart.items.map(item => ({
-                        id: item.productId,
-                        name: item.title,
-                        price: item.price / 100,
-                        quantity: item.quantity
-                    })),
-                    timestamp: new Date().toISOString(),
-                    method: 'gumroad_overlay'
-                }
-            }));
-        }
-
-        return true;
-    } catch (error) {
-        console.error('❌ Error opening Gumroad Overlay:', error);
-        return false;
+        dispatchCheckoutAnalytics('multi_item');
     }
+}
+
+/**
+ * Dispatch checkout analytics event
+ */
+function dispatchCheckoutAnalytics(method: string): void {
+    if (typeof window === 'undefined') return;
+
+    const cart = getStoredCart();
+    window.dispatchEvent(new CustomEvent('analytics-begin-checkout', {
+        detail: {
+            itemCount: cart.totalItems,
+            totalValue: cart.totalPrice / 100,
+            products: cart.items.map(item => ({
+                id: item.productId,
+                name: item.title,
+                price: item.price / 100,
+                quantity: item.quantity
+            })),
+            timestamp: new Date().toISOString(),
+            method
+        }
+    }));
 }
 
