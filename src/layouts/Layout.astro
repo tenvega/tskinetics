@@ -24,22 +24,32 @@ const latestProduct = products.length > 0 ? products[0] : null;
 // Get current page path for active navigation state
 const currentPath = Astro.url.pathname;
 
-// Log for debugging
-console.log('Current path:', currentPath);
-
 // Function to check if current page matches the link
 const isActivePage = (page: string) => {
-    if (currentPath === "/" && page === "home") return true;
-    if (currentPath === "/popular" && page === "popular") return true;
-    if (currentPath === "/new-releases" && page === "new-releases") return true;
-    if (currentPath === "/products" && page === "products") return true;
-    if (currentPath?.startsWith("/products/") && page === "products") return true;
-    if (currentPath === "/blog" && page === "blog") return true;
-    if (currentPath?.startsWith("/blog/") && page === "blog") return true;
-    if (currentPath?.startsWith("/categories/") && page === "products") return true;
-    if (currentPath === "/free-kit-300" && page === "free-kit") return true;
-    if (currentPath === "/contact" && page === "contact") return true;
-    return false;
+    const isActive = 
+        (currentPath === "/" && page === "home") ||
+        (currentPath === "/popular" && page === "popular") ||
+        (currentPath === "/popular/" && page === "popular") ||
+        (currentPath === "/new-releases" && page === "new-releases") ||
+        (currentPath === "/new-releases/" && page === "new-releases") ||
+        (currentPath === "/products" && page === "products") ||
+        (currentPath === "/products/" && page === "products") ||
+        (currentPath?.startsWith("/products/") && page === "products") ||
+        (currentPath === "/blog" && page === "blog") ||
+        (currentPath === "/blog/" && page === "blog") ||
+        (currentPath?.startsWith("/blog/") && page === "blog") ||
+        (currentPath?.startsWith("/categories/") && page === "products") ||
+        (currentPath === "/free-kit-300" && page === "free-kit") ||
+        (currentPath === "/free-kit-300/" && page === "free-kit") ||
+        (currentPath === "/contact" && page === "contact") ||
+        (currentPath === "/contact/" && page === "contact");
+    
+    // Debug log
+    if (isActive) {
+        console.log(`✓ Active: ${page} (path: ${currentPath})`);
+    }
+    
+    return isActive;
 };
 
 // Active link classes
