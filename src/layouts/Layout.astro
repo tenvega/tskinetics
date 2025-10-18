@@ -26,7 +26,7 @@ const currentPath = Astro.url.pathname;
 
 // Function to check if current page matches the link
 const isActivePage = (page: string) => {
-    const isActive = 
+    const isActive =
         (currentPath === "/" && page === "home") ||
         (currentPath === "/popular" && page === "popular") ||
         (currentPath === "/popular/" && page === "popular") ||
@@ -43,12 +43,12 @@ const isActivePage = (page: string) => {
         (currentPath === "/free-kit-300/" && page === "free-kit") ||
         (currentPath === "/contact" && page === "contact") ||
         (currentPath === "/contact/" && page === "contact");
-    
+
     // Debug log
     if (isActive) {
         console.log(`✓ Active: ${page} (path: ${currentPath})`);
     }
-    
+
     return isActive;
 };
 
