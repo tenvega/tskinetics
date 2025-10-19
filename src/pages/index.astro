@@ -10,7 +10,7 @@ let freeProduct: GumroadProduct | null = null;
 let featuredBundles: GumroadProduct[] = [];
 
 try {
-	products = await fetchProducts(20); // Fetch more products to find the free one
+	products = await fetchProducts(50); // Fetch more products to find bundles and free products
 	console.log(
 		`Successfully fetched ${products.length} products for homepage`,
 	);
@@ -34,27 +34,53 @@ try {
 		console.log("No free product found, falling back to static content");
 	}
 	
-	// Specific featured products by ID (FM Percussion and Sonic Entropy)
-	const featuredProductIds = ["99xqpkLEY4yTbHgcsVjwcA==", "zxUyXIn1veXajo6K81SdWA=="];
-	const featuredProducts = products.filter(
-		(product) => featuredProductIds.includes(product.id)
-	);
-
-	// Latest bundles (exclude the featured products to avoid duplicates)
-	const latestBundles = products.filter(
+	// Get all bundles from products
+	const allBundles = products.filter(
 		(product) => {
 			const title = product.title.toLowerCase();
 			const tagsString = Array.isArray(product.tags) 
 				? product.tags.join(' ').toLowerCase() 
 				: String(product.tags || '').toLowerCase();
 			
-			// Only include bundles, but exclude the featured products
 			const isBundle = tagsString.includes("bundle") || title.includes("bundle");
-			const isFeatured = featuredProductIds.includes(product.id);
-			
-			return isBundle && !isFeatured;
+			if (isBundle) {
+				console.log(`Found bundle: ${product.title} (tags: ${tagsString})`);
+			}
+			return isBundle;
 		}
 	);
+	
+	console.log(`Total bundles found: ${allBundles.length}`);
+
+	// Get newest bundle (by creation date)
+	const newestBundle = allBundles
+		.sort((a, b) => {
+			const dateA = new Date(a.created_at || 0);
+			const dateB = new Date(b.created_at || 0);
+			return dateB.getTime() - dateA.getTime();
+		})
+		.slice(0, 1);
+
+	// Get most popular bundle (by sales count)
+	const mostPopularBundle = allBundles
+		.sort((a, b) => (b.sales_count || 0) - (a.sales_count || 0))
+		.slice(0, 1);
+
+	// Combine newest and most popular (avoid duplicates)
+	const featuredProducts = [];
+	if (newestBundle.length > 0) {
+		featuredProducts.push(newestBundle[0]);
+		console.log(`Newest bundle: ${newestBundle[0].title}`);
+	}
+	if (mostPopularBundle.length > 0 && mostPopularBundle[0].id !== newestBundle[0]?.id) {
+		featuredProducts.push(mostPopularBundle[0]);
+		console.log(`Most popular bundle: ${mostPopularBundle[0].title}`);
+	}
+	
+	console.log(`Featured products selected: ${featuredProducts.length}`);
+
+	// Latest bundles (for other sections)
+	const latestBundles = allBundles.slice(0, 4);
 
 	const curatedCollections = {
 		// Use specific featured products
@@ -143,27 +169,43 @@ try {
 }
 
 // Access curated collections outside of try-catch for template use
-// Specific featured products by ID (FM Percussion and Sonic Entropy)
-const featuredProductIds = ["99xqpkLEY4yTbHgcsVjwcA==", "zxUyXIn1veXajo6K81SdWA=="];
-const featuredProductsFallback = products.filter(
-	(product) => featuredProductIds.includes(product.id)
-);
-
-// Latest bundles (exclude the featured products to avoid duplicates)
-const latestBundlesFallback = products.filter(
+// Get all bundles from products (fallback)
+const allBundlesFallback = products.filter(
 	(product) => {
 		const title = product.title.toLowerCase();
 		const tagsString = Array.isArray(product.tags) 
 			? product.tags.join(' ').toLowerCase() 
 			: String(product.tags || '').toLowerCase();
 		
-		// Only include bundles, but exclude the featured products
-		const isBundle = tagsString.includes("bundle") || title.includes("bundle");
-		const isFeatured = featuredProductIds.includes(product.id);
-		
-		return isBundle && !isFeatured;
+		return tagsString.includes("bundle") || title.includes("bundle");
 	}
 );
+
+// Get newest bundle (by creation date) - fallback
+const newestBundleFallback = allBundlesFallback
+	.sort((a, b) => {
+		const dateA = new Date(a.created_at || 0);
+		const dateB = new Date(b.created_at || 0);
+		return dateB.getTime() - dateA.getTime();
+	})
+	.slice(0, 1);
+
+// Get most popular bundle (by sales count) - fallback
+const mostPopularBundleFallback = allBundlesFallback
+	.sort((a, b) => (b.sales_count || 0) - (a.sales_count || 0))
+	.slice(0, 1);
+
+// Combine newest and most popular (avoid duplicates) - fallback
+const featuredProductsFallback = [];
+if (newestBundleFallback.length > 0) {
+	featuredProductsFallback.push(newestBundleFallback[0]);
+}
+if (mostPopularBundleFallback.length > 0 && mostPopularBundleFallback[0].id !== newestBundleFallback[0]?.id) {
+	featuredProductsFallback.push(mostPopularBundleFallback[0]);
+}
+
+// Latest bundles (for other sections) - fallback
+const latestBundlesFallback = allBundlesFallback.slice(0, 4);
 
 const curatedCollections = {
 	// Use specific featured products
