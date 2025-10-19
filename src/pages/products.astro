@@ -13,7 +13,7 @@ let products: GumroadProduct[] = [];
 let error: string | null = null;
 
 try {
-    products = await fetchProducts(12);
+    products = await fetchProducts(100); // Fetch all available products
 } catch (e) {
     error = e instanceof Error ? e.message : "Failed to fetch products";
     console.error("Error fetching products:", e);

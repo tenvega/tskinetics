@@ -678,9 +678,10 @@ export async function getStaticPaths() {
         updatePlayAllButton(false);
       });
 
-      audioPlayer.addEventListener('ended', () => {
-        nextTrack();
-      });
+      // Removed autoplay behavior - tracks now play individually
+      // audioPlayer.addEventListener('ended', () => {
+      //   nextTrack();
+      // });
 
       // Keyboard shortcuts
       document.addEventListener('keydown', (e) => {
