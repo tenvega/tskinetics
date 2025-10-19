@@ -229,8 +229,14 @@ const curatedCollections = {
 // Use specific featured products (FM Percussion and Sonic Entropy)
 featuredBundles = curatedCollections.featured.slice(0, 2);
 
-// Use first 4 products for "New Releases" section
-const newReleases = products.slice(0, 4);
+// Use newest 4 products for "New Releases" section (sorted by creation date)
+const newReleases = products
+  .sort((a, b) => {
+    const dateA = new Date(a.created_at || 0);
+    const dateB = new Date(b.created_at || 0);
+    return dateB.getTime() - dateA.getTime();
+  })
+  .slice(0, 4);
 
 // Get the latest product for the hero section (first product in the list)
 const latestProduct = products.length > 0 ? products[0] : null;

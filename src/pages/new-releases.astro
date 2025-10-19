@@ -11,32 +11,15 @@ try {
   console.log("Fetching new releases...");
   const allProducts = await fetchProducts(50);
 
-  // Define the specific order as per requirements
-  const newReleasesOrder = [
-    "FM Percussion",
-    "Sonic Entropy",
-    "TSK + /0A0A/ INTRO KIT",
-    "FM Vapor Drums-Green",
-    "FM Vapor Drums-Red",
-  ];
+  // Sort products by creation date (newest first) to show actual new releases
+  products = allProducts
+    .sort((a, b) => {
+      const dateA = new Date(a.created_at || 0);
+      const dateB = new Date(b.created_at || 0);
+      return dateB.getTime() - dateA.getTime();
+    })
+    .slice(0, 8); // Show the 8 most recent products
 
-  // Sort products according to the specified order
-  const sortedProducts = [];
-  for (const targetName of newReleasesOrder) {
-    const product = allProducts.find((p) => {
-      const title = p.title || p.name || "";
-      const name = p.name || p.title || "";
-      return (
-        title.toLowerCase().includes(targetName.toLowerCase()) ||
-        name.toLowerCase().includes(targetName.toLowerCase())
-      );
-    });
-    if (product) {
-      sortedProducts.push(product);
-    }
-  }
-
-  products = sortedProducts;
   console.log(`Successfully fetched ${products.length} new releases`);
 } catch (e) {
   error = e instanceof Error ? e.message : "Failed to fetch new releases";
