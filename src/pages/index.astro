@@ -262,7 +262,8 @@ const latestProduct = products.length > 0 ? products[0] : null;
 				>
 					<!-- New Release Label -->
 					<h2
-						class="text-white text-lg md:text-xl font-normal uppercase tracking-wide leading-tight"
+						class="text-white text-lg md:text-xl font-normal uppercase tracking-wide leading-tight drop-shadow-lg"
+						style="text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);"
 					>
 						new Release
 					</h2>
@@ -270,13 +271,15 @@ const latestProduct = products.length > 0 ? products[0] : null;
 					<!-- Main Title -->
 					{latestProduct ? (
 						<h1
-							class="text-white text-4xl md:text-5xl lg:text-6xl font-normal leading-tight"
+							class="text-white text-4xl md:text-5xl lg:text-6xl font-normal leading-tight drop-shadow-2xl"
+							style="text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.9);"
 						>
 							<strong>{latestProduct.title.toUpperCase()}</strong>
 						</h1>
 					) : (
 						<h1
-							class="text-white text-4xl md:text-5xl lg:text-6xl font-normal leading-tight"
+							class="text-white text-4xl md:text-5xl lg:text-6xl font-normal leading-tight drop-shadow-2xl"
+							style="text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.9);"
 						>
 							<strong>COMING SOON</strong>
 						</h1>
@@ -286,12 +289,14 @@ const latestProduct = products.length > 0 ? products[0] : null;
 					<div class="py-2">
 						{latestProduct ? (
 							<p
-								class="text-[#DDDDDD] text-sm md:text-base leading-relaxed max-w-full"
+								class="text-[#DDDDDD] text-sm md:text-base leading-relaxed max-w-full drop-shadow-lg"
+								style="text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);"
 								set:html={latestProduct.description ? latestProduct.description.replace(/<[^>]*>/g, '') : 'Discover our latest premium sound collection with professionally crafted samples and loops.'}
 							/>
 						) : (
 							<p
-								class="text-[#DDDDDD] text-sm md:text-base leading-relaxed max-w-full"
+								class="text-[#DDDDDD] text-sm md:text-base leading-relaxed max-w-full drop-shadow-lg"
+								style="text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);"
 							>
 								Stay tuned for our upcoming releases. We're constantly creating new premium sound collections for producers, composers, and sound designers.
 							</p>
@@ -303,14 +308,16 @@ const latestProduct = products.length > 0 ? products[0] : null;
 						{latestProduct ? (
 							<a
 								href={getProductUrlSync(latestProduct.id, latestProduct.title)}
-								class="inline-flex items-center justify-center px-6 py-2 bg-[#151515] border border-[#f3f3f3] text-[#f3f3f3] text-base md:text-lg font-bold leading-relaxed rounded-lg hover:bg-white hover:text-black transition-colors duration-300"
+								class="inline-flex items-center justify-center px-6 py-2 bg-[#151515] border border-[#f3f3f3] text-[#f3f3f3] text-base md:text-lg font-bold leading-relaxed rounded-lg hover:bg-white hover:text-black transition-colors duration-300 shadow-2xl"
+								style="box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);"
 							>
 								LEARN MORE
 							</a>
 						) : (
 							<a
 								href="/products"
-								class="inline-flex items-center justify-center px-6 py-2 bg-[#151515] border border-[#f3f3f3] text-[#f3f3f3] text-base md:text-lg font-bold leading-relaxed rounded-lg hover:bg-white hover:text-black transition-colors duration-300"
+								class="inline-flex items-center justify-center px-6 py-2 bg-[#151515] border border-[#f3f3f3] text-[#f3f3f3] text-base md:text-lg font-bold leading-relaxed rounded-lg hover:bg-white hover:text-black transition-colors duration-300 shadow-2xl"
+								style="box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);"
 							>
 								VIEW PRODUCTS
 							</a>
@@ -324,7 +331,8 @@ const latestProduct = products.length > 0 ? products[0] : null;
 						{latestProduct ? (
 							<a
 								href={getProductUrlSync(latestProduct.id, latestProduct.title)}
-								class="block rounded-lg overflow-hidden"
+								class="block rounded-lg overflow-hidden shadow-2xl"
+								style="box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);"
 							>
 								<img
 									src={latestProduct.thumbnail_url || latestProduct.cover_url || "/api/placeholder/400/400"}
@@ -334,10 +342,10 @@ const latestProduct = products.length > 0 ? products[0] : null;
 								/>
 							</a>
 						) : (
-							<div class="block rounded-lg overflow-hidden bg-gray-800 aspect-square flex items-center justify-center">
+							<div class="block rounded-lg overflow-hidden bg-gray-800 aspect-square flex items-center justify-center shadow-2xl" style="box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);">
 								<div class="text-center">
-									<div class="text-white text-2xl font-bold mb-2">TSK</div>
-									<div class="text-gray-400 text-sm">Coming Soon</div>
+									<div class="text-white text-2xl font-bold mb-2 drop-shadow-lg" style="text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);">TSK</div>
+									<div class="text-gray-400 text-sm drop-shadow-lg" style="text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);">Coming Soon</div>
 								</div>
 							</div>
 						)}
