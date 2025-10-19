@@ -4,6 +4,7 @@ node_modules/
 dist/
 .astro/
 .vscode/
+.claude/
 
 # macOS
 .DS_Store
